@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YSA STEM Summit 2026 — QR Codes</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=Playfair+Display:ital,wght@1,700&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f0f0ea;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .page {
+      background: #ffffff;
+      width: 794px;
+      min-height: 1123px;
+      padding: 56px 60px 48px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.12);
+    }
+
+    /* ── Header ── */
+    .header {
+      text-align: center;
+      border-bottom: 2px solid #0a0f0d;
+      padding-bottom: 28px;
+      width: 100%;
+      margin-bottom: 28px;
+    }
+
+    .org-name {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #3cbbb1;
+      margin-bottom: 8px;
+    }
+
+    .summit-title {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 38px;
+      font-weight: 700;
+      color: #0a0f0d;
+      line-height: 1.1;
+      margin-bottom: 10px;
+    }
+
+    .summit-title span {
+      color: #3cbbb1;
+    }
+
+    .summit-meta {
+      font-size: 14px;
+      font-weight: 500;
+      color: #444;
+      letter-spacing: 0.04em;
+    }
+
+    /* ── Subtitle ── */
+    .subtitle {
+      font-size: 15px;
+      font-weight: 400;
+      color: #555;
+      text-align: center;
+      margin-bottom: 36px;
+      letter-spacing: 0.02em;
+    }
+
+    /* ── QR Grid ── */
+    .qr-grid-top {
+      display: flex;
+      justify-content: center;
+      gap: 28px;
+      margin-bottom: 28px;
+      width: 100%;
+    }
+
+    .qr-grid-bottom {
+      display: flex;
+      justify-content: center;
+      gap: 28px;
+      margin-bottom: 0;
+      width: 100%;
+    }
+
+    .qr-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      background: #f9f9f7;
+      border: 1.5px solid #e0e0dc;
+      border-radius: 12px;
+      padding: 20px 18px 16px;
+      width: 196px;
+    }
+
+    .qr-card img {
+      width: 160px;
+      height: 160px;
+      display: block;
+      border-radius: 4px;
+    }
+
+    .qr-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0a0f0d;
+      text-align: center;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .qr-url {
+      font-size: 10px;
+      font-weight: 400;
+      color: #888;
+      text-align: center;
+      word-break: break-all;
+      line-height: 1.4;
+    }
+
+    /* ── Accent bar ── */
+    .accent-bar {
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, #3cbbb1 0%, #bbbdf6 50%, #ee4266 100%);
+      border-radius: 2px;
+      margin: 36px 0 0;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      width: 100%;
+      padding-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-url {
+      font-size: 13px;
+      font-weight: 700;
+      color: #3cbbb1;
+      letter-spacing: 0.04em;
+    }
+
+    .footer-location {
+      font-size: 12px;
+      font-weight: 400;
+      color: #666;
+      text-align: right;
+    }
+
+    /* ── Print ── */
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+
+      .page {
+        box-shadow: none;
+        width: 100%;
+        min-height: auto;
+        padding: 36px 40px 32px;
+      }
+
+      .qr-card {
+        break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <header class="header">
+      <p class="org-name">Young Scientist Academy</p>
+      <h1 class="summit-title">YSA <span>STEM Summit</span> 2026</h1>
+      <p class="summit-meta">July 11–15, 2026 &nbsp;·&nbsp; Lozova &amp; Codrii Nature Reserve, Moldova</p>
+    </header>
+
+    <p class="subtitle">Scan to explore the summit</p>
+
+    <!-- Top row: 3 cards -->
+    <div class="qr-grid-top">
+      <div class="qr-card">
+        <img src="qr_summit_hub.png" alt="Summit Hub QR Code">
+        <div class="qr-label">Summit Hub</div>
+        <div class="qr-url">ysalive.netlify.app</div>
+      </div>
+      <div class="qr-card">
+        <img src="qr_rsvp.png" alt="RSVP QR Code">
+        <div class="qr-label">RSVP / Register</div>
+        <div class="qr-url">ysalive.netlify.app/rsvp.html</div>
+      </div>
+      <div class="qr-card">
+        <img src="qr_agenda.png" alt="Full Agenda QR Code">
+        <div class="qr-label">Full Agenda</div>
+        <div class="qr-url">ysalive.netlify.app/agenda.html</div>
+      </div>
+    </div>
+
+    <!-- Bottom row: 2 cards centered -->
+    <div class="qr-grid-bottom">
+      <div class="qr-card">
+        <img src="qr_workshop.png" alt="Saturday Workshop QR Code">
+        <div class="qr-label">Saturday Workshop</div>
+        <div class="qr-url">ysalive.netlify.app/saturday&#8209;workshop.html</div>
+      </div>
+      <div class="qr-card">
+        <img src="qr_balloon.png" alt="Weather Balloon QR Code">
+        <div class="qr-label">Weather Balloon</div>
+        <div class="qr-url">ysalive.netlify.app/balloon.html</div>
+      </div>
+    </div>
+
+    <div class="accent-bar"></div>
+
+    <footer class="footer">
+      <span class="footer-url">ysalive.netlify.app</span>
+      <span class="footer-location">Lozova &amp; Codrii Nature Reserve &nbsp;·&nbsp; Moldova 🇲🇩</span>
+    </footer>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#0d4a5e"/>
+      <stop offset="100%" stop-color="#061a22"/>
+    </radialGradient>
+    <radialGradient id="dropGrad" cx="40%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#5ee8dc"/>
+      <stop offset="100%" stop-color="#1a9e94"/>
+    </radialGradient>
+    <radialGradient id="earthGrad" cx="40%" cy="35%" r="60%">
+      <stop offset="0%" stop-color="#2a7a4a"/>
+      <stop offset="100%" stop-color="#143a24"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="500" height="500" fill="url(#bgGrad)" rx="36"/>
+
+  <!-- Glow -->
+  <circle cx="250" cy="210" r="130" fill="rgba(60,187,177,0.07)"/>
+
+  <!-- Water drop shape -->
+  <path d="M250 90 C250 90 160 185 160 245 C160 295 200 335 250 335 C300 335 340 295 340 245 C340 185 250 90 250 90 Z"
+        fill="url(#dropGrad)" opacity="0.95"/>
+
+  <!-- Earth circle inside drop -->
+  <clipPath id="dropClip">
+    <path d="M250 90 C250 90 160 185 160 245 C160 295 200 335 250 335 C300 335 340 295 340 245 C340 185 250 90 250 90 Z"/>
+  </clipPath>
+  <circle cx="250" cy="255" r="65" fill="url(#earthGrad)" clip-path="url(#dropClip)"/>
+  <!-- Land masses -->
+  <ellipse cx="238" cy="245" rx="28" ry="18" fill="#3cbbb1" opacity="0.4" clip-path="url(#dropClip)"/>
+  <ellipse cx="268" cy="262" rx="18" ry="12" fill="#3cbbb1" opacity="0.35" clip-path="url(#dropClip)"/>
+
+  <!-- Water shimmer lines inside drop -->
+  <path d="M195 235 Q220 228 245 235 Q268 242 290 235" stroke="rgba(255,255,255,0.25)" stroke-width="3" fill="none" stroke-linecap="round" clip-path="url(#dropClip)"/>
+  <path d="M200 252 Q225 245 250 252 Q275 259 300 252" stroke="rgba(255,255,255,0.18)" stroke-width="2.5" fill="none" stroke-linecap="round" clip-path="url(#dropClip)"/>
+
+  <!-- Highlight on drop -->
+  <ellipse cx="220" cy="165" rx="18" ry="28" fill="rgba(255,255,255,0.18)" transform="rotate(-20,220,165)"/>
+
+  <!-- Small bubbles -->
+  <circle cx="168" cy="220" r="7" fill="rgba(94,232,220,0.3)" stroke="rgba(94,232,220,0.5)" stroke-width="1.5"/>
+  <circle cx="155" cy="255" r="4.5" fill="rgba(94,232,220,0.25)" stroke="rgba(94,232,220,0.4)" stroke-width="1"/>
+  <circle cx="332" cy="230" r="5.5" fill="rgba(94,232,220,0.25)" stroke="rgba(94,232,220,0.4)" stroke-width="1"/>
+
+  <!-- HYDROTERRA text -->
+  <text x="250" y="390" text-anchor="middle"
+        font-family="Arial Black, Impact, sans-serif"
+        font-weight="900" font-size="48" letter-spacing="2"
+        fill="white">HYDROTERRA</text>
+
+  <!-- Divider -->
+  <rect x="145" y="400" width="210" height="3" rx="2" fill="rgba(60,187,177,0.5)"/>
+
+  <!-- Tagline -->
+  <text x="250" y="425" text-anchor="middle"
+        font-family="Arial, sans-serif" font-weight="600"
+        font-size="16" letter-spacing="5"
+        fill="rgba(94,232,220,0.7)">WATER QUALITY</text>
+</svg>

@@ -1,0 +1,251 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  <defs>
+
+    <!-- Background radial gradient -->
+    <radialGradient id="bgGrad" cx="50%" cy="45%" r="60%">
+      <stop offset="0%"   stop-color="#0d2020"/>
+      <stop offset="100%" stop-color="#0a0f0d"/>
+    </radialGradient>
+
+    <!-- Bell outer radial gradient: teal at center, fades out -->
+    <radialGradient id="bellGrad" cx="50%" cy="38%" r="55%" gradientUnits="userSpaceOnUse"
+                    fx="250" fy="155">
+      <stop offset="0%"   stop-color="#5de8de" stop-opacity="0.65"/>
+      <stop offset="45%"  stop-color="#3cbbb1" stop-opacity="0.45"/>
+      <stop offset="80%"  stop-color="#2a8a82" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#0d2020" stop-opacity="0.0"/>
+    </radialGradient>
+
+    <!-- Inner bell highlight: bright white-teal at apex -->
+    <radialGradient id="apexGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"  stop-color="#e0fffc" stop-opacity="0.75"/>
+      <stop offset="40%" stop-color="#7eeee8" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#3cbbb1" stop-opacity="0.0"/>
+    </radialGradient>
+
+    <!-- Ambient glow behind bell -->
+    <radialGradient id="ambientGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"  stop-color="#3cbbb1" stop-opacity="0.28"/>
+      <stop offset="70%" stop-color="#3cbbb1" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#3cbbb1" stop-opacity="0.0"/>
+    </radialGradient>
+
+    <!-- Oral arm gradient -->
+    <linearGradient id="armGrad1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#3cbbb1" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#bbbdf6" stop-opacity="0.2"/>
+    </linearGradient>
+    <linearGradient id="armGrad2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#bbbdf6" stop-opacity="0.65"/>
+      <stop offset="100%" stop-color="#3cbbb1" stop-opacity="0.15"/>
+    </linearGradient>
+
+    <!-- Glow filter for bell and highlights -->
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+
+    <!-- Soft glow filter for tentacles -->
+    <filter id="softGlow" x="-40%" y="-10%" width="180%" height="120%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+
+    <!-- Strong apex glow filter -->
+    <filter id="apexFilter" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+
+    <!-- Clip for circular logo -->
+    <clipPath id="circleClip">
+      <circle cx="250" cy="250" r="245"/>
+    </clipPath>
+
+  </defs>
+
+  <!-- ── Background ── -->
+  <circle cx="250" cy="250" r="250" fill="url(#bgGrad)"/>
+
+  <g clip-path="url(#circleClip)">
+
+    <!-- ── Ambient glow behind jellyfish ── -->
+    <ellipse cx="250" cy="215" rx="175" ry="145" fill="url(#ambientGlow)" filter="url(#glow)"/>
+
+    <!-- ══════════════════════════════════════
+         TENTACLES — flowing down from bell rim
+         12 tentacles, alternating teal/lavender
+         ══════════════════════════════════════ -->
+
+    <!-- Tentacle group, drawn before bell so bell overlaps tops -->
+    <g filter="url(#softGlow)" opacity="0.85">
+
+      <!-- T1 — far left -->
+      <path d="M 118,275 C 108,310 125,335 112,370 C 100,405 118,425 108,455"
+            fill="none" stroke="#3cbbb1" stroke-width="1.8" stroke-linecap="round" opacity="0.55"/>
+
+      <!-- T2 -->
+      <path d="M 142,298 C 130,335 148,360 134,395 C 122,425 136,445 128,472"
+            fill="none" stroke="#bbbdf6" stroke-width="1.6" stroke-linecap="round" opacity="0.48"/>
+
+      <!-- T3 -->
+      <path d="M 168,312 C 160,350 175,372 164,408 C 154,438 166,458 158,483"
+            fill="none" stroke="#3cbbb1" stroke-width="1.5" stroke-linecap="round" opacity="0.52"/>
+
+      <!-- T4 -->
+      <path d="M 195,320 C 190,358 200,380 194,414 C 188,444 196,462 192,487"
+            fill="none" stroke="#bbbdf6" stroke-width="1.7" stroke-linecap="round" opacity="0.44"/>
+
+      <!-- T5 — inner left -->
+      <path d="M 220,323 C 218,362 224,384 220,418 C 216,448 222,466 220,490"
+            fill="none" stroke="#3cbbb1" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+
+      <!-- T6 — center-left -->
+      <path d="M 238,323 C 238,362 240,386 238,420 C 236,450 240,468 238,490"
+            fill="none" stroke="#bbbdf6" stroke-width="1.6" stroke-linecap="round" opacity="0.38"/>
+
+      <!-- T7 — center-right -->
+      <path d="M 262,323 C 262,362 260,386 262,420 C 264,450 260,468 262,490"
+            fill="none" stroke="#3cbbb1" stroke-width="1.6" stroke-linecap="round" opacity="0.38"/>
+
+      <!-- T8 — inner right -->
+      <path d="M 280,323 C 282,362 276,384 280,418 C 284,448 278,466 280,490"
+            fill="none" stroke="#bbbdf6" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+
+      <!-- T9 -->
+      <path d="M 305,320 C 310,358 300,380 306,414 C 312,444 304,462 308,487"
+            fill="none" stroke="#3cbbb1" stroke-width="1.7" stroke-linecap="round" opacity="0.44"/>
+
+      <!-- T10 -->
+      <path d="M 332,312 C 340,350 325,372 336,408 C 346,438 334,458 342,483"
+            fill="none" stroke="#bbbdf6" stroke-width="1.5" stroke-linecap="round" opacity="0.52"/>
+
+      <!-- T11 -->
+      <path d="M 358,298 C 370,335 352,360 366,395 C 378,425 364,445 372,472"
+            fill="none" stroke="#3cbbb1" stroke-width="1.6" stroke-linecap="round" opacity="0.48"/>
+
+      <!-- T12 — far right -->
+      <path d="M 382,275 C 392,310 375,335 388,370 C 400,405 382,425 392,455"
+            fill="none" stroke="#bbbdf6" stroke-width="1.8" stroke-linecap="round" opacity="0.55"/>
+
+    </g>
+
+    <!-- ══════════════════════════════════════
+         BELL — main dome body
+         ══════════════════════════════════════ -->
+
+    <!-- Bell outer fill -->
+    <ellipse cx="250" cy="210" rx="140" ry="110"
+             fill="url(#bellGrad)" filter="url(#glow)" opacity="0.82"/>
+
+    <!-- Bell edge subtlety: teal stroke -->
+    <ellipse cx="250" cy="210" rx="140" ry="110"
+             fill="none" stroke="#3cbbb1" stroke-width="1.2" opacity="0.35"/>
+
+    <!-- ── Gastrovascular ring patterns inside bell ── -->
+
+    <!-- Ring 1 — outermost -->
+    <ellipse cx="250" cy="215" rx="118" ry="88"
+             fill="none" stroke="#3cbbb1" stroke-width="1.2" opacity="0.30"/>
+
+    <!-- Ring 2 -->
+    <ellipse cx="250" cy="218" rx="90" ry="66"
+             fill="none" stroke="#5de8de" stroke-width="1.1" opacity="0.38"/>
+
+    <!-- Ring 3 -->
+    <ellipse cx="250" cy="220" rx="62" ry="45"
+             fill="none" stroke="#3cbbb1" stroke-width="1.0" opacity="0.42"/>
+
+    <!-- Ring 4 — innermost -->
+    <ellipse cx="250" cy="222" rx="36" ry="26"
+             fill="none" stroke="#7eeee8" stroke-width="0.9" opacity="0.48"/>
+
+    <!-- ── Radial gastrovascular canals — 8 spokes ── -->
+    <g stroke="#3cbbb1" stroke-width="0.9" opacity="0.28">
+      <line x1="250" y1="195" x2="250" y2="118"/>  <!-- top -->
+      <line x1="250" y1="195" x2="250" y2="272"/>  <!-- bottom -->
+      <line x1="250" y1="195" x2="182" y2="204"/>  <!-- left -->
+      <line x1="250" y1="195" x2="318" y2="204"/>  <!-- right -->
+      <line x1="250" y1="195" x2="202" y2="148"/>  <!-- upper-left -->
+      <line x1="250" y1="195" x2="298" y2="148"/>  <!-- upper-right -->
+      <line x1="250" y1="195" x2="208" y2="248"/>  <!-- lower-left -->
+      <line x1="250" y1="195" x2="292" y2="248"/>  <!-- lower-right -->
+    </g>
+
+    <!-- ── Pink accent ring near bell edge (partial arc) ── -->
+    <ellipse cx="250" cy="210" rx="134" ry="104"
+             fill="none" stroke="#ee4266" stroke-width="1.5"
+             stroke-dasharray="62 420" stroke-dashoffset="0"
+             opacity="0.38"/>
+    <ellipse cx="250" cy="210" rx="134" ry="104"
+             fill="none" stroke="#ee4266" stroke-width="1.5"
+             stroke-dasharray="38 420" stroke-dashoffset="150"
+             opacity="0.28"/>
+
+    <!-- ── Pink inner accent spots at 4-lobe junctions ── -->
+    <circle cx="250" cy="248" r="5" fill="#ee4266" opacity="0.32"/>
+    <circle cx="200" cy="228" r="3.5" fill="#ee4266" opacity="0.22"/>
+    <circle cx="300" cy="228" r="3.5" fill="#ee4266" opacity="0.22"/>
+    <circle cx="250" cy="180" r="3" fill="#ee4266" opacity="0.18"/>
+
+    <!-- ══════════════════════════════════════
+         ORAL ARMS — 4 thick wavy arms below bell center
+         ══════════════════════════════════════ -->
+
+    <!-- Arm 1 — left -->
+    <path d="M 232,255 C 220,280 238,298 224,318 C 212,336 226,352 218,372"
+          fill="none" stroke="#3cbbb1" stroke-width="4.5" stroke-linecap="round" opacity="0.55"/>
+    <path d="M 232,255 C 220,280 238,298 224,318 C 212,336 226,352 218,372"
+          fill="none" stroke="#bbbdf6" stroke-width="2.0" stroke-linecap="round" opacity="0.3"/>
+
+    <!-- Arm 2 — center-left -->
+    <path d="M 244,258 C 238,285 250,304 240,326 C 232,345 242,362 236,382"
+          fill="none" stroke="#3cbbb1" stroke-width="4.0" stroke-linecap="round" opacity="0.52"/>
+    <path d="M 244,258 C 238,285 250,304 240,326 C 232,345 242,362 236,382"
+          fill="none" stroke="#bbbdf6" stroke-width="1.8" stroke-linecap="round" opacity="0.28"/>
+
+    <!-- Arm 3 — center-right -->
+    <path d="M 256,258 C 262,285 250,304 260,326 C 268,345 258,362 264,382"
+          fill="none" stroke="#3cbbb1" stroke-width="4.0" stroke-linecap="round" opacity="0.52"/>
+    <path d="M 256,258 C 262,285 250,304 260,326 C 268,345 258,362 264,382"
+          fill="none" stroke="#bbbdf6" stroke-width="1.8" stroke-linecap="round" opacity="0.28"/>
+
+    <!-- Arm 4 — right -->
+    <path d="M 268,255 C 280,280 262,298 276,318 C 288,336 274,352 282,372"
+          fill="none" stroke="#3cbbb1" stroke-width="4.5" stroke-linecap="round" opacity="0.55"/>
+    <path d="M 268,255 C 280,280 262,298 276,318 C 288,336 274,352 282,372"
+          fill="none" stroke="#bbbdf6" stroke-width="2.0" stroke-linecap="round" opacity="0.3"/>
+
+    <!-- ══════════════════════════════════════
+         APEX GLOW — bright crown at top of bell
+         ══════════════════════════════════════ -->
+
+    <!-- Apex highlight ellipse -->
+    <ellipse cx="250" cy="148" rx="38" ry="24"
+             fill="url(#apexGlow)" filter="url(#apexFilter)" opacity="0.9"/>
+
+    <!-- Apex bright point -->
+    <ellipse cx="250" cy="148" rx="14" ry="9"
+             fill="#e0fffc" opacity="0.55"/>
+
+    <!-- ── Bell surface sheen: subtle top highlight ── -->
+    <ellipse cx="250" cy="168" rx="80" ry="38"
+             fill="#7eeee8" opacity="0.08"/>
+
+  </g><!-- end clip -->
+
+  <!-- ══════════════════════════════════════
+       TEXT — below bell
+       ══════════════════════════════════════ -->
+
+  <!-- Flag emoji -->
+  <text x="250" y="445" font-family="Arial, sans-serif" font-size="22"
+        text-anchor="middle" dominant-baseline="middle">🇺🇸</text>
+
+  <!-- Team name -->
+  <text x="250" y="474" font-family="'Arial Black', Impact, sans-serif"
+        font-size="38" font-weight="900" fill="white" text-anchor="middle"
+        letter-spacing="1">DIVE DEEP</text>
+
+</svg>

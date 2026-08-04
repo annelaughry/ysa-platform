@@ -1,0 +1,347 @@
+{% extends 'base.html' %}
+
+{% block title %}Research Hub · YSA{% endblock %}
+{% block meta_description %}Student research projects from the YSA Youth STEM Summit 2026 — 14 teams across Moldova, USA, Yemen, and Syria.{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ── PAGE SHELL ── */
+  .research-page {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 3.5rem 2rem 5rem;
+  }
+
+  /* ── HERO HEADER ── */
+  .research-hero {
+    margin-bottom: 3.5rem;
+  }
+  .research-tag {
+    display: inline-block;
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--teal);
+    margin-bottom: 0.75rem;
+  }
+  .research-hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4.5vw, 3.25rem);
+    font-weight: 700; line-height: 1.1;
+    margin-bottom: 1rem;
+  }
+  .research-hero h1 em { font-style: italic; color: var(--teal); }
+  .research-hero p {
+    font-size: 1.05rem;
+    color: rgba(245,245,240,0.6);
+    max-width: 560px; line-height: 1.7;
+  }
+
+  /* ── SECTION LABELS ── */
+  .program-section {
+    margin-bottom: 3.5rem;
+  }
+  .program-label {
+    display: flex; align-items: center; gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .program-label-badge {
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.75rem; border-radius: 100px;
+    background: rgba(60,187,177,0.1); color: var(--teal);
+    border: 1px solid rgba(60,187,177,0.25);
+  }
+  .program-label-badge.explorer {
+    background: rgba(238,66,102,0.1); color: var(--pink);
+    border-color: rgba(238,66,102,0.25);
+  }
+  .program-label h2 {
+    font-size: 1.1rem; font-weight: 700; color: var(--off-white);
+  }
+  .program-label span {
+    font-size: 0.8rem; color: rgba(245,245,240,0.4);
+    margin-left: auto;
+  }
+
+  /* ── TEAM GRID ── */
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+  }
+
+  /* ── TEAM CARD ── */
+  .team-card {
+    background: #111a15;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--tc, var(--teal));
+    border-radius: 14px;
+    padding: 1.5rem;
+    display: flex; flex-direction: column;
+    transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+  }
+  .team-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+    border-color: rgba(245,245,240,0.14);
+    border-left-color: var(--tc, var(--teal));
+  }
+  .team-card-top {
+    display: flex; align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 0.85rem;
+  }
+  .team-flag { font-size: 1.4rem; line-height: 1; }
+  .team-program-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--tc, var(--teal));
+    margin-top: 0.3rem; flex-shrink: 0;
+  }
+  .team-name {
+    font-size: 1.05rem; font-weight: 700;
+    color: var(--off-white);
+    margin-bottom: 0.3rem;
+  }
+  .team-topic {
+    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--tc, var(--teal));
+    margin-bottom: 0.65rem;
+  }
+  .team-desc {
+    font-size: 0.875rem;
+    color: rgba(245,245,240,0.58);
+    line-height: 1.6;
+    flex: 1;
+    margin-bottom: 1.25rem;
+  }
+  .team-link {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    font-size: 0.82rem; font-weight: 600;
+    color: var(--tc, var(--teal));
+    text-decoration: none;
+    transition: gap 0.15s;
+    align-self: flex-start;
+  }
+  .team-link:hover { gap: 0.55rem; }
+  .team-link-soon {
+    font-size: 0.8rem; font-weight: 500;
+    color: rgba(245,245,240,0.28);
+    font-style: italic;
+  }
+
+  /* ── MOBILE ── */
+  @media (max-width: 600px) {
+    .research-page { padding: 2.5rem 1.25rem 4rem; }
+    .team-grid { grid-template-columns: 1fr; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="research-page">
+
+  <!-- Hero header -->
+  <div class="research-hero">
+    <div class="research-tag">YSA Youth STEM Summit 2026 · Lozova, Moldova</div>
+    <h1>Team Research Projects <em>&middot; 2026</em></h1>
+    <p>14 student research teams from Moldova, the United States, Yemen, and Syria presenting original science — from greenspace mapping to weather balloons.</p>
+  </div>
+
+  <!-- ── GLOBAL STEM AMBASSADOR PROGRAM ── -->
+  <div class="program-section">
+    <div class="program-label">
+      <span class="program-label-badge">Global STEM Ambassador Program</span>
+      <h2>Ambassador Teams</h2>
+      <span>10 teams</span>
+    </div>
+
+    <div class="team-grid">
+
+      <!-- Code Green -->
+      <div class="team-card" style="--tc: #3cbbb1;">
+        <div class="team-card-top">
+          <span class="team-flag">🇺🇸</span>
+          <span class="team-program-dot"></span>
+        </div>
+        <div class="team-name">Code Green</div>
+        <div class="team-topic">Urban Greenspace &amp; Heat Islands</div>
+        <div class="team-desc">Satellite mapping of Wilmington, NC green space from 2019–2025 using NASA Landsat 8 and Sentinel-2 data — tracking the post-COVID development surge.</div>
+        <a href="{% url 'research:code_green' %}" class="team-link">View Research &rarr;</a>
+      </div>
+
+      <!-- Lab Rats -->
+      <div class="team-card" style="--tc: #bbbdf6;">
+        <div class="team-card-top">
+          <span class="team-flag">🇺🇸</span>
+          <span class="team-program-dot"></span>
+        </div>
+        <div class="team-name">Lab Rats</div>
+        <div class="team-topic">Martian Ecology</div>
+        <div class="team-desc">Mars habitat ecology and Martian soil science — investigating what plant life could survive in simulated Martian conditions.</div>
+        <span class="team-link-soon">Presentation coming soon</span>
+      </div>
+
+      <!-- Forța -->
+      <div class="team-card" style="--tc: #ee4266;">
+        <div class="team-card-top">
+          <span class="team-flag">🇺🇸</span>
+          <span class="team-program-dot"></span>
+        </div>
+        <div class="team-name">For&#x21b8;a</div>
+        <div class="team-topic">Jellyfish &amp; Ocean Warming</div>
+        <div class="team-desc">Studying jellyfish temperature tolerance and bloom dynamics as an indicator of ocean warming and coastal ecosystem stress.</div>
+        <span class="team-link-soon">Presentation coming soon</span>
+      </div>
+
+      <!-- Dive Deep -->
+      <div class="team-card" style="--tc: #3cbbb1;">
+        <div class="team-card-top">
+          <span class="team-flag">🇺🇸</span>
+          <span class="team-program-dot"></span>
+        </div>
+        <div class="team-name">Dive Deep</div>
+        <div class="team-topic">Marine Biodiversity</div>
+        <div class="team-desc">Marine biodiversity monitoring and coastal ecosystem health assessment along the North Carolina coastline.</div>
+        <span class="team-link-soon">Presentation coming soon</span>
+      </div>
+
+      <!-- Stealth -->
+      <div class="team-card" style="--tc: #f1b643;">
+        <div class="team-card-top">
+          <span class="team-flag">🇾🇪</span>
+          <span class="team-program-dot"></span>
+        </div>
+        <div class="team-name">Stealth</div>
+        <div class="team-topic">Weather Balloon Engineering</div>
+        <div class="team-desc">High-altitude weather balloon payload engineering — designing, building, and launching sensor packages to 32 km altitude.</div>
+        <span class="team-link-soon">Presentation coming soon</span>
+      </div>
+
+      <!-- Supernovas -->
+      <div class="team-card" style="--tc: #bbbdf6;">
+        <div class="team-card-top">
+          <span class="team-flag">🇺🇸</span>
+          <span class="team-program-dot"></span>
+        </div>
+        <div class="team-name">Supernovas</div>
+        <div class="team-topic">Atmospheric Science</div>
+        <div class="team-desc">Atmospheric data collection and near-space science — analyzing temperature, pressure, and composition data from balloon payloads.</div>
+        <span class="team-link-soon">Presentation coming soon</span>
+      </div>
+
+      <!-- Codrii Minds -->
+      <div class="team-card" style="--tc: #3cbbb1;">
+        <div class="team-card-top">
+          <span class="team-flag">🇲🇩</span>
+          <span class="team-program-dot"></span>
+        </div>
+        <div class="team-name">Codrii Minds</div>
+        <div class="team-topic">Codrii Reserve Biodiversity</div>
+        <div class="team-desc">Biodiversity and ecosystem research in the Codrii Nature Reserve — tracking species populations and forest health across Moldova's largest protected forest.</div>
+        <span class="team-link-soon">Presentation coming soon</span>
+      </div>
+
+      <!-- Noroc Science -->
+      <div class="team-card" style="--tc: #bbbdf6;">
+        <div class="team-card-top">
+          <span class="team-flag">🇲🇩</span>
+          <span class="team-program-dot"></span>
+        </div>
+        <div class="team-name">Noroc Science</div>
+        <div class="team-topic">Air Quality</div>
+        <div class="team-desc">Environmental air quality monitoring and health impact analysis across urban and rural sites in Moldova.</div>
+        <span class="team-link-soon">Presentation coming soon</span>
+      </div>
+
+      <!-- 20dm³ -->
+      <div class="team-card" style="--tc: #f1b643;">
+        <div class="team-card-top">
+          <span class="team-flag">🇲🇩</span>
+          <span class="team-program-dot"></span>
+        </div>
+        <div class="team-name">20dm&sup3;</div>
+        <div class="team-topic">Chemistry</div>
+        <div class="team-desc">Chemistry and materials science research — investigating novel compounds and their environmental applications.</div>
+        <span class="team-link-soon">Presentation coming soon</span>
+      </div>
+
+      <!-- HydroTerra -->
+      <div class="team-card" style="--tc: #3cbbb1;">
+        <div class="team-card-top">
+          <span class="team-flag">🇲🇩</span>
+          <span class="team-program-dot"></span>
+        </div>
+        <div class="team-name">HydroTerra</div>
+        <div class="team-topic">Water Quality</div>
+        <div class="team-desc">Water quality monitoring across Moldova — testing drinking water sources for contaminants and publishing results in a live public dashboard.</div>
+        <a href="{% url 'research:hydroterra' %}" class="team-link">View Research &rarr;</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── STEM EXPLORER PROGRAM ── -->
+  <div class="program-section">
+    <div class="program-label">
+      <span class="program-label-badge explorer">STEM Explorer Program</span>
+      <h2>Explorer Teams</h2>
+      <span>4 teams</span>
+    </div>
+
+    <div class="team-grid">
+
+      <!-- Şacal -->
+      <div class="team-card" style="--tc: #c4903a;">
+        <div class="team-card-top">
+          <span class="team-flag">🇲🇩</span>
+          <span class="team-program-dot"></span>
+        </div>
+        <div class="team-name">&Scedil;acal</div>
+        <div class="team-topic">Wildlife &amp; Forest Ecology</div>
+        <div class="team-desc">Wildlife tracking and forest ecology in Moldova — studying animal behavior and habitat health in the Codrii region.</div>
+        <span class="team-link-soon">Presentation coming soon</span>
+      </div>
+
+      <!-- Capybara -->
+      <div class="team-card" style="--tc: #a07850;">
+        <div class="team-card-top">
+          <span class="team-flag">🇲🇩</span>
+          <span class="team-program-dot"></span>
+        </div>
+        <div class="team-name">Capybara</div>
+        <div class="team-topic">Wetlands</div>
+        <div class="team-desc">Wetland ecosystem research — studying water mammals and aquatic biodiversity in Moldova's river floodplains.</div>
+        <span class="team-link-soon">Presentation coming soon</span>
+      </div>
+
+      <!-- Ice Bee -->
+      <div class="team-card" style="--tc: #7dd3fc;">
+        <div class="team-card-top">
+          <span class="team-flag">🇲🇩</span>
+          <span class="team-program-dot"></span>
+        </div>
+        <div class="team-name">Ice Bee</div>
+        <div class="team-topic">Pollinators</div>
+        <div class="team-desc">Pollinator health and climate adaptation — tracking bee population stress responses to temperature shifts and habitat loss.</div>
+        <span class="team-link-soon">Presentation coming soon</span>
+      </div>
+
+      <!-- Gravity Goats -->
+      <div class="team-card" style="--tc: #f0b429;">
+        <div class="team-card-top">
+          <span class="team-flag">🇸🇾</span>
+          <span class="team-program-dot"></span>
+        </div>
+        <div class="team-name">Gravity Goats</div>
+        <div class="team-topic">Physics</div>
+        <div class="team-desc">Physics experiments and gravitational force research — hands-on lab investigations into fundamental mechanics.</div>
+        <span class="team-link-soon">Presentation coming soon</span>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}

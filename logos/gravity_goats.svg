@@ -1,0 +1,128 @@
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bgGG" cx="50%" cy="38%" r="70%">
+      <stop offset="0%" stop-color="#12143e"/>
+      <stop offset="100%" stop-color="#060810"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <circle cx="250" cy="250" r="248" fill="url(#bgGG)"/>
+
+  <!-- Stars (gravity/night-lab vibe) -->
+  <circle cx="62"  cy="78"  r="2"   fill="white" opacity="0.4"/>
+  <circle cx="152" cy="46"  r="1.5" fill="white" opacity="0.35"/>
+  <circle cx="352" cy="50"  r="1.5" fill="white" opacity="0.35"/>
+  <circle cx="440" cy="82"  r="2"   fill="white" opacity="0.4"/>
+  <circle cx="42"  cy="168" r="1"   fill="white" opacity="0.28"/>
+  <circle cx="460" cy="155" r="1"   fill="white" opacity="0.28"/>
+  <circle cx="420" cy="42"  r="1"   fill="white" opacity="0.32"/>
+  <circle cx="88"  cy="42"  r="1"   fill="white" opacity="0.32"/>
+
+  <!-- ── TEST TUBE HORNS (amber, slightly back-swept, mountain goat style) ── -->
+
+  <!-- LEFT HORN — main tube -->
+  <path d="M 192,192 Q 185,142 182,88"
+        stroke="#c87800" stroke-width="22" fill="none" stroke-linecap="round"/>
+  <!-- Left tube sheen (lighter edge) -->
+  <path d="M 186,190 Q 179,140 177,88"
+        stroke="rgba(255,200,80,0.35)" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <!-- Closed end (sealed test tube tip) -->
+  <circle cx="182" cy="88" r="11" fill="#c87800"/>
+  <circle cx="179" cy="85" r="4"  fill="rgba(255,200,80,0.4)"/>
+  <!-- Graduation marks (tick marks along the tube) -->
+  <line x1="175" y1="170" x2="189" y2="167" stroke="#ffd060" stroke-width="2"   stroke-linecap="round"/>
+  <line x1="174" y1="150" x2="190" y2="147" stroke="#ffd060" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="173" y1="130" x2="188" y2="128" stroke="#ffd060" stroke-width="2"   stroke-linecap="round"/>
+  <line x1="172" y1="110" x2="187" y2="108" stroke="#ffd060" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- RIGHT HORN — main tube -->
+  <path d="M 308,192 Q 315,142 318,88"
+        stroke="#c87800" stroke-width="22" fill="none" stroke-linecap="round"/>
+  <!-- Right tube sheen -->
+  <path d="M 314,190 Q 321,140 323,88"
+        stroke="rgba(255,200,80,0.35)" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <!-- Closed end -->
+  <circle cx="318" cy="88" r="11" fill="#c87800"/>
+  <circle cx="321" cy="85" r="4"  fill="rgba(255,200,80,0.4)"/>
+  <!-- Graduation marks -->
+  <line x1="325" y1="170" x2="311" y2="167" stroke="#ffd060" stroke-width="2"   stroke-linecap="round"/>
+  <line x1="326" y1="150" x2="310" y2="147" stroke="#ffd060" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="327" y1="130" x2="312" y2="128" stroke="#ffd060" stroke-width="2"   stroke-linecap="round"/>
+  <line x1="328" y1="110" x2="313" y2="108" stroke="#ffd060" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- ── FLASK HEAD (round-bottom flask = goat face) ── -->
+  <!-- Main flask bulb -->
+  <circle cx="250" cy="256" r="108" fill="#eef0ff"/>
+  <!-- Flask neck (below bulb — goat muzzle/chin zone) -->
+  <rect   x="226" y="342" width="48" height="38" rx="6" fill="#eef0ff"/>
+  <ellipse cx="250" cy="342" rx="24" ry="8"  fill="#eef0ff"/>
+  <ellipse cx="250" cy="380" rx="21" ry="7"  fill="#eef0ff"/>
+  <!-- Glass sheen highlight -->
+  <ellipse cx="225" cy="218" rx="34" ry="22" fill="rgba(180,190,255,0.22)"
+           transform="rotate(-30 225 218)"/>
+  <!-- Faint teal liquid at flask bottom -->
+  <ellipse cx="250" cy="338" rx="88" ry="24" fill="rgba(60,187,177,0.10)"/>
+
+  <!-- ── SAFETY GOGGLES ── -->
+
+  <!-- Goggle straps (side, going around head) -->
+  <path d="M 162,250 Q 146,272 150,298 Q 154,318 170,330"
+        stroke="#f0b429" stroke-width="7" fill="none" stroke-linecap="round"/>
+  <path d="M 338,250 Q 354,272 350,298 Q 346,318 330,330"
+        stroke="#f0b429" stroke-width="7" fill="none" stroke-linecap="round"/>
+
+  <!-- Left goggle frame -->
+  <ellipse cx="207" cy="250" rx="47" ry="37" fill="none" stroke="#f0b429" stroke-width="9"/>
+  <!-- Left lens (white tinted glass) -->
+  <ellipse cx="207" cy="250" rx="38" ry="28" fill="#dce8ff"/>
+
+  <!-- Right goggle frame -->
+  <ellipse cx="293" cy="250" rx="47" ry="37" fill="none" stroke="#f0b429" stroke-width="9"/>
+  <!-- Right lens -->
+  <ellipse cx="293" cy="250" rx="38" ry="28" fill="#dce8ff"/>
+
+  <!-- Nose bridge between goggles -->
+  <rect x="246" y="244" width="8" height="18" rx="4" fill="#f0b429"/>
+
+  <!-- Left eye (through goggle lens) -->
+  <circle cx="207" cy="250" r="21"  fill="#3cbbb1"/>
+  <ellipse cx="207" cy="250" rx="8" ry="13" fill="#091212"/>
+  <circle cx="214" cy="243" r="5"   fill="white" opacity="0.6"/>
+
+  <!-- Right eye -->
+  <circle cx="293" cy="250" r="21"  fill="#3cbbb1"/>
+  <ellipse cx="293" cy="250" rx="8" ry="13" fill="#091212"/>
+  <circle cx="300" cy="243" r="5"   fill="white" opacity="0.6"/>
+
+  <!-- ── TRANSFER PIPETTE (nose) ── -->
+  <!-- Rubber bulb -->
+  <ellipse cx="250" cy="312" rx="19" ry="26" fill="#c8a878"/>
+  <!-- Bulb sheen -->
+  <ellipse cx="244" cy="305" rx="7"  ry="9"  fill="rgba(255,230,180,0.45)"/>
+  <!-- Glass tube -->
+  <rect x="246" y="336" width="8" height="52" rx="3" fill="#bcd8f0"/>
+  <!-- Tube sheen -->
+  <rect x="247" y="336" width="3" height="52" rx="1.5" fill="rgba(255,255,255,0.55)"/>
+  <!-- Tapered tip -->
+  <polygon points="246,388 254,388 252,406 248,406" fill="#bcd8f0"/>
+
+  <!-- TEAL WATER DROPLETS coming from pipette tip (YSA water!) -->
+  <!-- Main drop -->
+  <ellipse cx="250" cy="417" rx="7" ry="10" fill="#3cbbb1"/>
+  <!-- Satellites -->
+  <circle cx="240" cy="412" r="4.5" fill="#3cbbb1" opacity="0.8"/>
+  <circle cx="261" cy="414" r="3.5" fill="#3cbbb1" opacity="0.75"/>
+  <circle cx="245" cy="425" r="2.5" fill="#3cbbb1" opacity="0.6"/>
+  <circle cx="257" cy="423" r="2"   fill="#3cbbb1" opacity="0.55"/>
+
+  <!-- ── TEXT ── -->
+  <text x="250" y="455" text-anchor="middle"
+        font-family="'Arial Black', Impact, sans-serif"
+        font-weight="900" font-size="36" letter-spacing="2"
+        fill="#eef0ff">GRAVITY</text>
+  <text x="250" y="490" text-anchor="middle"
+        font-family="'Arial Black', Impact, sans-serif"
+        font-weight="900" font-size="36" letter-spacing="2"
+        fill="#f0b429">GOATS</text>
+</svg>

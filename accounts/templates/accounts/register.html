@@ -1,0 +1,263 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
+
+  .auth-wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0a0f0d;
+    padding: 2rem 1rem;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .auth-card {
+    background: #111a15;
+    border: 1px solid rgba(245, 245, 240, 0.08);
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+  }
+
+  .auth-logo {
+    text-align: center;
+    margin-bottom: 1.75rem;
+  }
+
+  .auth-logo .wordmark {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.6rem;
+    color: #3cbbb1;
+    letter-spacing: -0.02em;
+  }
+
+  .auth-logo .sub {
+    font-size: 0.75rem;
+    color: rgba(245, 245, 240, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-top: 0.25rem;
+  }
+
+  .auth-heading {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #f5f5f0;
+    margin: 0 0 1.5rem;
+    text-align: center;
+  }
+
+  .form-group {
+    margin-bottom: 1.1rem;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: rgba(245, 245, 240, 0.55);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.4rem;
+  }
+
+  .form-group input {
+    width: 100%;
+    box-sizing: border-box;
+    background: rgba(245, 245, 240, 0.05);
+    border: 1px solid rgba(245, 245, 240, 0.12);
+    border-radius: 8px;
+    padding: 0.65rem 0.9rem;
+    font-size: 0.95rem;
+    font-family: 'Inter', sans-serif;
+    color: #f5f5f0;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .form-group input:focus {
+    border-color: #3cbbb1;
+    box-shadow: 0 0 0 3px rgba(60, 187, 177, 0.15);
+  }
+
+  .form-group input::placeholder {
+    color: rgba(245, 245, 240, 0.25);
+  }
+
+  .form-hint {
+    font-size: 0.75rem;
+    color: rgba(245, 245, 240, 0.3);
+    margin-top: 0.3rem;
+  }
+
+  .error-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1rem;
+  }
+
+  .error-list li {
+    background: rgba(238, 66, 102, 0.12);
+    border: 1px solid rgba(238, 66, 102, 0.3);
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+    color: #ee4266;
+    margin-bottom: 0.4rem;
+  }
+
+  .field-errors {
+    margin-top: 0.3rem;
+  }
+
+  .field-errors span {
+    display: block;
+    font-size: 0.8rem;
+    color: #ee4266;
+  }
+
+  .btn-primary {
+    width: 100%;
+    padding: 0.75rem;
+    background: #3cbbb1;
+    color: #0a0f0d;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    transition: background 0.2s, transform 0.1s;
+  }
+
+  .btn-primary:hover {
+    background: #4ecdc4;
+  }
+
+  .btn-primary:active {
+    transform: scale(0.98);
+  }
+
+  .auth-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.85rem;
+    color: rgba(245, 245, 240, 0.4);
+  }
+
+  .auth-footer a {
+    color: #3cbbb1;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .auth-footer a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="wordmark">Young Scientist Academy</div>
+      <div class="sub">Create your account</div>
+    </div>
+
+    <h1 class="auth-heading">Register</h1>
+
+    {% if form.non_field_errors %}
+      <ul class="error-list">
+        {% for error in form.non_field_errors %}
+          <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label for="{{ form.username.id_for_label }}">Username</label>
+        <input
+          type="text"
+          name="{{ form.username.html_name }}"
+          id="{{ form.username.id_for_label }}"
+          value="{{ form.username.value|default:'' }}"
+          placeholder="your_username"
+          autocomplete="username"
+          autofocus
+        >
+        {% if form.username.errors %}
+          <div class="field-errors">
+            {% for e in form.username.errors %}<span>{{ e }}</span>{% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.email.id_for_label }}">Email <span style="opacity:.45;font-weight:400;">(optional)</span></label>
+        <input
+          type="email"
+          name="{{ form.email.html_name }}"
+          id="{{ form.email.id_for_label }}"
+          value="{{ form.email.value|default:'' }}"
+          placeholder="you@example.com"
+          autocomplete="email"
+        >
+        <div class="form-hint">Used for account recovery only.</div>
+        {% if form.email.errors %}
+          <div class="field-errors">
+            {% for e in form.email.errors %}<span>{{ e }}</span>{% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.password1.id_for_label }}">Password</label>
+        <input
+          type="password"
+          name="{{ form.password1.html_name }}"
+          id="{{ form.password1.id_for_label }}"
+          placeholder="••••••••"
+          autocomplete="new-password"
+        >
+        {% if form.password1.errors %}
+          <div class="field-errors">
+            {% for e in form.password1.errors %}<span>{{ e }}</span>{% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.password2.id_for_label }}">Confirm password</label>
+        <input
+          type="password"
+          name="{{ form.password2.html_name }}"
+          id="{{ form.password2.id_for_label }}"
+          placeholder="••••••••"
+          autocomplete="new-password"
+        >
+        {% if form.password2.errors %}
+          <div class="field-errors">
+            {% for e in form.password2.errors %}<span>{{ e }}</span>{% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <button type="submit" class="btn-primary">Create account</button>
+    </form>
+
+    <div class="auth-footer">
+      Already have an account?
+      <a href="{% url 'accounts:login' %}">Sign in &rarr;</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
