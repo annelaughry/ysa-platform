@@ -31,7 +31,7 @@
   .research-hero h1 em { font-style: italic; color: var(--teal); }
   .research-hero p {
     font-size: 1.05rem;
-    color: rgba(245,245,240,0.6);
+    color: color-mix(in srgb, var(--off-white) 60%, transparent);
     max-width: 560px; line-height: 1.7;
   }
 
@@ -60,7 +60,7 @@
     font-size: 1.1rem; font-weight: 700; color: var(--off-white);
   }
   .program-label span {
-    font-size: 0.8rem; color: rgba(245,245,240,0.4);
+    font-size: 0.8rem; color: color-mix(in srgb, var(--off-white) 40%, transparent);
     margin-left: auto;
   }
 
@@ -73,7 +73,7 @@
 
   /* ── TEAM CARD ── */
   .team-card {
-    background: #111a15;
+    background: var(--card-bg);
     border: 1px solid var(--border);
     border-left: 3px solid var(--tc, var(--teal));
     border-radius: 14px;
@@ -84,7 +84,7 @@
   .team-card:hover {
     transform: translateY(-3px);
     box-shadow: 0 8px 32px rgba(0,0,0,0.35);
-    border-color: rgba(245,245,240,0.14);
+    border-color: color-mix(in srgb, var(--off-white) 14%, transparent);
     border-left-color: var(--tc, var(--teal));
   }
   .team-card-top {
@@ -111,7 +111,7 @@
   }
   .team-desc {
     font-size: 0.875rem;
-    color: rgba(245,245,240,0.58);
+    color: color-mix(in srgb, var(--off-white) 58%, transparent);
     line-height: 1.6;
     flex: 1;
     margin-bottom: 1.25rem;
@@ -127,7 +127,7 @@
   .team-link:hover { gap: 0.55rem; }
   .team-link-soon {
     font-size: 0.8rem; font-weight: 500;
-    color: rgba(245,245,240,0.28);
+    color: color-mix(in srgb, var(--off-white) 28%, transparent);
     font-style: italic;
   }
 

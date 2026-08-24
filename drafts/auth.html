@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign In — YSA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--teal:#3cbbb1;--lavender:#bbbdf6;--pink:#ee4266;--dark:#0a0f0d;--gold:#f1b643;--off-white:#f5f5f0;--card-bg:#111a15;--border:rgba(245,245,240,0.08);--nav-h:64px;}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--off-white);min-height:100vh;}
+    a{color:inherit;text-decoration:none;}
+    body.light{--dark:#f0f4f2;--card-bg:#ffffff;--off-white:#0d1a15;--border:rgba(10,20,15,0.1);}
+    body.colorblind{--teal:#0077bb;--pink:#cc3311;}
+    body.font-lg{font-size:17px;} body.font-sm{font-size:13px;}
+
+    nav.ysa-nav{position:sticky;top:0;z-index:200;height:var(--nav-h);background:rgba(10,15,13,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 2rem;}
+    .nav-logo{display:flex;align-items:center;gap:.65rem;}
+    .nav-logo img{height:32px;}
+    .nav-logo-text{font-weight:800;font-size:1rem;color:var(--off-white);letter-spacing:-.02em;}
+    .nav-right{display:flex;align-items:center;gap:.75rem;}
+
+    .auth-wrap{min-height:calc(100vh - var(--nav-h));display:flex;align-items:center;justify-content:center;padding:2rem;position:relative;overflow:hidden;}
+    .auth-wrap::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 60% at 30% 40%,rgba(60,187,177,0.07) 0%,transparent 70%),radial-gradient(ellipse 40% 40% at 75% 65%,rgba(187,189,246,0.05) 0%,transparent 70%);}
+
+    .auth-card{background:var(--card-bg);border:1px solid var(--border);border-radius:24px;padding:2.5rem;width:100%;max-width:440px;position:relative;z-index:1;}
+    .auth-logo{text-align:center;margin-bottom:2rem;}
+    .auth-logo img{height:36px;margin-bottom:.65rem;}
+    .auth-logo p{font-size:.8rem;color:color-mix(in srgb, var(--off-white) 45%, transparent);}
+
+    .auth-tabs{display:grid;grid-template-columns:1fr 1fr;background:rgba(245,245,240,0.04);border-radius:10px;padding:3px;gap:3px;margin-bottom:2rem;}
+    .auth-tab{padding:.55rem;border-radius:8px;border:none;background:none;color:color-mix(in srgb, var(--off-white) 50%, transparent);font-size:.875rem;font-weight:500;cursor:pointer;transition:all .15s;}
+    .auth-tab.active{background:var(--card-bg);color:var(--off-white);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,0.2);}
+
+    .auth-panel{display:none;}
+    .auth-panel.active{display:block;}
+
+    .auth-panel h2{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;margin-bottom:.35rem;}
+    .auth-panel .subtitle{font-size:.875rem;color:color-mix(in srgb, var(--off-white) 50%, transparent);margin-bottom:1.75rem;line-height:1.55;}
+    .auth-panel .subtitle strong{color:var(--teal);}
+
+    .form-group{margin-bottom:1.1rem;}
+    .form-group label{display:block;font-size:.78rem;font-weight:600;color:color-mix(in srgb, var(--off-white) 65%, transparent);margin-bottom:.4rem;letter-spacing:.02em;}
+    .form-group input, .form-group select{
+      width:100%;padding:.7rem 1rem;border-radius:10px;
+      background:rgba(245,245,240,0.04);border:1px solid var(--border);
+      color:var(--off-white);font-size:.9rem;font-family:'Inter',sans-serif;
+      transition:border-color .15s;outline:none;
+    }
+    .form-group input:focus, .form-group select:focus{border-color:rgba(60,187,177,.5);box-shadow:0 0 0 3px rgba(60,187,177,.08);}
+    .form-group input::placeholder{color:color-mix(in srgb, var(--off-white) 25%, transparent);}
+    .form-group select option{background:var(--dark);}
+
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+
+    .btn-auth{width:100%;padding:.8rem;border-radius:100px;background:var(--teal);color:var(--dark);font-weight:700;font-size:.95rem;border:none;cursor:pointer;transition:all .15s;margin-top:.5rem;}
+    .btn-auth:hover{background:#2fa89e;transform:translateY(-1px);}
+
+    .auth-divider{display:flex;align-items:center;gap:.75rem;margin:1.25rem 0;}
+    .auth-divider hr{flex:1;border:none;border-top:1px solid var(--border);}
+    .auth-divider span{font-size:.75rem;color:color-mix(in srgb, var(--off-white) 30%, transparent);white-space:nowrap;}
+
+    .btn-google{width:100%;padding:.75rem;border-radius:100px;background:none;border:1.5px solid var(--border);color:var(--off-white);font-size:.875rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.6rem;transition:all .15s;}
+    .btn-google:hover{border-color:rgba(245,245,240,.3);background:rgba(245,245,240,.04);}
+    .google-icon{font-size:1rem;}
+
+    .auth-footer{text-align:center;margin-top:1.5rem;font-size:.8rem;color:color-mix(in srgb, var(--off-white) 40%, transparent);}
+    .auth-footer a{color:var(--teal);font-weight:600;}
+
+    .privacy-note{font-size:.72rem;color:color-mix(in srgb, var(--off-white) 28%, transparent);text-align:center;margin-top:1.25rem;line-height:1.55;}
+
+    /* PROFILE PAGE */
+    .profile-wrap{max-width:640px;margin:0 auto;padding:2rem 2rem 4rem;}
+    .profile-header{display:flex;align-items:center;gap:1.5rem;margin-bottom:2rem;flex-wrap:wrap;}
+    .profile-avatar-wrap{position:relative;}
+    .profile-avatar{width:80px;height:80px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:800;color:var(--dark);}
+    .profile-info h1{font-size:1.5rem;font-weight:800;margin-bottom:.25rem;}
+    .profile-info .role-tag{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.25rem .65rem;border-radius:100px;background:rgba(60,187,177,.1);color:var(--teal);display:inline-block;}
+    .profile-info .joined{font-size:.8rem;color:color-mix(in srgb, var(--off-white) 40%, transparent);margin-top:.35rem;}
+    .profile-card{background:var(--card-bg);border:1px solid var(--border);border-radius:16px;padding:1.75rem;margin-bottom:1.25rem;}
+    .profile-card h3{font-size:.85rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:color-mix(in srgb, var(--off-white) 40%, transparent);margin-bottom:1.1rem;}
+    .profile-field{display:flex;justify-content:space-between;align-items:center;padding:.65rem 0;border-bottom:1px solid var(--border);}
+    .profile-field:last-child{border-bottom:none;}
+    .field-label{font-size:.82rem;font-weight:500;color:color-mix(in srgb, var(--off-white) 55%, transparent);}
+    .field-value{font-size:.875rem;font-weight:600;}
+
+    /* SHOW/HIDE */
+    #loginPanel, #registerPanel, #profilePanel{display:none;}
+    #loginPanel.active, #registerPanel.active, #profilePanel.active{display:block;}
+  </style>
+</head>
+<body>
+<script>
+  (function(){
+    const theme=localStorage.getItem('ysa-theme')||'dark';
+    const hex=localStorage.getItem('ysa-accent-hex')||'#3cbbb1';
+    const fs=localStorage.getItem('ysa-font-size')||'md';
+    document.body.classList.toggle('light',theme==='light');
+    document.documentElement.style.setProperty('--teal',hex);
+    if(fs!=='md')document.body.classList.add('font-'+fs);
+  })();
+</script>
+
+<nav class="ysa-nav">
+  <a href="index.html" class="nav-logo">
+    <img src="https://ysalive.netlify.app/ysa-primarybrandmark-transparent.png" alt="YSA"/>
+    <span class="nav-logo-text">YSA</span>
+  </a>
+  <div class="nav-right">
+    <a href="index.html?settings=1" style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid var(--border);color:rgba(245,245,240,.55);font-size:1rem;">⚙️</a>
+    <a href="ambassadors.html" style="display:flex;align-items:center;gap:.35rem;padding:.45rem 1rem;background:var(--teal);color:var(--dark);border-radius:100px;font-size:.85rem;font-weight:700;">Dashboard &rarr;</a>
+  </div>
+</nav>
+
+<!-- ── AUTH VIEW ── -->
+<div id="authView" class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <img src="https://ysalive.netlify.app/ysa-primarybrandmark-transparent.png" alt="YSA"/>
+      <p>Young Scientist Academy Platform</p>
+    </div>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuthTab('login', this)">Sign In</button>
+      <button class="auth-tab" onclick="switchAuthTab('register', this)">Create Account</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div class="auth-panel active" id="loginForm">
+      <h2>Welcome back</h2>
+      <p class="subtitle">Sign in to access the <strong>Ambassador App</strong> and your research hub.</p>
+      <div class="form-group">
+        <label>Username or Email</label>
+        <input type="text" placeholder="your_username"/>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" placeholder="••••••••"/>
+      </div>
+      <button class="btn-auth" onclick="mockSignIn()">Sign In &rarr;</button>
+      <div class="auth-divider"><hr/><span>or continue with</span><hr/></div>
+      <button class="btn-google" onclick="mockSignIn()"><span class="google-icon">🔵</span> Continue with Google</button>
+      <div class="auth-footer">
+        Don't have an account? <a href="#" onclick="switchAuthTab('register', document.querySelectorAll('.auth-tab')[1])">Create one &rarr;</a>
+      </div>
+    </div>
+
+    <!-- REGISTER -->
+    <div class="auth-panel" id="registerForm">
+      <h2>Join YSA</h2>
+      <p class="subtitle">Create your ambassador account to access research tools, the leaderboard, and your team's hub.</p>
+      <div class="form-row">
+        <div class="form-group">
+          <label>First Name</label>
+          <input type="text" placeholder="Maddie"/>
+        </div>
+        <div class="form-group">
+          <label>Last Name</label>
+          <input type="text" placeholder="Woodhouse"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" placeholder="maddie_codegreen"/>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" placeholder="you@example.com"/>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" placeholder="Create a strong password"/>
+      </div>
+      <div class="form-group">
+        <label>Role</label>
+        <select>
+          <option value="">Select your role...</option>
+          <option>Ambassador</option>
+          <option>Teacher</option>
+          <option>Staff</option>
+        </select>
+      </div>
+      <button class="btn-auth" onclick="mockSignIn()">Create Account &rarr;</button>
+      <div class="auth-divider"><hr/><span>or</span><hr/></div>
+      <button class="btn-google" onclick="mockSignIn()"><span class="google-icon">🔵</span> Sign up with Google</button>
+      <div class="privacy-note">By creating an account, you agree to YSA's terms of use. Your data is stored securely and never sold.</div>
+      <div class="auth-footer">
+        Already have an account? <a href="#" onclick="switchAuthTab('login', document.querySelectorAll('.auth-tab')[0])">Sign in &rarr;</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── PROFILE VIEW (shown after "sign in" in draft) ── -->
+<div id="profileView" style="display:none;">
+  <div class="profile-wrap">
+    <div class="profile-header">
+      <div class="profile-avatar-wrap">
+        <div class="profile-avatar">M</div>
+      </div>
+      <div class="profile-info">
+        <h1>Maddie Woodhouse</h1>
+        <span class="role-tag">Ambassador</span>
+        <div class="joined">Member since August 2026 · Code Green 🌿</div>
+      </div>
+    </div>
+
+    <div class="profile-card">
+      <h3>Account Info</h3>
+      <div class="profile-field"><span class="field-label">Username</span><span class="field-value">maddie_codegreen</span></div>
+      <div class="profile-field"><span class="field-label">Email</span><span class="field-value">gsachair@youngscientistacademy.org</span></div>
+      <div class="profile-field"><span class="field-label">Role</span><span class="field-value">Ambassador</span></div>
+      <div class="profile-field"><span class="field-label">Team</span><span class="field-value">🌿 Code Green</span></div>
+      <div class="profile-field"><span class="field-label">Country</span><span class="field-value">🇺🇸 United States</span></div>
+    </div>
+
+    <div class="profile-card">
+      <h3>Bio</h3>
+      <p style="font-size:.9rem;color:color-mix(in srgb, var(--off-white) 65%, transparent);line-height:1.7;">Youth Programs &amp; Technology Lead at YSA. Building the Code Green greenspace tracker and the YSA digital platform. Passionate about environmental data science and making science accessible.</p>
+    </div>
+
+    <div class="profile-card">
+      <h3>Ambassador Stats</h3>
+      <div class="profile-field"><span class="field-label">Points</span><span class="field-value" style="color:var(--teal);">245 pts</span></div>
+      <div class="profile-field"><span class="field-label">Status Level</span><span class="field-value">🧪 Experimenter</span></div>
+      <div class="profile-field"><span class="field-label">Individual Rank</span><span class="field-value">#4</span></div>
+    </div>
+
+    <div style="display:flex;gap:.75rem;margin-top:1rem;flex-wrap:wrap;">
+      <a href="ambassadors.html" style="display:inline-flex;align-items:center;padding:.65rem 1.4rem;border-radius:100px;background:var(--teal);color:var(--dark);font-weight:700;font-size:.875rem;">Go to Dashboard &rarr;</a>
+      <button onclick="signOut()" style="display:inline-flex;align-items:center;padding:.65rem 1.4rem;border-radius:100px;border:1.5px solid rgba(245,245,240,.2);color:var(--off-white);font-weight:600;font-size:.875rem;background:none;cursor:pointer;">Sign Out</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function switchAuthTab(tab, btn) {
+    document.querySelectorAll('.auth-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.auth-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(tab + 'Form').classList.add('active');
+  }
+
+  function mockSignIn() {
+    // In draft mode: clicking sign in shows the profile view
+    document.getElementById('authView').style.display = 'none';
+    document.getElementById('profileView').style.display = 'block';
+  }
+
+  function signOut() {
+    document.getElementById('profileView').style.display = 'none';
+    document.getElementById('authView').style.display = 'flex';
+  }
+
+  // Check URL param
+  if (new URLSearchParams(window.location.search).get('register') === '1') {
+    switchAuthTab('register', document.querySelectorAll('.auth-tab')[1]);
+  }
+</script>
+</body>
+</html>

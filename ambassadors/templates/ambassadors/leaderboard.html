@@ -14,7 +14,7 @@
     --amber:    #c4903a;
     --off-white:#f5f5f0;
     --card-bg:  #111a15;
-    --border:   rgba(245,245,240,0.08);
+    --border:   color-mix(in srgb, var(--off-white) 8%, transparent);
   }
 
   .lb-wrap {
@@ -39,7 +39,7 @@
   }
 
   .lb-header p {
-    color: rgba(245,245,240,0.45);
+    color: color-mix(in srgb, var(--off-white) 45%, transparent);
     font-size: 0.95rem;
   }
 
@@ -56,7 +56,7 @@
   .toggle-btn {
     background: none;
     border: none;
-    color: rgba(245,245,240,0.45);
+    color: color-mix(in srgb, var(--off-white) 45%, transparent);
     font-family: 'Inter', sans-serif;
     font-size: 0.9rem;
     font-weight: 600;
@@ -98,18 +98,18 @@
     transition: border-color 0.15s;
   }
 
-  .lb-row:hover { border-color: rgba(245,245,240,0.15); }
+  .lb-row:hover { border-color: color-mix(in srgb, var(--off-white) 15%, transparent); }
 
   .lb-rank {
     font-size: 1.1rem;
     font-weight: 800;
-    color: rgba(245,245,240,0.25);
+    color: color-mix(in srgb, var(--off-white) 25%, transparent);
     min-width: 2rem;
     text-align: center;
   }
 
   .lb-rank.top1 { color: var(--gold); }
-  .lb-rank.top2 { color: rgba(245,245,240,0.6); }
+  .lb-rank.top2 { color: color-mix(in srgb, var(--off-white) 60%, transparent); }
   .lb-rank.top3 { color: var(--amber); }
 
   .lb-info {
@@ -127,7 +127,7 @@
 
   .lb-team {
     font-size: 0.78rem;
-    color: rgba(245,245,240,0.4);
+    color: color-mix(in srgb, var(--off-white) 40%, transparent);
     margin-top: 0.1rem;
   }
 
@@ -148,7 +148,7 @@
 
   .lb-bar-track {
     height: 6px;
-    background: rgba(245,245,240,0.07);
+    background: color-mix(in srgb, var(--off-white) 7%, transparent);
     border-radius: 999px;
     overflow: hidden;
   }
@@ -190,13 +190,13 @@
   .tlb-rank {
     font-size: 1.1rem;
     font-weight: 800;
-    color: rgba(245,245,240,0.25);
+    color: color-mix(in srgb, var(--off-white) 25%, transparent);
     min-width: 2rem;
     text-align: center;
   }
 
   .tlb-rank.top1 { color: var(--gold); }
-  .tlb-rank.top2 { color: rgba(245,245,240,0.6); }
+  .tlb-rank.top2 { color: color-mix(in srgb, var(--off-white) 60%, transparent); }
   .tlb-rank.top3 { color: var(--amber); }
 
   .tlb-info { flex: 1; }
@@ -209,7 +209,7 @@
 
   .tlb-meta {
     font-size: 0.78rem;
-    color: rgba(245,245,240,0.4);
+    color: color-mix(in srgb, var(--off-white) 40%, transparent);
     margin-top: 0.15rem;
   }
 
@@ -225,12 +225,12 @@
 
   .tlb-avg {
     font-size: 0.75rem;
-    color: rgba(245,245,240,0.35);
+    color: color-mix(in srgb, var(--off-white) 35%, transparent);
     margin-top: 0.1rem;
   }
 
   .empty-note {
-    color: rgba(245,245,240,0.3);
+    color: color-mix(in srgb, var(--off-white) 30%, transparent);
     font-size: 0.9rem;
     text-align: center;
     padding: 3rem 0;

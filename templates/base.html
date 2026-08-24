@@ -34,6 +34,27 @@
     body.has-switcher { padding-bottom: 40px; }
     a { color: inherit; }
 
+    /* ── LIGHT MODE ── */
+    body.light {
+      --dark:     #f0f4f2;
+      --card-bg:  #ffffff;
+      --off-white:#0d1a15;
+      --border:   rgba(10,20,15,0.1);
+    }
+
+    /* ── COLORBLIND MODE (deuteranopia-friendly) ── */
+    body.colorblind {
+      --teal:     #0077bb;
+      --pink:     #cc3311;
+      --gold:     #ee7733;
+      --lavender: #33bbee;
+      --amber:    #ee3377;
+    }
+
+    /* ── FONT SIZE ── */
+    body.font-lg { font-size: 17px; }
+    body.font-sm { font-size: 13px; }
+
     /* ── NAV ── */
     nav.ysa-nav {
       position: sticky; top: 0; z-index: 200;
@@ -200,6 +221,21 @@
   {% block extra_css %}{% endblock %}
 </head>
 <body{% if user.is_authenticated %} class="has-switcher"{% endif %}>
+<script>
+  // ── APPLY SAVED SETTINGS (runs on every page — home page's settings panel writes these) ──
+  (function() {
+    const theme      = localStorage.getItem('ysa-theme') || 'dark';
+    const accentHex  = localStorage.getItem('ysa-accent-hex') || '#3cbbb1';
+    const fontSize   = localStorage.getItem('ysa-font-size') || 'md';
+    const colorblind = localStorage.getItem('ysa-colorblind') === '1';
+
+    document.body.classList.toggle('light', theme === 'light');
+    document.documentElement.style.setProperty('--teal', accentHex);
+    document.body.classList.remove('font-sm', 'font-lg');
+    if (fontSize !== 'md') document.body.classList.add('font-' + fontSize);
+    document.body.classList.toggle('colorblind', colorblind);
+  })();
+</script>
 
 <!-- ── NAVIGATION ── -->
 <nav class="ysa-nav">

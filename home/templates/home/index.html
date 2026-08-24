@@ -14,7 +14,7 @@
     --amber:    #c4903a;
     --off-white:#f5f5f0;
     --card-bg:  #111a15;
-    --border:   rgba(245,245,240,0.08);
+    --border:   color-mix(in srgb, var(--off-white) 8%, transparent);
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
@@ -68,7 +68,7 @@
   }
   .hero p {
     font-size: clamp(1rem, 2vw, 1.2rem);
-    color: rgba(245,245,240,0.65);
+    color: color-mix(in srgb, var(--off-white) 65%, transparent);
     max-width: 560px; line-height: 1.7;
     margin-bottom: 2.5rem;
   }
@@ -86,7 +86,7 @@
   .btn-primary:hover { background: #2fa89e; transform: translateY(-1px); }
   .btn-outline {
     background: transparent;
-    border: 1.5px solid rgba(245,245,240,0.25);
+    border: 1.5px solid color-mix(in srgb, var(--off-white) 25%, transparent);
     color: var(--off-white); font-weight: 600; font-size: 0.95rem;
     padding: 0.8rem 1.8rem; border-radius: 100px;
     text-decoration: none; transition: all 0.2s;
@@ -102,7 +102,7 @@
     color: var(--teal); line-height: 1;
   }
   .hero-stat .lbl {
-    font-size: 0.75rem; color: rgba(245,245,240,0.5);
+    font-size: 0.75rem; color: color-mix(in srgb, var(--off-white) 50%, transparent);
     text-transform: uppercase; letter-spacing: 0.06em;
     margin-top: 0.3rem;
   }
@@ -125,7 +125,7 @@
   .section-header h2 em { font-style: italic; color: var(--teal); }
   .section-header p {
     margin-top: 1rem;
-    font-size: 1.05rem; color: rgba(245,245,240,0.65);
+    font-size: 1.05rem; color: color-mix(in srgb, var(--off-white) 65%, transparent);
     max-width: 560px; line-height: 1.7;
   }
 
@@ -145,7 +145,7 @@
     margin-bottom: 0.5rem;
   }
   .card p {
-    font-size: 0.9rem; color: rgba(245,245,240,0.6); line-height: 1.65;
+    font-size: 0.9rem; color: color-mix(in srgb, var(--off-white) 60%, transparent); line-height: 1.65;
   }
   .card-accent-teal { border-color: rgba(60,187,177,0.25); }
   .card-accent-pink { border-color: rgba(238,66,102,0.25); }
@@ -166,7 +166,7 @@
   }
   .about-mission h3 em { color: var(--teal); font-style: italic; }
   .about-mission p {
-    font-size: 1rem; color: rgba(245,245,240,0.7); line-height: 1.75;
+    font-size: 1rem; color: color-mix(in srgb, var(--off-white) 70%, transparent); line-height: 1.75;
     max-width: 680px;
   }
   .stat-row {
@@ -184,7 +184,7 @@
     color: var(--teal); line-height: 1;
   }
   .stat-card .l {
-    font-size: 0.8rem; color: rgba(245,245,240,0.5);
+    font-size: 0.8rem; color: color-mix(in srgb, var(--off-white) 50%, transparent);
     text-transform: uppercase; letter-spacing: 0.06em;
     margin-top: 0.35rem;
   }
@@ -195,7 +195,7 @@
   }
   .testimonial p {
     font-size: 0.95rem; line-height: 1.7;
-    color: rgba(245,245,240,0.75); font-style: italic;
+    color: color-mix(in srgb, var(--off-white) 75%, transparent); font-style: italic;
     margin-bottom: 1.25rem;
   }
   .testimonial .attr {
@@ -214,7 +214,7 @@
     color: var(--gold); min-width: 48px; padding-top: 2px;
   }
   .timeline-content h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.25rem; }
-  .timeline-content p { font-size: 0.85rem; color: rgba(245,245,240,0.55); line-height: 1.6; }
+  .timeline-content p { font-size: 0.85rem; color: color-mix(in srgb, var(--off-white) 55%, transparent); line-height: 1.6; }
 
   /* ── PROGRAMS ── */
   .sub-tabs {
@@ -225,7 +225,7 @@
   .sub-tab {
     padding: 0.6rem 1.2rem;
     font-size: 0.875rem; font-weight: 600;
-    color: rgba(245,245,240,0.5);
+    color: color-mix(in srgb, var(--off-white) 50%, transparent);
     border-bottom: 2px solid transparent;
     cursor: pointer; transition: all 0.15s;
     background: none; border-left: none; border-right: none; border-top: none;
@@ -257,14 +257,14 @@
     font-size: 1.3rem; font-weight: 700; margin-bottom: 0.75rem;
   }
   .program-block p {
-    font-size: 0.9rem; color: rgba(245,245,240,0.65); line-height: 1.7;
+    font-size: 0.9rem; color: color-mix(in srgb, var(--off-white) 65%, transparent); line-height: 1.7;
     margin-bottom: 1.25rem;
   }
   .prog-details { list-style: none; }
   .prog-details li {
-    font-size: 0.85rem; color: rgba(245,245,240,0.6);
+    font-size: 0.85rem; color: color-mix(in srgb, var(--off-white) 60%, transparent);
     padding: 0.4rem 0; display: flex; align-items: center; gap: 0.6rem;
-    border-bottom: 1px solid rgba(245,245,240,0.06);
+    border-bottom: 1px solid color-mix(in srgb, var(--off-white) 6%, transparent);
   }
   .prog-details li:last-child { border-bottom: none; }
   .prog-details li::before { content: '→'; color: var(--teal); font-size: 0.75rem; }
@@ -283,7 +283,7 @@
   .cal-date .mo { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.06em; color: var(--teal); text-transform: uppercase; }
   .cal-date .dy { font-size: 1.4rem; font-weight: 800; line-height: 1; }
   .cal-info h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.2rem; }
-  .cal-info p { font-size: 0.8rem; color: rgba(245,245,240,0.5); }
+  .cal-info p { font-size: 0.8rem; color: color-mix(in srgb, var(--off-white) 50%, transparent); }
   .cal-tag {
     margin-left: auto;
     font-size: 0.7rem; font-weight: 700; padding: 0.25rem 0.65rem;
@@ -298,7 +298,7 @@
     border-radius: 16px; padding: 2rem;
   }
   .signup-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.5rem; }
-  .signup-card p { font-size: 0.85rem; color: rgba(245,245,240,0.6); line-height: 1.65; margin-bottom: 1.5rem; }
+  .signup-card p { font-size: 0.85rem; color: color-mix(in srgb, var(--off-white) 60%, transparent); line-height: 1.65; margin-bottom: 1.5rem; }
   .signup-card .status {
     font-size: 0.75rem; font-weight: 600;
     padding: 0.25rem 0.7rem; border-radius: 100px;
@@ -306,7 +306,7 @@
   }
   .status-open { background: rgba(60,187,177,0.15); color: var(--teal); }
   .status-upcoming { background: rgba(241,182,67,0.15); color: var(--gold); }
-  .status-closed { background: rgba(245,245,240,0.08); color: rgba(245,245,240,0.4); }
+  .status-closed { background: color-mix(in srgb, var(--off-white) 8%, transparent); color: color-mix(in srgb, var(--off-white) 40%, transparent); }
 
   /* ── MEDIA ── */
   .media-row { display: grid; grid-template-columns: 1.5fr 1fr; gap: 2rem; margin-bottom: 3rem; }
@@ -317,7 +317,7 @@
   .media-thumb {
     aspect-ratio: 16/9; background: #0d1a13;
     display: flex; align-items: center; justify-content: center;
-    font-size: 3rem; color: rgba(245,245,240,0.15);
+    font-size: 3rem; color: color-mix(in srgb, var(--off-white) 15%, transparent);
     position: relative;
   }
   .media-thumb img {
@@ -336,7 +336,7 @@
   }
   .media-main-body { padding: 1.5rem; }
   .media-main-body h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.4rem; }
-  .media-main-body p { font-size: 0.85rem; color: rgba(245,245,240,0.55); line-height: 1.6; }
+  .media-main-body p { font-size: 0.85rem; color: color-mix(in srgb, var(--off-white) 55%, transparent); line-height: 1.6; }
   .media-side { display: flex; flex-direction: column; gap: 1rem; }
   .media-mini {
     background: var(--card-bg); border: 1px solid var(--border);
@@ -345,7 +345,7 @@
   }
   .media-mini-icon { font-size: 1.4rem; flex-shrink: 0; }
   .media-mini h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.25rem; }
-  .media-mini p { font-size: 0.78rem; color: rgba(245,245,240,0.5); line-height: 1.55; }
+  .media-mini p { font-size: 0.78rem; color: color-mix(in srgb, var(--off-white) 50%, transparent); line-height: 1.55; }
   /* scrolling photo ticker */
   .photo-ticker-wrap {
     overflow: hidden; margin-bottom: 3rem;
@@ -397,7 +397,7 @@
   }
   .donate-hero h2 em { color: var(--gold); font-style: italic; }
   .donate-hero p {
-    font-size: 1rem; color: rgba(245,245,240,0.65);
+    font-size: 1rem; color: color-mix(in srgb, var(--off-white) 65%, transparent);
     max-width: 520px; margin: 0 auto 2rem; line-height: 1.7;
   }
   .donate-ctas { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
@@ -411,7 +411,7 @@
   .sponsor-section { margin-bottom: 3rem; }
   .sponsor-section h3 {
     font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em;
-    text-transform: uppercase; color: rgba(245,245,240,0.35);
+    text-transform: uppercase; color: color-mix(in srgb, var(--off-white) 35%, transparent);
     text-align: center; margin-bottom: 2rem;
   }
   .sponsor-logos {
@@ -431,7 +431,7 @@
   }
   .impact-card .icon { font-size: 2.5rem; margin-bottom: 1rem; }
   .impact-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.5rem; }
-  .impact-card p { font-size: 0.85rem; color: rgba(245,245,240,0.55); line-height: 1.65; }
+  .impact-card p { font-size: 0.85rem; color: color-mix(in srgb, var(--off-white) 55%, transparent); line-height: 1.65; }
 
   /* ── FOOTER ── */
   footer {
@@ -445,27 +445,27 @@
   }
   .footer-brand img { height: 32px; margin-bottom: 1rem; }
   .footer-brand p {
-    font-size: 0.82rem; color: rgba(245,245,240,0.4); line-height: 1.65;
+    font-size: 0.82rem; color: color-mix(in srgb, var(--off-white) 40%, transparent); line-height: 1.65;
     max-width: 240px; margin-bottom: 1rem;
   }
   .footer-socials { display: flex; gap: 0.75rem; }
   .footer-socials a {
     width: 32px; height: 32px; border-radius: 8px;
-    background: rgba(245,245,240,0.06);
+    background: color-mix(in srgb, var(--off-white) 6%, transparent);
     display: flex; align-items: center; justify-content: center;
-    font-size: 0.85rem; text-decoration: none; color: rgba(245,245,240,0.5);
+    font-size: 0.85rem; text-decoration: none; color: color-mix(in srgb, var(--off-white) 50%, transparent);
     transition: all 0.15s;
   }
   .footer-socials a:hover { background: rgba(60,187,177,0.15); color: var(--teal); }
   .footer-col h4 {
     font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em;
-    text-transform: uppercase; color: rgba(245,245,240,0.35);
+    text-transform: uppercase; color: color-mix(in srgb, var(--off-white) 35%, transparent);
     margin-bottom: 1rem;
   }
   .footer-col ul { list-style: none; }
   .footer-col li { margin-bottom: 0.6rem; }
   .footer-col a {
-    font-size: 0.85rem; color: rgba(245,245,240,0.55);
+    font-size: 0.85rem; color: color-mix(in srgb, var(--off-white) 55%, transparent);
     text-decoration: none; transition: color 0.15s;
   }
   .footer-col a:hover { color: var(--teal); }
@@ -476,19 +476,19 @@
     flex-wrap: wrap; gap: 1rem;
   }
   .footer-bottom p {
-    font-size: 0.78rem; color: rgba(245,245,240,0.25);
+    font-size: 0.78rem; color: color-mix(in srgb, var(--off-white) 25%, transparent);
   }
-  .footer-bottom a { color: rgba(245,245,240,0.35); text-decoration: none; }
+  .footer-bottom a { color: color-mix(in srgb, var(--off-white) 35%, transparent); text-decoration: none; }
   .footer-bottom a:hover { color: var(--teal); }
 
   /* ── SETTINGS BUTTON ── */
   .nav-settings-btn {
     width: 36px; height: 36px; border-radius: 10px;
-    background: rgba(245,245,240,0.07);
+    background: color-mix(in srgb, var(--off-white) 7%, transparent);
     border: 1px solid var(--border);
     display: flex; align-items: center; justify-content: center;
     cursor: pointer; font-size: 1rem;
-    transition: all 0.15s; color: rgba(245,245,240,0.6);
+    transition: all 0.15s; color: color-mix(in srgb, var(--off-white) 60%, transparent);
     margin-left: 0.25rem;
   }
   .nav-settings-btn:hover { background: rgba(60,187,177,0.15); color: var(--teal); border-color: rgba(60,187,177,0.3); }
@@ -504,7 +504,7 @@
     position: fixed; top: 0; right: -380px; bottom: 0;
     width: 340px; z-index: 9999; isolation: isolate;
     background: #0e1712;
-    border-left: 1px solid rgba(245,245,240,0.1);
+    border-left: 1px solid color-mix(in srgb, var(--off-white) 10%, transparent);
     padding: 2rem 1.75rem;
     transition: right 0.3s cubic-bezier(0.16,1,0.3,1);
     overflow-y: auto;
@@ -519,8 +519,8 @@
   }
   .settings-close {
     width: 32px; height: 32px; border-radius: 8px;
-    background: rgba(245,245,240,0.07); border: none;
-    color: rgba(245,245,240,0.6); font-size: 1rem;
+    background: color-mix(in srgb, var(--off-white) 7%, transparent); border: none;
+    color: color-mix(in srgb, var(--off-white) 60%, transparent); font-size: 1rem;
     cursor: pointer; display: flex; align-items: center; justify-content: center;
     transition: all 0.15s;
   }
@@ -528,7 +528,7 @@
   .settings-section { margin-bottom: 2rem; }
   .settings-section-label {
     font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em;
-    text-transform: uppercase; color: rgba(245,245,240,0.3);
+    text-transform: uppercase; color: color-mix(in srgb, var(--off-white) 30%, transparent);
     margin-bottom: 1rem;
   }
 
@@ -538,10 +538,10 @@
   }
   .theme-btn {
     flex: 1; padding: 0.65rem;
-    background: rgba(245,245,240,0.05);
-    border: 1.5px solid rgba(245,245,240,0.1);
+    background: color-mix(in srgb, var(--off-white) 5%, transparent);
+    border: 1.5px solid color-mix(in srgb, var(--off-white) 10%, transparent);
     border-radius: 10px; cursor: pointer;
-    color: rgba(245,245,240,0.5);
+    color: color-mix(in srgb, var(--off-white) 50%, transparent);
     font-size: 0.85rem; font-weight: 600;
     display: flex; align-items: center; justify-content: center; gap: 0.4rem;
     transition: all 0.15s;
@@ -573,10 +573,10 @@
   .font-size-btns { display: flex; gap: 0.5rem; }
   .font-size-btn {
     flex: 1; padding: 0.6rem;
-    background: rgba(245,245,240,0.05);
-    border: 1.5px solid rgba(245,245,240,0.1);
+    background: color-mix(in srgb, var(--off-white) 5%, transparent);
+    border: 1.5px solid color-mix(in srgb, var(--off-white) 10%, transparent);
     border-radius: 10px; cursor: pointer;
-    color: rgba(245,245,240,0.5); font-weight: 600;
+    color: color-mix(in srgb, var(--off-white) 50%, transparent); font-weight: 600;
     transition: all 0.15s;
   }
   .font-size-btn.active {
@@ -592,10 +592,10 @@
   .compact-row {
     display: flex; align-items: center; justify-content: space-between;
   }
-  .compact-row span { font-size: 0.875rem; color: rgba(245,245,240,0.7); }
+  .compact-row span { font-size: 0.875rem; color: color-mix(in srgb, var(--off-white) 70%, transparent); }
   .toggle-switch {
     width: 44px; height: 24px;
-    background: rgba(245,245,240,0.12);
+    background: color-mix(in srgb, var(--off-white) 12%, transparent);
     border-radius: 100px; cursor: pointer;
     position: relative; transition: background 0.2s;
     border: none;
@@ -609,13 +609,7 @@
   }
   .toggle-switch.on::after { transform: translateX(20px); }
 
-  /* ── LIGHT MODE ── */
-  body.light {
-    --dark:     #f0f4f2;
-    --card-bg:  #ffffff;
-    --off-white:#0d1a15;
-    --border:   rgba(10,20,15,0.1);
-  }
+  /* ── LIGHT MODE (variable flip lives in base.html — shared across pages) ── */
   body.light .settings-panel { background: #ffffff; border-color: rgba(10,20,15,0.12); }
   body.light .settings-section-label { color: rgba(10,20,15,0.35); }
   body.light .theme-btn,
@@ -630,7 +624,7 @@
       radial-gradient(ellipse 60% 50% at 20% 40%, rgba(60,187,177,0.08) 0%, transparent 70%),
       radial-gradient(ellipse 40% 40% at 80% 60%, rgba(238,66,102,0.05) 0%, transparent 70%);
   }
-  body.light .compact-row span { color: rgba(10,20,15,0.65); }
+  body.light .compact-row span { color: rgba(10,20,15,0.7); }
   body.light .footer-bottom p,
   body.light .footer-col a,
   body.light .footer-brand p { color: rgba(10,20,15,0.4); }
@@ -648,24 +642,15 @@
     box-shadow: 0 1px 4px rgba(0,0,0,0.06);
   }
 
-  /* ── COLORBLIND MODE (deuteranopia-friendly) ── */
-  body.colorblind {
-    --teal:     #0077bb;
-    --pink:     #cc3311;
-    --gold:     #ee7733;
-    --lavender: #33bbee;
-    --amber:    #ee3377;
+  /* ── COLORBLIND MODE + FONT SIZE (shared rules live in base.html) ── */
+
+  /* ── REDUCED MOTION ── */
+  body.reduced-motion *, body.reduced-motion *::before, body.reduced-motion *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
-
-  /* ── FONT SIZE ── */
-  body.font-lg { font-size: 17px; }
-  body.font-sm { font-size: 13px; }
-
-  /* ── COMPACT MODE ── */
-  body.compact .hero { padding: 2rem 2rem 3rem; min-height: auto; }
-  body.compact .section-header { padding: 3rem 2rem 1.5rem; }
-  body.compact .content-wrap { padding: 0 2rem 3rem; }
-  body.compact .card { padding: 1.25rem; }
 
   /* ── MOBILE ── */
   @media (max-width: 768px) {
@@ -730,18 +715,18 @@
       <button class="toggle-switch" id="colorblindToggle" onclick="toggleColorblind()"></button>
     </div>
     <div class="compact-row">
-      <span>Compact spacing</span>
-      <button class="toggle-switch" id="compactToggle" onclick="toggleCompact()"></button>
+      <span>Reduced motion</span>
+      <button class="toggle-switch" id="reducedMotionToggle" onclick="toggleReducedMotion()"></button>
     </div>
     <div id="tts-controls" style="display:none;margin-top:1rem;padding:0.75rem;background:rgba(60,187,177,0.08);border:1px solid rgba(60,187,177,0.2);border-radius:10px;">
-      <div style="font-size:.7rem;color:rgba(245,245,240,.4);margin-bottom:.5rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;">TTS Controls</div>
+      <div style="font-size:.7rem;color:color-mix(in srgb, var(--off-white) 40%, transparent);margin-bottom:.5rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;">TTS Controls</div>
       <div style="display:flex;gap:.5rem;margin-bottom:.5rem;">
         <button onclick="ttsSpeak()" style="flex:1;padding:.4rem;background:rgba(60,187,177,0.15);border:1px solid rgba(60,187,177,0.3);border-radius:8px;color:var(--teal);font-size:.75rem;font-weight:600;cursor:pointer;">▶ Read</button>
-        <button onclick="ttsPause()" style="flex:1;padding:.4rem;background:rgba(245,245,240,.06);border:1px solid var(--border);border-radius:8px;color:rgba(245,245,240,.5);font-size:.75rem;font-weight:600;cursor:pointer;">⏸ Pause</button>
-        <button onclick="ttsStop()" style="flex:1;padding:.4rem;background:rgba(245,245,240,.06);border:1px solid var(--border);border-radius:8px;color:rgba(245,245,240,.5);font-size:.75rem;font-weight:600;cursor:pointer;">⏹ Stop</button>
+        <button onclick="ttsPause()" style="flex:1;padding:.4rem;background:color-mix(in srgb, var(--off-white) 6%, transparent);border:1px solid var(--border);border-radius:8px;color:color-mix(in srgb, var(--off-white) 50%, transparent);font-size:.75rem;font-weight:600;cursor:pointer;">⏸ Pause</button>
+        <button onclick="ttsStop()" style="flex:1;padding:.4rem;background:color-mix(in srgb, var(--off-white) 6%, transparent);border:1px solid var(--border);border-radius:8px;color:color-mix(in srgb, var(--off-white) 50%, transparent);font-size:.75rem;font-weight:600;cursor:pointer;">⏹ Stop</button>
       </div>
       <div style="display:flex;align-items:center;gap:.5rem;">
-        <span style="font-size:.7rem;color:rgba(245,245,240,.35);">Speed</span>
+        <span style="font-size:.7rem;color:color-mix(in srgb, var(--off-white) 35%, transparent);">Speed</span>
         <input type="range" id="ttsRate" min="0.5" max="2" step="0.1" value="1" style="flex:1;accent-color:var(--teal);" oninput="document.getElementById('ttsRateVal').textContent=this.value+'×'"/>
         <span id="ttsRateVal" style="font-size:.7rem;color:var(--teal);min-width:2rem;">1×</span>
       </div>
@@ -750,9 +735,9 @@
 
   <div class="settings-section" style="margin-top:auto;padding-top:1rem;border-top:1px solid var(--border);">
     <div class="settings-section-label">About</div>
-    <p style="font-size:.8rem;color:rgba(245,245,240,.4);line-height:1.65;">YSA Platform · Built with Django<br/>youngscientistacademy.org</p>
+    <p style="font-size:.8rem;color:color-mix(in srgb, var(--off-white) 40%, transparent);line-height:1.65;">YSA Platform · Built with Django<br/>youngscientistacademy.org</p>
     <br/>
-    <button onclick="resetSettings()" style="font-size:.8rem;color:rgba(245,245,240,.3);background:none;border:none;cursor:pointer;padding:0;text-decoration:underline;">Reset to defaults</button>
+    <button onclick="resetSettings()" style="font-size:.8rem;color:color-mix(in srgb, var(--off-white) 30%, transparent);background:none;border:none;cursor:pointer;padding:0;text-decoration:underline;">Reset to defaults</button>
   </div>
 </div>
 
@@ -761,14 +746,14 @@
   <div class="hero">
     <div class="hero-badge">🔬 5th Annual Youth STEM Summit · 2026</div>
     <h1>Empower the <em>next generation</em> of scientists.</h1>
-    <p>The Young Scientist Academy empowers all youth to be community ambassadors of science and technology — through hands-on research, international partnerships, and real-world solutions.</p>
+    <p>The Young Scientist Academy empowers all youth to be community ambassadors of science and technology, through hands-on research, international partnerships, and real-world solutions.</p>
     <div class="hero-ctas">
       <a class="btn-primary" href="#" onclick="showSection('programs'); return false;">Explore Programs</a>
       <a class="btn-outline" href="https://youngscientistacademy.org/donate.html" target="_blank">Support YSA</a>
     </div>
     <div class="hero-stats">
       <div class="hero-stat"><div class="num">350+</div><div class="lbl">Youth Each Week</div></div>
-      <div class="hero-stat"><div class="num">5</div><div class="lbl">Countries</div></div>
+      <div class="hero-stat"><div class="num">4</div><div class="lbl">Countries</div></div>
       <div class="hero-stat"><div class="num">2017</div><div class="lbl">Founded</div></div>
       <div class="hero-stat"><div class="num">5th</div><div class="lbl">Annual Summit</div></div>
     </div>
@@ -801,15 +786,14 @@
       <div style="flex:1;min-width:240px;">
         <div style="font-size:0.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem;">2026 Youth STEM Summit</div>
         <h3 style="font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;line-height:1.3;margin-bottom:.75rem;">First joint in-person<br/><em style="color:var(--teal);font-style:italic;">NC × Moldova summit</em></h3>
-        <p style="font-size:.9rem;color:rgba(245,245,240,.6);line-height:1.7;margin-bottom:1.25rem;">10 teams. 5 countries. Research presentations, a weather balloon launch, and five days of science in Moldova's Codrii Reserve.</p>
+        <p style="font-size:.9rem;color:color-mix(in srgb, var(--off-white) 60%, transparent);line-height:1.7;margin-bottom:1.25rem;">10 teams. 4 countries. Research presentations, a weather balloon launch, and five days of science in Moldova's Codrii Reserve.</p>
         <a href="https://ysalive.netlify.app" target="_blank" class="btn-primary" style="font-size:.875rem;padding:.65rem 1.4rem;display:inline-block;">View Summit Site →</a>
       </div>
       <div style="flex:1;min-width:240px;display:flex;flex-wrap:wrap;gap:.75rem;">
-        <div style="font-size:.8rem;color:rgba(245,245,240,.55);">🇺🇸 North Carolina</div>
-        <div style="font-size:.8rem;color:rgba(245,245,240,.55);">🇲🇩 Moldova</div>
-        <div style="font-size:.8rem;color:rgba(245,245,240,.55);">🇾🇪 Yemen</div>
-        <div style="font-size:.8rem;color:rgba(245,245,240,.55);">🇺🇦 Ukraine</div>
-        <div style="font-size:.8rem;color:rgba(245,245,240,.55);">🇸🇾 Syria</div>
+        <div style="font-size:.8rem;color:color-mix(in srgb, var(--off-white) 55%, transparent);">🇺🇸 North Carolina</div>
+        <div style="font-size:.8rem;color:color-mix(in srgb, var(--off-white) 55%, transparent);">🇲🇩 Moldova</div>
+        <div style="font-size:.8rem;color:color-mix(in srgb, var(--off-white) 55%, transparent);">🇾🇪 Yemen</div>
+        <div style="font-size:.8rem;color:color-mix(in srgb, var(--off-white) 55%, transparent);">🇸🇾 Syria</div>
         <div style="width:100%;height:1px;background:var(--border);"></div>
         <div style="font-size:.8rem;font-weight:600;color:var(--teal);">10 teams presenting research</div>
         <div style="font-size:.8rem;font-weight:600;color:var(--teal);">1 weather balloon launched to 32km</div>
@@ -824,7 +808,7 @@
   <div class="section-header">
     <div class="section-tag">About YSA</div>
     <h2>Where young scientists <em>change the world</em></h2>
-    <p>Founded in 2017 by Dr. Rob Condon, the Young Scientist Academy has grown from a single program in Wilmington, NC to an international network spanning five countries.</p>
+    <p>Founded in 2017 by Dr. Rob Condon, the Young Scientist Academy has grown from a single program in Wilmington, NC to an international network spanning four countries.</p>
   </div>
   <div class="content-wrap">
     <div class="about-mission">
@@ -834,7 +818,7 @@
 
     <div class="stat-row">
       <div class="stat-card"><div class="n">350+</div><div class="l">Youth Served Each Week</div></div>
-      <div class="stat-card"><div class="n">5</div><div class="l">Countries Represented</div></div>
+      <div class="stat-card"><div class="n">4</div><div class="l">Countries Represented</div></div>
       <div class="stat-card"><div class="n">2017</div><div class="l">Year Founded</div></div>
       <div class="stat-card"><div class="n">2023</div><div class="l">Moldova Partnership Launched</div></div>
       <div class="stat-card"><div class="n">5th</div><div class="l">Annual Youth Summit</div></div>
@@ -852,7 +836,7 @@
     </div>
 
     <div style="margin-bottom:1.5rem;">
-      <div style="font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(245,245,240,.35);margin-bottom:1.25rem;">Our Story</div>
+      <div style="font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:color-mix(in srgb, var(--off-white) 35%, transparent);margin-bottom:1.25rem;">Our Story</div>
     </div>
     <div class="about-timeline">
       <div class="timeline-item">
@@ -955,7 +939,7 @@
           <div style="font-size:1.75rem;">🎓</div>
           <div>
             <h3 style="margin-bottom:.2rem;">Teach STEM</h3>
-            <div style="font-size:.78rem;color:rgba(245,245,240,.45);">Educator Resource Program · Run by Annie</div>
+            <div style="font-size:.78rem;color:color-mix(in srgb, var(--off-white) 45%, transparent);">Educator Resource Program · Run by Annie</div>
           </div>
         </div>
         <p>Curriculum, tools, and training for educators bringing authentic hands-on science experiences to their classrooms. Developed in partnership with schools across New Hanover and Duplin Counties.</p>
@@ -966,7 +950,7 @@
     <!-- CALENDAR -->
     <div id="sub-calendar" class="sub-panel">
       <div class="calendar-grid">
-        <div style="font-size:.78rem;color:rgba(245,245,240,.35);margin-bottom:.5rem;letter-spacing:.06em;text-transform:uppercase;font-weight:600;">Upcoming Events — 2026/27</div>
+        <div style="font-size:.78rem;color:color-mix(in srgb, var(--off-white) 35%, transparent);margin-bottom:.5rem;letter-spacing:.06em;text-transform:uppercase;font-weight:600;">Upcoming Events — 2026/27</div>
 
         <div class="cal-event">
           <div class="cal-date"><div class="mo">Jul</div><div class="dy">18</div></div>
@@ -987,16 +971,16 @@
         </div>
 
         <div class="cal-event">
-          <div class="cal-date"><div class="mo">Fall</div><div class="dy">2026</div></div>
+          <div class="cal-date"><div class="mo">Oct</div><div class="dy">TBD</div></div>
           <div class="cal-info">
             <h4>STEM Explorer Program Applications Open</h4>
-            <p>Summer STEM Explorers Program — applications open to all students</p>
+            <p>Wilmington, NC · Applications open to all students for the Fall 2026 cohort</p>
           </div>
           <span class="cal-tag tag-teal">Explorer</span>
         </div>
 
         <div class="cal-event">
-          <div class="cal-date"><div class="mo">Sum</div><div class="dy">2027</div></div>
+          <div class="cal-date"><div class="mo">Jun</div><div class="dy">2027</div></div>
           <div class="cal-info">
             <h4>6th Annual Youth STEM Summit</h4>
             <p>Wilmington, NC · 2027 summit — details coming soon</p>
@@ -1057,7 +1041,7 @@
         <div class="media-main-body">
           <h3>2026 Youth STEM Summit — Highlights</h3>
           <p>Recap of the 5th Annual Youth STEM Summit. Student research presentations, weather balloon launch, Codrii Reserve field work, and the first joint NC × Moldova summit.</p>
-          <br/><span style="font-size:.78rem;color:rgba(245,245,240,.35);">🎬 Full video coming soon · Subscribe on YouTube</span>
+          <br/><span style="font-size:.78rem;color:color-mix(in srgb, var(--off-white) 35%, transparent);">🎬 Full video coming soon · Subscribe on YouTube</span>
         </div>
       </div>
       <div class="media-side">
@@ -1092,7 +1076,7 @@
       </div>
     </div>
 
-    <div style="font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(245,245,240,.3);margin-bottom:1rem;">Summit Photos · Hover to pause</div>
+    <div style="font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:color-mix(in srgb, var(--off-white) 30%, transparent);margin-bottom:1rem;">Summit Photos · Hover to pause</div>
     <div class="photo-ticker-wrap">
       <div class="photo-ticker" id="photoTicker">
         <img src="https://ysalive.netlify.app/photos/492241298_1745901536259731_6421098025252713610_n.jpg" alt="Summit"/>
@@ -1123,7 +1107,7 @@
       </div>
     </div>
 
-    <div style="font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(245,245,240,.3);margin-bottom:1rem;">Follow YSA</div>
+    <div style="font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:color-mix(in srgb, var(--off-white) 30%, transparent);margin-bottom:1rem;">Follow YSA</div>
     <div class="social-row">
       <a class="social-pill" href="https://instagram.com/youngscientistacademy" target="_blank"><span class="sicon">📸</span> @youngscientistacademy</a>
       <a class="social-pill" href="https://www.tiktok.com/@ysamoldova" target="_blank"><span class="sicon">🎵</span> @ysamoldova</a>
@@ -1353,22 +1337,22 @@
     localStorage.setItem('ysa-colorblind', isOn ? '1' : '0');
   }
 
-  // ── COMPACT MODE ──
-  function toggleCompact() {
-    const isOn = document.getElementById('compactToggle').classList.toggle('on');
-    document.body.classList.toggle('compact', isOn);
-    localStorage.setItem('ysa-compact', isOn ? '1' : '0');
+  // ── REDUCED MOTION ──
+  function toggleReducedMotion() {
+    const isOn = document.getElementById('reducedMotionToggle').classList.toggle('on');
+    document.body.classList.toggle('reduced-motion', isOn);
+    localStorage.setItem('ysa-reduced-motion', isOn ? '1' : '0');
   }
 
   // ── RESET ──
   function resetSettings() {
-    ['ysa-theme','ysa-accent-name','ysa-accent-hex','ysa-font-size','ysa-compact','ysa-colorblind','ysa-tts']
+    ['ysa-theme','ysa-accent-name','ysa-accent-hex','ysa-font-size','ysa-reduced-motion','ysa-colorblind','ysa-tts']
       .forEach(k => localStorage.removeItem(k));
     setTheme('dark');
     setAccent('teal', '#3cbbb1');
     setFontSize('md');
-    document.body.classList.remove('compact', 'colorblind');
-    ['compactToggle','colorblindToggle','ttsToggle'].forEach(id => document.getElementById(id).classList.remove('on'));
+    document.body.classList.remove('reduced-motion', 'colorblind');
+    ['reducedMotionToggle','colorblindToggle','ttsToggle'].forEach(id => document.getElementById(id).classList.remove('on'));
     document.getElementById('tts-controls').style.display = 'none';
     ttsEnabled = false;
     window.speechSynthesis.cancel();
@@ -1380,16 +1364,16 @@
     const aName  = localStorage.getItem('ysa-accent-name') || 'teal';
     const aHex   = localStorage.getItem('ysa-accent-hex')  || '#3cbbb1';
     const fSize  = localStorage.getItem('ysa-font-size')   || 'md';
-    const compact    = localStorage.getItem('ysa-compact')    || '0';
-    const colorblind = localStorage.getItem('ysa-colorblind') || '0';
-    const tts        = localStorage.getItem('ysa-tts')        || '0';
+    const reducedMotion = localStorage.getItem('ysa-reduced-motion') || '0';
+    const colorblind    = localStorage.getItem('ysa-colorblind')     || '0';
+    const tts           = localStorage.getItem('ysa-tts')            || '0';
 
     setTheme(theme);
     setAccent(aName, aHex);
     setFontSize(fSize);
-    if (compact === '1') {
-      document.body.classList.add('compact');
-      document.getElementById('compactToggle').classList.add('on');
+    if (reducedMotion === '1') {
+      document.body.classList.add('reduced-motion');
+      document.getElementById('reducedMotionToggle').classList.add('on');
     }
     if (colorblind === '1') {
       document.body.classList.add('colorblind');
