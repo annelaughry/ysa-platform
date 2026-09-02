@@ -1,0 +1,1689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ambassador App — YSA</title>
+
+  <!-- Google Fonts: Inter for body text, Playfair Display for headings.
+       preconnect tells the browser to open the connection early so the fonts
+       load faster when the actual stylesheet request arrives. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* ══════════════════════════════════════════════════
+       DESIGN TOKEN / THEME VARIABLES
+       ══════════════════════════════════════════════════
+       CSS custom properties (variables) live here so a single
+       value controls every spot it's used.
+
+       IMPORTANT — this file defaults to LIGHT MODE at the :root level
+       (--dark is a near-white and --off-white is a near-black), which is
+       the opposite of what the variable names might suggest. The names
+       were chosen to match their role in dark mode; when the page loads in
+       light mode these variable values are simply swapped.
+
+       The html.dark ruleset below restores the expected dark-mode values.
+    */
+    :root {
+      --teal: #3cbbb1; --lavender: #bbbdf6; --pink: #ee4266;
+      --dark: #f7faf8; --off-white: #0d1a15; --card-bg: #ffffff;
+      --border: rgba(10,20,15,0.1); --gold: #f1b643; --amber: #c4903a;
+    }
+
+    /* Dark mode: the <html> element gets class="dark" by the theme-init
+       script (see the first <script> tag in <body>). These overrides flip
+       the background/text/card variables so the whole page goes dark
+       without touching any other CSS. */
+    html.dark { --dark: #0a0f0d; --off-white: #f5f5f0; --card-bg: #111a15; --border: rgba(245,245,240,0.08); }
+
+    /* The bottom bar keeps its dark look regardless of page theme — it's
+       an intentional "always-dark toolbar." This rule overrides the
+       bottom-bar's light-mode background specifically when dark mode is on. */
+    html.dark .bottom-bar { background: rgba(10,15,13,0.97) !important; border-top-color: rgba(245,245,240,0.06) !important; }
+
+    /* Colorblind mode (deuteranopia): swaps the accent colors to a
+       blue/orange/red palette that's distinguishable without red-green
+       vision. Applied via html.colorblind by the theme-init script. */
+    html.colorblind { --teal: #0077bb; --pink: #cc3311; --gold: #ee7733; }
+
+    /* Global box model reset. box-sizing: border-box means padding and
+       borders are included inside an element's declared width/height —
+       much easier to reason about than the default "content-box" model.
+       margin/padding 0 removes the browser's default spacing everywhere
+       so we start from a clean baseline. */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* Body defaults. padding-bottom: 68px reserves space at the very
+       bottom of the page so the fixed bottom bar (52px tall) doesn't
+       overlap the last bit of content — without this, content would
+       scroll behind the bar and be hidden. */
+    body { font-family: 'Inter', sans-serif; background: var(--dark); color: var(--off-white); min-height: 100vh; padding-bottom: 68px; }
+
+    /* Strip underlines from links and inherit the surrounding text color
+       so links look like regular text unless we explicitly style them. */
+    a { color: inherit; text-decoration: none; }
+
+    /* Colorblind accent overrides at the body level (mirrors the html.colorblind
+       rule above — belt-and-suspenders for cases where JS applies the class
+       to body instead of html). */
+    body.colorblind { --teal: #0077bb; --pink: #cc3311; --gold: #ee7733; }
+
+    /* Accessibility font-size options. The base font-size on html scales
+       everything that uses rem units, so bumping it here enlarges the
+       whole UI proportionally. */
+    html.font-lg { font-size: 17px; } html.font-sm { font-size: 13px; }
+
+
+    /* ══════════════════════════════════════════════════
+       TOP NAVIGATION BAR
+       ══════════════════════════════════════════════════
+       position: sticky keeps the nav glued to the top of the viewport as
+       the user scrolls — it stays there without overlapping content the
+       way position: fixed would (sticky only activates after the element
+       would normally scroll off-screen).
+       z-index: 200 ensures the nav draws on top of page content. */
+    nav.nav-ysa {
+      position: sticky; top: 0; z-index: 200;
+      height: 72px;
+      /* Semi-transparent background + backdrop-filter creates a frosted-glass
+         effect — you can see page content blurring underneath as you scroll. */
+      background: rgba(255,255,255,0.97);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      box-shadow: 0 1px 8px rgba(0,0,0,0.05);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2.5rem; gap: 1rem; position: relative;
+    }
+    /* Dark mode nav: swap background to a dark translucent tone. */
+    html.dark nav.nav-ysa { background: rgba(10,15,13,0.97); border-bottom-color: rgba(255,255,255,0.07); }
+
+    /* Logo area: flex keeps the logo image and text side by side.
+       flex-shrink: 0 prevents the logo from compressing when nav space is tight. */
+    .nav-logo { display: flex; align-items: center; text-decoration: none; flex-shrink: 0; cursor: pointer; }
+    .nav-logo img { height: 52px; display: block; }
+    .nav-logo-text { font-weight: 800; font-size: 1rem; color: var(--off-white); letter-spacing: -0.02em; }
+    .nav-logo-sub  { font-size: 0.65rem; color: var(--teal); font-weight: 600; letter-spacing: .06em; text-transform: uppercase; line-height: 1; }
+
+    /* ── NAV LINKS AND DROPDOWN TRIGGER BUTTONS ──
+       flex: 1 + justify-content: center keeps the menu centered between
+       logo and right-side buttons regardless of how wide each side is. */
+    .nav-menu { display: flex; align-items: center; gap: 0.1rem; list-style: none; flex: 1; justify-content: center; }
+    .nav-menu > li { position: relative; }
+
+    /* Both <a> and <button> elements are used inside nav items — <button>
+       for dropdown triggers (since they don't navigate by themselves),
+       <a> for direct links. Giving them the same styles makes them look
+       identical. */
+    .nav-menu > li > a, .nav-menu > li > button {
+      display: flex; align-items: center; gap: 0.25rem;
+      padding: 0.45rem 0.85rem; border-radius: 6px;
+      color: #444;
+      font-size: 0.9rem; font-weight: 500;
+      transition: color 0.15s, background 0.15s; cursor: pointer;
+      white-space: nowrap; background: none; border: none; font-family: inherit;
+    }
+
+    /* color-mix() usage: instead of hardcoding rgba(245,245,240, 0.75) for
+       dark mode link text, we mix --off-white with transparent at 75%.
+       This means the color automatically updates when --off-white changes
+       (e.g., in light mode or colorblind mode) rather than staying stuck
+       at the literal rgba value. */
+    html.dark .nav-menu > li > a, html.dark .nav-menu > li > button { color: color-mix(in srgb, var(--off-white) 75%, transparent); }
+
+    /* Hover state: highlight link in pink and show a faint pink background. */
+    .nav-menu > li > a:hover, .nav-menu > li > button:hover { color: var(--pink); background: rgba(238,66,102,0.05); }
+    .nav-item:hover > button, .nav-item:hover > a { color: var(--pink); }
+    .nav-dropdown a:hover { color: var(--pink) !important; background: rgba(238,66,102,0.06) !important; }
+    html.dark .nav-menu > li > a:hover, html.dark .nav-menu > li > button:hover { background: rgba(245,245,240,0.07); }
+
+    /* Active state: bold pink text marks the current page. */
+    .nav-menu > li > a.active { color: var(--pink); font-weight: 600; }
+
+    /* The small triangle/chevron (▼) next to dropdown labels. Rotates 180°
+       on hover so it points up when the dropdown is open — a common
+       affordance to show direction. */
+    .nav-chevron { font-size: 0.6rem; opacity: 0.6; transition: transform 0.2s; }
+    .nav-item:hover .nav-chevron { transform: rotate(180deg); }
+
+    /* ── DROPDOWN PANELS ──
+       Hidden by default (opacity: 0 + visibility: hidden + pointer-events: none).
+       Using opacity + visibility together is intentional: opacity alone hides it
+       visually but leaves it clickable; visibility: hidden removes it from
+       pointer events too. pointer-events: none is an extra belt-and-suspenders.
+
+       The slight translateY(-4px) on the closed state creates a subtle
+       "slide down" effect when the dropdown opens. */
+    .nav-dropdown {
+      position: absolute; top: 100%; left: 50%; transform: translateX(-50%); padding-top: 8px;
+      background: rgba(247,250,248,0.98); backdrop-filter: blur(16px);
+      border: 1px solid var(--border); border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+      padding: 0.5rem; min-width: 200px;
+      opacity: 0; visibility: hidden; pointer-events: none;
+      transition: opacity 0.18s, transform 0.18s;
+      transform: translateX(-50%) translateY(-4px);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+    }
+
+    /* CSS-only hover trigger: when the mouse is over the parent <li>, the
+       dropdown becomes visible. No JavaScript needed for this. */
+    .nav-item:hover .nav-dropdown { opacity: 1; visibility: visible; pointer-events: auto; transform: translateX(-50%) translateY(0); }
+
+    /* Individual links inside the dropdown. */
+    .nav-dropdown a {
+      display: block; padding: 0.55rem 0.9rem; border-radius: 8px;
+      font-size: 0.85rem; color: color-mix(in srgb, var(--off-white) 70%, transparent);
+      transition: background 0.12s, color 0.12s;
+    }
+    .nav-dropdown a:hover { background: rgba(245,245,240,0.07); color: var(--off-white); }
+
+    /* Small uppercase label that groups links inside a dropdown, e.g. "Learn More". */
+    .nav-dropdown .dd-tag { font-size: 0.65rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--teal); padding: 0.7rem 0.9rem 0.25rem; }
+
+    /* Right side of the nav: search button, gear icon, hamburger.
+       flex-shrink: 0 prevents them from being squeezed smaller. */
+    .nav-right { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
+
+    /* Circular icon button used for the search toggle and the gear link. */
+    .nav-search-btn {
+      display: flex; align-items: center; justify-content: center;
+      width: 38px; height: 38px; border-radius: 50%;
+      background: none; border: none;
+      color: #555; transition: color 0.15s, background 0.15s; cursor: pointer;
+    }
+    .nav-search-btn:hover { color: var(--pink); background: rgba(238,66,102,0.07); }
+    html.dark .nav-search-btn { color: color-mix(in srgb, var(--off-white) 60%, transparent); }
+    html.dark .nav-search-btn:hover { color: var(--off-white); background: rgba(245,245,240,0.07); }
+
+    /* ── EXPANDABLE SEARCH BAR ──
+       Positioned absolute relative to the nav so it slides out directly
+       below it. display: none by default — toggled to "flex" by
+       toggleSearchBar() in JS. */
+    .nav-search-bar {
+      position: absolute; top: 100%; left: 0; right: 0; z-index: 199;
+      background: rgba(255,255,255,0.98); border-bottom: 1px solid rgba(0,0,0,0.1);
+      padding: 0.75rem 2.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      display: none;
+    }
+    html.dark .nav-search-bar { background: rgba(10,15,13,0.98); border-color: rgba(255,255,255,0.07); }
+    .nav-search-bar.open { display: flex; align-items: center; gap: 0.75rem; }
+
+    /* The actual text input inside the search bar. flex: 1 makes it stretch
+       to fill the available width next to the icon. */
+    .nav-search-bar input {
+      flex: 1; border: none; outline: none; font-size: 1rem; background: transparent;
+      color: var(--off-white); font-family: inherit;
+    }
+    .nav-search-bar input::placeholder { color: #aaa; }
+
+    /* Primary CTA button in the nav (e.g. "Sign In" or "Register").
+       Solid pink background, white text. */
+    .nav-cta {
+      display: flex; align-items: center; gap: 0.35rem;
+      padding: 0.45rem 1.1rem; background: var(--pink); color: #fff;
+      border-radius: 6px; font-size: 0.85rem; font-weight: 700;
+      transition: background 0.15s, transform 0.1s; white-space: nowrap;
+    }
+    .nav-cta:hover { background: #d43359; transform: translateY(-1px); }
+
+    /* Secondary CTA: outlined pink, no fill — used when there's already a
+       primary button and we want a softer alternative. */
+    .nav-cta-secondary {
+      display: flex; align-items: center; gap: 0.35rem;
+      padding: 0.45rem 1rem; background: transparent; color: var(--pink);
+      border: 1.5px solid var(--pink); border-radius: 6px; font-size: 0.85rem; font-weight: 700;
+      transition: background 0.15s; white-space: nowrap;
+    }
+    .nav-cta-secondary:hover { background: rgba(238,66,102,0.07); }
+
+    /* Hamburger button: three horizontal bars. Hidden on desktop,
+       shown on mobile via the media query below. */
+    .nav-hamburger { display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 4px; }
+    .nav-hamburger span { display: block; width: 22px; height: 2px; background: var(--off-white); border-radius: 2px; }
+
+    /* ── MOBILE NAV ──
+       On screens narrower than 860px: hide the normal menu, show the
+       hamburger, and when toggled make the menu appear as a full-width
+       column dropping down from the nav. */
+    @media (max-width: 860px) {
+      .nav-menu { display: none; flex-direction: column; align-items: stretch; position: absolute; top: var(--nav-h); left: 0; right: 0; background: rgba(10,15,13,0.98); border-bottom: 1px solid var(--border); padding: 0.75rem 1.25rem 1rem; gap: 0.25rem; }
+      .nav-menu.open { display: flex; }
+      .nav-hamburger { display: flex; }
+      /* On mobile the dropdown panels are always visible (no hover state
+         available on touch) and positioned inline rather than floating. */
+      .nav-dropdown { position: static; transform: none; opacity: 1; visibility: visible; pointer-events: auto; background: transparent; border: none; box-shadow: none; padding: 0.25rem 0 0.25rem 1rem; }
+      .nav-item:hover .nav-dropdown { transform: none; }
+    }
+
+
+    /* ══════════════════════════════════════════════════
+       APP SWITCHER (fixed strip along the bottom of the screen)
+       ══════════════════════════════════════════════════
+       position: fixed means this bar stays glued to the bottom of the
+       viewport at all times, even while the user scrolls. This is
+       different from position: sticky (which only activates at a scroll
+       threshold). z-index: 150 puts it above most page content but below
+       the nav (z-index 200). */
+    .app-switcher {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 150; height: 38px;
+      background: rgba(10,15,13,0.97); border-top: 1px solid var(--border);
+      backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+    }
+
+    /* Each app link is a pill-shaped button.
+       .current highlights the active app with a teal tint. */
+    .app-switcher a { display: flex; align-items: center; gap: 0.3rem; padding: 0.25rem 0.75rem; border-radius: 100px; border: 1px solid var(--border); color: rgba(245,245,240,0.5); font-size: 0.72rem; font-weight: 500; transition: all 0.15s; }
+    .app-switcher a:hover { color: var(--off-white); border-color: rgba(245,245,240,0.25); }
+    .app-switcher a.current { color: var(--teal); border-color: rgba(60,187,177,0.35); background: rgba(60,187,177,0.07); }
+    .app-switcher-sep { color: rgba(245,245,240,0.15); font-size: 0.7rem; }
+
+
+    /* ══════════════════════════════════════════════════
+       PAGE-LEVEL TAB BAR
+       ══════════════════════════════════════════════════
+       Tabs sit just below the nav. The active tab gets a colored
+       bottom border that bleeds through the tab bar's own border-bottom,
+       creating the classic "selected tab" underline look. The
+       margin-bottom: -1px trick aligns the tab's border with the
+       container's border so they merge visually. */
+    .page-tabs { border-bottom: 1px solid var(--border); display: flex; padding: 0 2rem; gap: 0; }
+    .page-tab { padding: 1rem 1.25rem; border: none; background: none; color: color-mix(in srgb, var(--off-white) 45%, transparent); font-size: 0.85rem; font-weight: 500; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; }
+    .page-tab:hover { color: var(--off-white); }
+    .page-tab.active { color: var(--teal); border-bottom-color: var(--teal); font-weight: 600; }
+
+    /* Page panels are the full-page sections behind each tab.
+       Only the .active one is visible at a time — showTab() in JS
+       handles toggling the active class. */
+    .page-panel { display: none; }
+    .page-panel.active { display: block; }
+
+
+    /* ══════════════════════════════════════════════════
+       GENERAL LAYOUT HELPERS
+       ══════════════════════════════════════════════════ */
+
+    /* .page-wrap centers content and applies consistent horizontal padding.
+       max-width: 1100px stops lines from becoming too long on wide screens. */
+    .page-wrap { max-width: 1100px; margin: 0 auto; padding: 2rem 2rem 4rem; }
+    .page-header { margin-bottom: 2rem; }
+    .page-header h1 { font-size: 1.6rem; font-weight: 800; margin-bottom: 0.3rem; }
+    .page-header p { color: color-mix(in srgb, var(--off-white) 55%, transparent); font-size: 0.9rem; }
+
+    /* Generic card: dark background, subtle border, rounded corners, drop shadow.
+       The hover state lifts the card slightly (translateY(-4px)) and adds a
+       teal border glow — gives a sense of depth and interactivity. */
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 1.75rem; box-shadow: 0 4px 24px rgba(0,0,0,0.3); transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s; }
+    .card:hover { transform: translateY(-4px); box-shadow: 0 8px 32px rgba(0,0,0,0.4); border-color: rgba(60,187,177,0.4); }
+    .card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
+    /* color-mix() again: 60% opacity without hardcoding an rgba hex. */
+    .card p { font-size: 0.875rem; color: color-mix(in srgb, var(--off-white) 60%, transparent); line-height: 1.65; }
+
+    /* Responsive grid helpers. grid-template-columns: repeat(3, 1fr) creates
+       three equal columns. See media queries at the bottom for how these
+       collapse on small screens. */
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; }
+
+    /* Reusable button styles. border-radius: 100px makes fully rounded "pill"
+       buttons regardless of the button's actual size. */
+    .btn-primary { display: inline-flex; align-items: center; padding: 0.65rem 1.4rem; border-radius: 100px; background: var(--teal); color: var(--dark); font-weight: 700; font-size: 0.875rem; border: none; cursor: pointer; transition: all 0.15s; }
+    .btn-primary:hover { background: #2fa89e; }
+    .btn-outline { display: inline-flex; align-items: center; padding: 0.65rem 1.4rem; border-radius: 100px; border: 1.5px solid rgba(245,245,240,0.2); color: var(--off-white); font-weight: 600; font-size: 0.875rem; background: none; cursor: pointer; transition: all 0.15s; }
+    .btn-outline:hover { border-color: rgba(245,245,240,0.45); }
+
+
+    /* ══════════════════════════════════════════════════
+       DASHBOARD TAB STYLES
+       ══════════════════════════════════════════════════ */
+
+    /* Hero greeting card at the top of the dashboard. The gradient
+       background uses rgba so it's translucent — the page's own background
+       shows through slightly. flex-wrap: wrap lets the avatar and text
+       stack vertically on small screens. */
+    .dash-hero { background: linear-gradient(135deg, rgba(60,187,177,0.08) 0%, rgba(187,189,246,0.05) 100%); border: 1px solid rgba(60,187,177,0.15); border-radius: 20px; padding: 2.5rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
+
+    /* Circular avatar placeholder — shows the user's initial until we have
+       a real avatar image. flex-shrink: 0 prevents it from being squashed. */
+    .dash-avatar { width: 72px; height: 72px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 1.75rem; font-weight: 800; color: var(--dark); flex-shrink: 0; }
+
+    .dash-user h2 { font-size: 1.4rem; font-weight: 800; margin-bottom: 0.25rem; }
+
+    /* The "Experimenter" status pill badge below the user's name. */
+    .dash-user .status-badge { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.3rem 0.75rem; border-radius: 100px; background: rgba(60,187,177,0.12); color: var(--teal); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.04em; }
+
+    /* Team/program attribution line below the status badge. */
+    .dash-user .team-tag { font-size: 0.8rem; color: color-mix(in srgb, var(--off-white) 50%, transparent); margin-top: 0.4rem; }
+
+    /* 4-column stat grid (points, rank, hours, presentations). */
+    .dash-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+    .dash-stat { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
+    .dash-stat .n { font-size: 1.75rem; font-weight: 800; color: var(--teal); line-height: 1; }
+    .dash-stat .l { font-size: 0.72rem; color: color-mix(in srgb, var(--off-white) 45%, transparent); margin-top: 0.25rem; font-weight: 500; letter-spacing: 0.03em; }
+
+    /* XP progress bar — the container is a dim track; the inner bar is
+       teal and its width is set inline (e.g. style="width:70%") to
+       represent progress toward the next level. overflow: hidden clips
+       the inner bar at the container's rounded edges. */
+    .progress-bar-wrap { background: rgba(245,245,240,0.06); border-radius: 100px; height: 6px; margin-top: 0.5rem; overflow: hidden; }
+    .progress-bar { height: 100%; background: var(--teal); border-radius: 100px; transition: width 0.5s ease; }
+
+    /* Recent activity feed — a vertical list of items. */
+    .recent-activity { display: flex; flex-direction: column; gap: 0.65rem; }
+
+    /* Each activity row: emoji icon + text + points + timestamp.
+       The icon and timestamp are flex-shrink: 0 / white-space: nowrap
+       to stay fixed; the text (flex: 1) fills the remaining space. */
+    .activity-item { display: flex; align-items: center; gap: 1rem; padding: 0.85rem 1rem; background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; }
+    .activity-icon { font-size: 1.1rem; flex-shrink: 0; }
+    .activity-text { flex: 1; font-size: 0.875rem; }
+    .activity-pts { font-size: 0.78rem; font-weight: 700; color: var(--teal); white-space: nowrap; }
+    .activity-time { font-size: 0.72rem; color: color-mix(in srgb, var(--off-white) 35%, transparent); white-space: nowrap; }
+
+
+    /* ══════════════════════════════════════════════════
+       STATUS LEVEL PROGRESSION TRACKER
+       ══════════════════════════════════════════════════
+       A vertically stacked list of level rows. The .current row gets a
+       teal tint; rows the user has already passed get .done. Both .current
+       and .done rows show a teal pip dot. */
+    .status-levels { display: flex; flex-direction: column; gap: 0; background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; margin-bottom: 2rem; }
+    .level-row { display: flex; align-items: center; gap: 1.25rem; padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--border); transition: background 0.15s; }
+    .level-row:last-child { border-bottom: none; }
+    .level-row.current { background: rgba(60,187,177,0.06); }
+
+    /* The small dot to the left of each level name. Default: dim border color.
+       .done and .current: glows teal to show progress. */
+    .level-pip { width: 10px; height: 10px; border-radius: 50%; background: var(--border); flex-shrink: 0; }
+    .level-row.current .level-pip, .level-row.done .level-pip { background: var(--teal); }
+
+    .level-name { font-size: 0.875rem; font-weight: 600; flex: 1; }
+    .level-range { font-size: 0.75rem; color: color-mix(in srgb, var(--off-white) 40%, transparent); }
+    .level-row.current .level-name { color: var(--teal); }
+
+
+    /* ══════════════════════════════════════════════════
+       TEAMS TAB STYLES
+       ══════════════════════════════════════════════════ */
+
+    /* Filter pill buttons above the team grid. .active gets a teal
+       background to show which filter is selected. */
+    .teams-filter { display: flex; gap: 0.5rem; margin-bottom: 1.75rem; flex-wrap: wrap; }
+    .filter-btn { padding: 0.4rem 0.85rem; border-radius: 100px; border: 1px solid var(--border); background: none; color: color-mix(in srgb, var(--off-white) 55%, transparent); font-size: 0.78rem; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+    .filter-btn:hover { border-color: rgba(245,245,240,0.3); color: var(--off-white); }
+    .filter-btn.active { background: rgba(60,187,177,0.1); border-color: rgba(60,187,177,0.4); color: var(--teal); font-weight: 600; }
+
+    /* Responsive card grid: auto-fill means CSS creates as many columns as
+       fit with a minimum of 280px each. On small screens this naturally
+       collapses to 1 or 2 columns without needing extra media queries. */
+    .teams-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem; }
+
+    /* Individual team card. cursor: default because cards aren't clickable;
+       they're informational. */
+    .team-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; transition: border-color 0.2s, transform 0.15s; cursor: default; }
+    .team-card:hover { transform: translateY(-2px); }
+    .team-card-header { display: flex; align-items: center; gap: 0.85rem; margin-bottom: 0.85rem; }
+    .team-flag { font-size: 1.5rem; }
+    .team-name { font-size: 1rem; font-weight: 700; }
+
+    /* Program badge pill: either teal (GSA) or gold (Explorer) depending
+       on which class is applied. */
+    .team-program-badge { font-size: 0.65rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 0.2rem 0.5rem; border-radius: 100px; }
+    .badge-gsa { background: rgba(60,187,177,0.12); color: var(--teal); }
+    .badge-explorer { background: rgba(241,182,67,0.12); color: var(--gold); }
+
+    /* Brief research topic description under the team name. */
+    .team-topic { font-size: 0.82rem; color: color-mix(in srgb, var(--off-white) 55%, transparent); line-height: 1.55; margin-bottom: 0.85rem; }
+    .team-country { font-size: 0.75rem; color: color-mix(in srgb, var(--off-white) 40%, transparent); }
+
+
+    /* ══════════════════════════════════════════════════
+       LEADERBOARD TAB STYLES
+       ══════════════════════════════════════════════════ */
+
+    /* Toggle buttons to switch between Individual and By Team views. */
+    .lb-toggle { display: flex; gap: 0.5rem; margin-bottom: 2rem; }
+    .lb-btn { padding: 0.5rem 1.1rem; border-radius: 8px; border: 1px solid var(--border); background: none; color: color-mix(in srgb, var(--off-white) 55%, transparent); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+    .lb-btn.active { color: var(--teal); border-color: rgba(60,187,177,0.4); background: rgba(60,187,177,0.07); font-weight: 600; }
+
+    /* The leaderboard is a styled "table" built from div rows.
+       overflow: hidden on the container clips the top/bottom row corners
+       to the border-radius of the outer card. */
+    .lb-table { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+
+    /* Each row uses CSS grid with three columns: rank number, person info, points.
+       The first column (40px) is fixed; the middle (1fr) stretches to fill space;
+       the last (auto) fits the points number. */
+    .lb-row { display: grid; align-items: center; padding: 0.9rem 1.25rem; border-bottom: 1px solid var(--border); gap: 1rem; }
+    .lb-row:last-child { border-bottom: none; }
+    .lb-header { grid-template-columns: 40px 1fr auto; background: rgba(245,245,240,0.03); }
+    .lb-header span { font-size: 0.67rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: color-mix(in srgb, var(--off-white) 35%, transparent); }
+    .lb-row-data { grid-template-columns: 40px 1fr auto; }
+
+    /* Rank number / trophy emoji. Gold/silver/bronze classes add color. */
+    .lb-rank { font-size: 1.1rem; font-weight: 800; color: color-mix(in srgb, var(--off-white) 35%, transparent); text-align: center; }
+    .lb-rank.gold { color: var(--gold); }
+    .lb-rank.silver { color: #c0c0c0; }
+    .lb-rank.bronze { color: #cd7f32; }
+
+    /* Person cell: avatar circle + name + team stacked. */
+    .lb-person { display: flex; align-items: center; gap: 0.75rem; }
+    .lb-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800; color: var(--dark); flex-shrink: 0; }
+    .lb-name { font-size: 0.9rem; font-weight: 600; }
+    .lb-team { font-size: 0.75rem; color: color-mix(in srgb, var(--off-white) 45%, transparent); }
+
+    /* Points value — right-aligned, bold teal. */
+    .lb-pts { font-size: 1rem; font-weight: 800; color: var(--teal); text-align: right; }
+
+
+    /* ══════════════════════════════════════════════════
+       QUIZ TAB STYLES
+       ══════════════════════════════════════════════════ */
+
+    /* Quiz is centered and capped at 640px for a comfortable reading width. */
+    .quiz-wrap { max-width: 640px; margin: 0 auto; }
+
+    /* ── PROGRESS PIPS ──
+       Seven thin bars, one per question. They serve as a visual progress
+       indicator — like dots in a slideshow. The states are:
+         (no class) = not yet reached — dim gray
+         .active    = current question — medium teal
+         .done      = answered — full teal
+       The updatePips() JS function drives these state changes. */
+    .quiz-progress { display: flex; gap: 0.4rem; margin-bottom: 2rem; }
+    .quiz-pip { flex: 1; height: 4px; border-radius: 100px; background: rgba(245,245,240,0.08); transition: background 0.3s; }
+    .quiz-pip.done { background: var(--teal); }
+    .quiz-pip.active { background: rgba(60,187,177,0.4); }
+
+    /* Question card — uses Playfair Display serif for the question text
+       to make it feel more weighty and intentional. */
+    .quiz-question { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 2.5rem; margin-bottom: 1.25rem; }
+    .quiz-question h3 { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; line-height: 1.4; margin-bottom: 1.5rem; }
+
+    /* Answer options: full-width buttons stacked vertically. */
+    .quiz-options { display: flex; flex-direction: column; gap: 0.65rem; }
+
+    /* Each answer option is a button. On hover: teal outline + faint fill.
+       When .selected: solid teal border, teal text, bold weight. */
+    .quiz-option { padding: 0.85rem 1.1rem; border-radius: 10px; border: 1px solid var(--border); background: none; color: var(--off-white); font-size: 0.9rem; text-align: left; cursor: pointer; transition: all 0.15s; }
+    .quiz-option:hover { border-color: rgba(60,187,177,0.4); background: rgba(60,187,177,0.06); }
+    .quiz-option.selected { border-color: var(--teal); background: rgba(60,187,177,0.1); color: var(--teal); font-weight: 600; }
+
+    /* Row below the question: step counter on the left, Next button on the right. */
+    .quiz-nav { display: flex; justify-content: space-between; align-items: center; }
+    .quiz-step { font-size: 0.78rem; color: color-mix(in srgb, var(--off-white) 40%, transparent); }
+
+    /* Result card shown after the last question. The teal border and centered
+       layout gives it a ceremonial "reveal" feeling. */
+    .quiz-result { background: var(--card-bg); border: 1px solid rgba(60,187,177,0.25); border-radius: 20px; padding: 3rem; text-align: center; }
+    .quiz-result .result-flag { font-size: 3rem; margin-bottom: 1rem; }
+    .quiz-result h2 { font-family: 'Playfair Display', serif; font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .quiz-result .result-team { font-size: 1.1rem; font-weight: 700; color: var(--teal); margin-bottom: 1rem; }
+    .quiz-result p { color: color-mix(in srgb, var(--off-white) 60%, transparent); line-height: 1.75; margin-bottom: 2rem; max-width: 480px; margin-left: auto; margin-right: auto; }
+
+
+    /* ══════════════════════════════════════════════════
+       EXTRA THEME UTILITIES (HTML-level)
+       ══════════════════════════════════════════════════ */
+
+    /* Colorblind mode also tints the lavender accent. */
+    html.colorblind { --teal: #0077bb; --pink: #cc3311; --gold: #ee7733; --lavender: #33bbee; }
+
+    /* Reduced motion: collapses all animation and transition durations to
+       nearly zero for users who have vestibular disorders or motion
+       sensitivity. The !important overrides any inline duration. */
+    html.reduced-motion *, html.reduced-motion *::before, html.reduced-motion *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+
+    /* Gradient text effect: clips a teal-to-lavender gradient to the text
+       shape using the background-clip property. -webkit- prefix needed for
+       Safari/older Chrome. Only works on text — doesn't affect layout. */
+    .gradient-text { background: linear-gradient(135deg, var(--teal), var(--lavender)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+    /* ── FLOATING BACKGROUND PARTICLES ──
+       The particle container is fixed (covers the full viewport at all times)
+       and has z-index: 0 so it sits behind all content. pointer-events: none
+       ensures particles don't block clicks on anything underneath. */
+    .particles { position: fixed; inset: 0; overflow: hidden; z-index: 0; pointer-events: none; }
+
+    /* Each particle starts below the viewport (translateY 100vh) and
+       floats up past the top (-12vh), fading in and out with opacity.
+       The rotate + scale transforms make motion feel organic rather than
+       strictly linear. JavaScript creates and randomizes each particle. */
+    .particle { position: absolute; opacity: 0; animation: float-up linear infinite; }
+    .particle.circle  { border-radius: 50%; }
+    .particle.square  { border-radius: 2px; }
+
+    /* Triangles can't be a background color, so they're made with CSS
+       border tricks: zero width/height, with colored bottom border and
+       transparent side borders creates a triangle shape. CSS variables
+       (--tri-half, --tri-h, --tri-color) are set inline per particle. */
+    .particle.triangle { background: transparent !important; width: 0 !important; height: 0 !important; border-left: var(--tri-half) solid transparent; border-right: var(--tri-half) solid transparent; border-bottom: var(--tri-h) solid var(--tri-color); }
+
+    @keyframes float-up { 0% { transform: translateY(100vh) rotate(0deg) scale(0.6); opacity: 0; } 10% { opacity: 0.3; } 90% { opacity: 0.3; } 100% { transform: translateY(-12vh) rotate(360deg) scale(1); opacity: 0; } }
+
+    /* ── BOTTOM APP SWITCHER BAR ──
+       position: fixed keeps this bar stuck to the bottom of the viewport
+       at all times, even while scrolling. This is the same pattern as a
+       mobile bottom navigation (like iOS tab bars). z-index: 999 puts it
+       above everything else on the page.
+
+       The light-mode default (near-white background) is overridden by the
+       html.dark rule at the top of the stylesheet so it always appears dark. */
+    .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 52px; background: rgba(247,250,248,0.97); backdrop-filter: blur(12px); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: center; gap: 2.5rem; z-index: 999; }
+    html.dark .bottom-bar { background: rgba(10,15,13,0.97) !important; border-top-color: rgba(245,245,240,0.06) !important; }
+
+    /* Individual switcher links. flex-direction: column stacks the icon
+       emoji above the label text. .active gets a teal color to mark the
+       current section. */
+    .switcher-link { color: color-mix(in srgb, var(--off-white) 45%, transparent); font-size: 0.75rem; text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 1px; transition: color 0.2s; }
+    .switcher-link:hover { color: var(--teal); }
+    .switcher-link.active { color: var(--teal); }
+
+    /* ══════════════════════════════════════════════════
+       RESPONSIVE BREAKPOINTS
+       ══════════════════════════════════════════════════
+       Below 768px: four-column grids drop to two columns so cards don't
+       become too narrow. Padding and font sizes shrink for smaller screens. */
+    @media (max-width: 768px) {
+      .grid-3, .grid-4, .dash-stats { grid-template-columns: 1fr 1fr; }
+      .page-tabs { padding: 0 1rem; }
+      .page-tab { padding: 0.75rem 0.75rem; font-size: 0.78rem; }
+      .page-wrap { padding: 1.5rem 1.25rem 3rem; }
+      .dash-hero { padding: 1.75rem; }
+    }
+
+    /* Below 480px (phones): everything goes single-column. The nav logo
+       text is hidden to save space (just the image remains). App switcher
+       links and separators shrink or disappear. */
+    @media (max-width: 480px) {
+      .grid-3, .grid-4, .dash-stats { grid-template-columns: 1fr; }
+      .nav-logo-text { display: none; }
+      .app-switcher a { padding: 0.2rem 0.5rem; font-size: 0.65rem; }
+      .app-switcher-sep { display: none; }
+    }
+
+    /* Page fade-in */
+    /* page fade removed */
+
+    /* Back button: a small pill-shaped "← Back" link used at the top of
+       the dashboard to return to the home page. Teal on hover. */
+    .back-btn { display:inline-flex;align-items:center;gap:.4rem;padding:.4rem .9rem;border-radius:100px;border:1px solid var(--border);background:none;color:color-mix(in srgb, var(--off-white) 55%, transparent);font-size:.8rem;font-weight:600;cursor:pointer;text-decoration:none;transition:all .15s;margin-bottom:1.25rem; }
+    .back-btn:hover { border-color:var(--teal);color:var(--teal); }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════
+     THEME INIT SCRIPT (runs before anything renders)
+     ══════════════════════════════════════════════════
+     This IIFE (Immediately Invoked Function Expression) runs the instant the
+     browser parses this <script> tag — before the rest of the page HTML is
+     even read. That's intentional: it reads the user's saved theme preferences
+     from localStorage and applies them to the <html> element right away.
+
+     Why html element, not body? Because the body hasn't been created yet at
+     this point in parsing. Classes on html are just as effective for CSS.
+
+     The version check at the top is a migration guard: if the user has old
+     localStorage keys from a previous version of the platform (version !== '2'),
+     we wipe the theme/accent keys so stale settings don't carry over. Then
+     we stamp version '2' so this only runs once per browser.
+-->
+<script>
+(function(){
+  // Clear stale theme data from any previous version of the platform.
+  if(localStorage.getItem('ysa-platform-version') !== '2') {
+    ['ysa-theme','ysa-accent-hex','ysa-accent-name'].forEach(function(k){localStorage.removeItem(k);});
+    localStorage.setItem('ysa-platform-version','2');
+  }
+  var h=document.documentElement;
+  // Read all saved preferences from localStorage.
+  var t=localStorage.getItem('ysa-theme'),c=localStorage.getItem('ysa-colorblind'),
+      f=localStorage.getItem('ysa-font-size'),r=localStorage.getItem('ysa-reduced-motion'),
+      acc=localStorage.getItem('ysa-accent-hex');
+  // Apply each preference as a class on <html> so CSS variables pick it up.
+  if(t==='dark') h.classList.add('dark');
+  if(c==='1') h.classList.add('colorblind');
+  if(f) h.classList.add('font-'+f);
+  if(r==='1') h.classList.add('reduced-motion');
+  // Custom accent color: set the --teal CSS variable to the user's chosen hex.
+  if(acc) h.style.setProperty('--teal',acc);
+})();
+</script>
+
+<!-- ══════════════════════════════════════════════════
+     FLOATING PARTICLES CONTAINER
+     ══════════════════════════════════════════════════
+     This empty div is the mounting point for the animated background
+     particles. The particle JS at the bottom of the file creates <div>
+     elements and appends them here. The div itself is position: fixed and
+     covers the full screen (see .particles CSS above). -->
+<div class="particles" id="particles"></div>
+
+<!-- Second theme-init pass at body level. This duplicates some of the html-level
+     init above to also handle body classes (like .light and .colorblind) that
+     some older CSS rules target via "body.X" selectors. It's safe to run twice —
+     setting the same class twice is a no-op. -->
+<script>
+  (function() {
+    const theme = localStorage.getItem('ysa-theme') || 'dark';
+    const accentHex = localStorage.getItem('ysa-accent-hex') || '#3cbbb1';
+    const fontSize = localStorage.getItem('ysa-font-size') || 'md';
+    const colorblind = localStorage.getItem('ysa-colorblind') === '1';
+    // Toggle .light on body (rather than html) for any CSS that targets body.light.
+    document.body.classList.toggle('light', theme === 'light');
+    // Re-apply the accent color as a CSS variable on the root.
+    document.documentElement.style.setProperty('--teal', accentHex);
+    if (fontSize !== 'md') document.body.classList.add('font-' + fontSize);
+    document.body.classList.toggle('colorblind', colorblind);
+  })();
+</script>
+
+<!-- ══════════════════════════════════════════════════
+     TOP NAVIGATION
+     ══════════════════════════════════════════════════
+     The nav is sticky (stays at the top while scrolling) and contains:
+     - Logo (links back to index.html)
+     - Center menu with dropdown submenus (CSS hover-only, no JS)
+     - Right side: search icon, gear icon, hamburger (mobile)
+-->
+<nav class="nav-ysa">
+  <!-- Logo: links to the home page. onerror hides the image if the URL fails
+       to load (e.g. offline), so the nav doesn't show a broken image icon. -->
+  <a href="index.html" class="nav-logo">
+    <img src="https://ysalive.netlify.app/ysa-primarybrandmark-transparent.png" alt="YSA logo" onerror="this.style.display='none'"/>
+  </a>
+
+  <!-- Navigation menu. On mobile this collapses and is toggled by toggleNav(). -->
+  <ul class="nav-menu" id="navMenu">
+    <!-- Direct link — no dropdown -->
+    <li><a href="index.html">Home</a></li>
+
+    <!-- Dropdown item: the <button> is the trigger, the .nav-dropdown appears
+         on CSS hover. No JavaScript needed — it's pure CSS :hover. -->
+    <li class="nav-item">
+      <button>About <span class="nav-chevron">&#9660;</span></button>
+      <div class="nav-dropdown">
+        <!-- .dd-tag is a non-clickable label that groups the links below it. -->
+        <div class="dd-tag">Learn More</div>
+        <a href="#about">Our Story</a>
+        <a href="https://www.youngscientistacademy.org/staff-and-board.html" target="_blank">Staff &amp; Board</a>
+        <a href="#sponsors">Sponsors</a>
+        <a href="https://www.youngscientistacademy.org/in-the-news.html" target="_blank">In the News</a>
+        <a href="https://www.youngscientistacademy.org/job-opportunities.html" target="_blank">Job Opportunities</a>
+      </div>
+    </li>
+
+    <li class="nav-item">
+      <button>Events <span class="nav-chevron">&#9660;</span></button>
+      <div class="nav-dropdown">
+        <div class="dd-tag">Upcoming</div>
+        <a href="#events">Sparkle for STEM</a>
+        <a href="#summit">Youth Summit</a>
+        <a href="#events">YSA Hackathon</a>
+      </div>
+    </li>
+
+    <li class="nav-item">
+      <button>Programs <span class="nav-chevron">&#9660;</span></button>
+      <div class="nav-dropdown">
+        <div class="dd-tag">Our Programs</div>
+        <a href="#programs">Learn STEM</a>
+        <a href="https://www.youngscientistacademy.org/registration-971003-187895.html" target="_blank">Teach STEM</a>
+        <a href="ambassadors.html">Global STEM Ambassadors</a>
+        <a href="#programs">Summer STEM Explorers</a>
+      </div>
+    </li>
+
+    <li><a href="https://youngscientistacademy.org/donate.html" target="_blank">Donate</a></li>
+  </ul>
+
+  <!-- Right-side controls -->
+  <div class="nav-right">
+    <!-- Search toggle button. onclick calls toggleSearchBar() which shows/hides
+         the .nav-search-bar panel below the nav. The SVG is an inline magnifying
+         glass icon — no image file dependency. -->
+    <button class="nav-search-btn" onclick="toggleSearchBar()" title="Search" aria-label="Search">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </button>
+
+    <!-- Gear icon: links to index.html?settings=1 (the home page, which will
+         auto-open the settings panel when it sees ?settings=1 in the URL).
+         The settings panel itself only lives on the home page — this is the
+         standard pattern for reaching it from any other page. -->
+    <a href="index.html?settings=1" class="nav-search-btn" title="Accessibility Settings" aria-label="Accessibility Settings"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></a>
+
+    <!-- Hamburger button: only visible on mobile (see media query).
+         Three <span> elements styled as horizontal bars in CSS. -->
+    <button class="nav-hamburger" onclick="toggleNav()" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Expandable search bar that slides down below the nav when the search
+     icon is clicked. Hidden by default (display: none), shown with class .open. -->
+<div class="nav-search-bar" id="navSearchBar">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+  <!-- Pressing Escape closes the bar via the onkeydown handler. -->
+  <input type="text" placeholder="Search YSA..." id="navSearchInput" onkeydown="if(event.key==='Escape')toggleSearchBar()"/>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════
+     PAGE TAB BAR
+     ══════════════════════════════════════════════════
+     Four tabs that switch between major sections of the ambassador app.
+     Each calls showTab() with the section name and a reference to itself
+     (this) so the function can mark it as active. "Dashboard" starts active. -->
+<div class="page-tabs">
+  <button class="page-tab active" onclick="showTab('dashboard', this)">Dashboard</button>
+  <button class="page-tab" onclick="showTab('teams', this)">Teams</button>
+  <button class="page-tab" onclick="showTab('leaderboard', this)">Leaderboard</button>
+  <button class="page-tab" onclick="showTab('quiz', this)">Find My Team</button>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════
+     TAB PANEL: DASHBOARD
+     ══════════════════════════════════════════════════
+     This section is visible by default (.page-panel.active). showTab()
+     in JS manages which panel has the .active class. -->
+<div id="tab-dashboard" class="page-panel active">
+  <div class="page-wrap">
+    <!-- Back to home link. &#8592; is the HTML entity for ← -->
+    <a href="index.html" class="back-btn">&#8592; Back</a>
+
+    <!-- ── SIGN-IN GATE ──
+         Shown (via JS below) when the user is NOT logged in.
+         Hidden by default in HTML (display:none) — JS flips it.
+         Directs the user to auth.html to sign in or create an account. -->
+    <div id="dashSignInGate" style="display:none;text-align:center;padding:4rem 1rem;">
+      <div style="font-size:2.5rem;margin-bottom:1rem;">🔒</div>
+      <h2 style="font-size:1.5rem;font-weight:800;margin-bottom:.5rem;">Sign in to see your dashboard</h2>
+      <p style="color:color-mix(in srgb,var(--off-white) 55%,transparent);margin-bottom:2rem;max-width:360px;margin-left:auto;margin-right:auto;">Track your points, team progress, and research activity as a YSA ambassador.</p>
+      <a href="auth.html" style="display:inline-block;background:var(--teal);color:var(--dark);font-weight:700;padding:.75rem 2rem;border-radius:100px;font-size:.9rem;margin-bottom:.75rem;">Sign In</a>
+      <br>
+      <!-- text-underline-offset adds a small gap between the text and underline for readability. -->
+      <a href="auth.html#register" style="font-size:.85rem;color:var(--teal);text-decoration:underline;text-underline-offset:3px;">Create an account</a>
+    </div>
+
+    <!-- ── DASHBOARD CONTENT ──
+         Shown when the user IS logged in. The sign-in gate check at the
+         bottom of the file toggles which of these two divs is visible. -->
+    <div id="dashContent">
+
+      <!-- Hero greeting card with avatar, name, status badge, and team. -->
+      <div class="dash-hero">
+        <!-- Avatar: a colored circle with the user's initial. In a real
+             logged-in build, this would be swapped for a real avatar image. -->
+        <div class="dash-avatar">M</div>
+        <div class="dash-user">
+          <!-- .gradient-text applies a teal-to-lavender gradient fill to the text
+               (see .gradient-text CSS). The emoji is part of the text string. -->
+          <h2 class="gradient-text">Hey, Maddie! 👋</h2>
+          <div style="display:flex;align-items:center;gap:.65rem;margin-top:.35rem;flex-wrap:wrap;">
+            <!-- Status badge shows the current XP rank. -->
+            <span class="status-badge">🧪 Experimenter</span>
+            <!-- Team tag shows team name and program track. -->
+            <span class="team-tag">🌿 Code Green · GSA</span>
+          </div>
+          <div class="team-tag" style="margin-top:.4rem;">Member since August 2026</div>
+        </div>
+      </div>
+
+      <!-- Stat cards: 4-column grid with key numbers.
+           The progress bar inside the first card is an inline-width div —
+           70% means the user is 70% of the way to the next level. -->
+      <div class="dash-stats">
+        <div class="dash-stat">
+          <div class="n">245</div>
+          <div class="l">Total Points</div>
+          <!-- Progress bar toward next level. Width set inline as a percentage. -->
+          <div class="progress-bar-wrap" style="margin-top:.65rem;">
+            <div class="progress-bar" style="width:70%"></div>
+          </div>
+          <div style="font-size:.7rem;color:color-mix(in srgb, var(--off-white) 35%, transparent);margin-top:.35rem;">105 pts to Analyst</div>
+        </div>
+        <div class="dash-stat">
+          <div class="n">#3</div>
+          <div class="l">Team Rank</div>
+        </div>
+        <div class="dash-stat">
+          <div class="n">12</div>
+          <div class="l">Research Hours</div>
+        </div>
+        <div class="dash-stat">
+          <div class="n">3</div>
+          <div class="l">Presentations</div>
+        </div>
+      </div>
+
+      <!-- Lower dashboard section: two columns — activity feed (left) and
+           status levels (right). The grid collapses to a single column on
+           mobile via the media query, but this inline grid is the desktop layout. -->
+      <div style="display:grid;grid-template-columns:1fr 280px;gap:1.5rem;align-items:start;margin-bottom:2rem;" class="dash-lower">
+
+        <!-- Left column: recent activity feed -->
+        <div>
+          <!-- Section label — small uppercase, dim. A common design pattern
+               to introduce a list without using a full heading. -->
+          <div style="font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:color-mix(in srgb, var(--off-white) 35%, transparent);margin-bottom:.85rem;">Recent Activity</div>
+          <div class="recent-activity">
+            <!-- Each activity-item row: emoji icon, description, points awarded, time. -->
+            <div class="activity-item"><span class="activity-icon">🔬</span><div class="activity-text">Research presentation — Code Green satellite analysis</div><span class="activity-pts">+50 pts</span><span class="activity-time">2 days ago</span></div>
+            <div class="activity-item"><span class="activity-icon">📝</span><div class="activity-text">Weekly meeting attendance</div><span class="activity-pts">+10 pts</span><span class="activity-time">1 week ago</span></div>
+            <div class="activity-item"><span class="activity-icon">🌍</span><div class="activity-text">Summit participant — 2026 Youth STEM Summit</div><span class="activity-pts">+100 pts</span><span class="activity-time">Aug 2026</span></div>
+            <div class="activity-item"><span class="activity-icon">🤝</span><div class="activity-text">Joined YSA Ambassador Program</div><span class="activity-pts">+25 pts</span><span class="activity-time">Aug 2026</span></div>
+          </div>
+        </div>
+
+        <!-- Right column: status level ladder -->
+        <div>
+          <div style="font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:color-mix(in srgb, var(--off-white) 35%, transparent);margin-bottom:.85rem;">Status Levels</div>
+          <!-- Each row has a .level-pip dot, a name, and a point range.
+               .done = already passed; .current = current level (highlighted in teal). -->
+          <div class="status-levels">
+            <div class="level-row done"><div class="level-pip"></div><div class="level-name">Observer</div><div class="level-range">0–49</div></div>
+            <div class="level-row done"><div class="level-pip"></div><div class="level-name">Hypothesis</div><div class="level-range">50–149</div></div>
+            <!-- "← you" annotation in the name is intentional — it's a fun,
+                 direct way to show the user exactly where they are. -->
+            <div class="level-row current"><div class="level-pip"></div><div class="level-name">Experimenter ← you</div><div class="level-range">150–349</div></div>
+            <div class="level-row"><div class="level-pip"></div><div class="level-name">Analyst</div><div class="level-range">350–699</div></div>
+            <div class="level-row"><div class="level-pip"></div><div class="level-name">Researcher</div><div class="level-range">700–1199</div></div>
+            <div class="level-row"><div class="level-pip"></div><div class="level-name">Principal Investigator</div><div class="level-range">1200+</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Featured project card. The inline linear-gradient background adds a
+           subtle teal-to-lavender tint over the card-bg, giving it a distinct
+           "featured" look compared to plain cards on the page. -->
+      <div class="card" style="background:linear-gradient(135deg,rgba(60,187,177,0.06) 0%,rgba(187,189,246,0.04) 100%);border-color:rgba(60,187,177,0.15);">
+        <div style="display:flex;align-items:center;gap:.85rem;">
+          <div style="font-size:1.75rem;">🌿</div>
+          <div>
+            <h3 style="margin-bottom:.2rem;">Code Green — Urban Greenspace Tracker</h3>
+            <p style="margin-bottom:0;">Tracking green space coverage in Wilmington, NC from 2019–2025 using NASA/USGS Landsat 8 and Sentinel-2 satellite data.</p>
+          </div>
+          <!-- flex-shrink:0 keeps the button from being squished by the text. -->
+          <div style="flex-shrink:0;">
+            <!-- &rarr; is the HTML entity for the → arrow character. -->
+            <a href="research.html#codegreen" class="btn-outline" style="font-size:.8rem;padding:.5rem 1rem;">View Research &rarr;</a>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end #dashContent -->
+  </div>
+</div><!-- end tab-dashboard -->
+
+
+<!-- ══════════════════════════════════════════════════
+     TAB PANEL: TEAMS
+     ══════════════════════════════════════════════════
+     Shows all 14 teams in a responsive card grid with filter buttons.
+     Each card has a data-program attribute ("gsa" or "explorer") and a
+     data-country attribute ("us", "md", "ye", "sy") — the filterTeams()
+     function uses these to show/hide cards without re-rendering them. -->
+<div id="tab-teams" class="page-panel">
+  <div class="page-wrap">
+    <div class="page-header">
+      <h1>Ambassador Teams</h1>
+      <p>14 teams across 4 countries — two tracks, one mission.</p>
+    </div>
+
+    <!-- Filter buttons. The "All Teams" button starts active.
+         Each calls filterTeams(filterValue, this) — the second argument
+         (this) lets the function mark itself as the active button. -->
+    <div class="teams-filter">
+      <button class="filter-btn active" onclick="filterTeams('all', this)">All Teams</button>
+      <button class="filter-btn" onclick="filterTeams('gsa', this)">Global STEM Ambassadors</button>
+      <button class="filter-btn" onclick="filterTeams('explorer', this)">Explorer Teams</button>
+    </div>
+
+    <!-- The grid container. CSS auto-fill means it creates as many columns
+         as fit at 280px minimum — automatically responsive. -->
+    <div class="teams-grid" id="teamsGrid">
+
+      <!-- ── GSA TEAMS ──
+           All GSA team cards have data-program="gsa". The border-color is
+           a faint teal tint — Explorer cards use a gold tint instead (below).
+           This subtle color difference visually separates the two programs
+           even without reading the badge. -->
+
+      <div class="team-card" data-program="gsa" data-country="us" style="border-color:rgba(60,187,177,0.18);">
+        <div class="team-card-header">
+          <!-- Flag emoji was removed from these cards but the header div
+               remains — no <div class="team-flag"> here. -->
+          <div>
+            <div class="team-name">Code Green</div>
+            <span class="team-program-badge badge-gsa">GSA</span>
+          </div>
+        </div>
+        <div class="team-topic">Urban greenspace tracking and heat island analysis in Wilmington, NC using Sentinel-2 satellite data.</div>
+        <div class="team-country">Wilmington, NC</div>
+      </div>
+
+      <div class="team-card" data-program="gsa" data-country="us" style="border-color:rgba(60,187,177,0.18);">
+        <div class="team-card-header">
+
+          <div>
+            <div class="team-name">Lab Rats</div>
+            <span class="team-program-badge badge-gsa">GSA</span>
+          </div>
+        </div>
+        <div class="team-topic">Martian ecology — studying how Earth organisms could survive in Mars-like conditions.</div>
+        <div class="team-country">Wilmington, NC</div>
+      </div>
+
+      <div class="team-card" data-program="gsa" data-country="us" style="border-color:rgba(60,187,177,0.18);">
+        <div class="team-card-header">
+
+          <div>
+            <div class="team-name">Forța</div>
+            <span class="team-program-badge badge-gsa">GSA</span>
+          </div>
+        </div>
+        <div class="team-topic">Jellyfish population dynamics and ocean warming in the Atlantic coastal ecosystem.</div>
+        <div class="team-country">Wilmington, NC</div>
+      </div>
+
+      <div class="team-card" data-program="gsa" data-country="us" style="border-color:rgba(60,187,177,0.18);">
+        <div class="team-card-header">
+
+          <div>
+            <div class="team-name">Dive Deep</div>
+            <span class="team-program-badge badge-gsa">GSA</span>
+          </div>
+        </div>
+        <div class="team-topic">Marine biodiversity research along the NC coast — documenting species distribution and habitat health.</div>
+        <div class="team-country">Wilmington, NC</div>
+      </div>
+
+      <div class="team-card" data-program="gsa" data-country="us" style="border-color:rgba(60,187,177,0.18);">
+        <div class="team-card-header">
+
+          <div>
+            <div class="team-name">Supernovas</div>
+            <span class="team-program-badge badge-gsa">GSA</span>
+          </div>
+        </div>
+        <div class="team-topic">Atmospheric science and weather pattern analysis across the NC coastal region.</div>
+        <div class="team-country">Wilmington, NC</div>
+      </div>
+
+      <!-- data-country="ye" = Yemen. This is why the country filter exists —
+           the dataset spans US, Moldova (md), Yemen (ye), and Syria (sy). -->
+      <div class="team-card" data-program="gsa" data-country="ye" style="border-color:rgba(60,187,177,0.18);">
+        <div class="team-card-header">
+
+          <div>
+            <div class="team-name">Stealth</div>
+            <span class="team-program-badge badge-gsa">GSA</span>
+          </div>
+        </div>
+        <div class="team-topic">Weather balloon engineering — designing, building, and launching high-altitude research payloads.</div>
+        <div class="team-country">Yemen</div>
+      </div>
+
+      <div class="team-card" data-program="gsa" data-country="md" style="border-color:rgba(60,187,177,0.18);">
+        <div class="team-card-header">
+
+          <div>
+            <div class="team-name">Codrii Minds</div>
+            <span class="team-program-badge badge-gsa">GSA</span>
+          </div>
+        </div>
+        <div class="team-topic">Codrii Reserve biodiversity monitoring — documenting flora and fauna in Moldova's largest forest.</div>
+        <div class="team-country">Chișinău, Moldova</div>
+      </div>
+
+      <div class="team-card" data-program="gsa" data-country="md" style="border-color:rgba(60,187,177,0.18);">
+        <div class="team-card-header">
+
+          <div>
+            <div class="team-name">Noroc Science</div>
+            <span class="team-program-badge badge-gsa">GSA</span>
+          </div>
+        </div>
+        <div class="team-topic">Air quality monitoring across urban Chișinău — tracking particulate matter and pollution sources.</div>
+        <div class="team-country">Chișinău, Moldova</div>
+      </div>
+
+      <div class="team-card" data-program="gsa" data-country="md" style="border-color:rgba(60,187,177,0.18);">
+        <div class="team-card-header">
+
+          <div>
+            <!-- "20dm³" is a chemistry reference — 20 cubic decimeters = 20 liters,
+                 the molar volume of an ideal gas at standard conditions. -->
+            <div class="team-name">20dm³</div>
+            <span class="team-program-badge badge-gsa">GSA</span>
+          </div>
+        </div>
+        <div class="team-topic">Chemistry and materials science — researching sustainable material alternatives for everyday applications.</div>
+        <div class="team-country">Moldova</div>
+      </div>
+
+      <div class="team-card" data-program="gsa" data-country="md" style="border-color:rgba(60,187,177,0.18);">
+        <div class="team-card-header">
+
+          <div>
+            <div class="team-name">HydroTerra</div>
+            <span class="team-program-badge badge-gsa">GSA</span>
+          </div>
+        </div>
+        <div class="team-topic">Water quality analysis across Moldovan rural communities — testing for contaminants and safe drinking water access.</div>
+        <div class="team-country">Moldova</div>
+      </div>
+
+      <!-- ── EXPLORER TEAMS ──
+           Explorer cards use data-program="explorer" and a gold border tint
+           (rgba(241,182,67,0.18)) instead of teal, to visually distinguish
+           them from GSA teams. The badge inside uses .badge-explorer (gold). -->
+
+      <div class="team-card" data-program="explorer" data-country="md" style="border-color:rgba(241,182,67,0.18);">
+        <div class="team-card-header">
+
+          <div>
+            <div class="team-name">Şacal</div>
+            <!-- Explorer badge: gold color scheme instead of teal. -->
+            <span class="team-program-badge badge-explorer">Explorer</span>
+          </div>
+        </div>
+        <div class="team-topic">Wildlife and forest ecology — tracking golden jackals and other predators in Moldovan reserves.</div>
+        <div class="team-country">Moldova</div>
+      </div>
+
+      <div class="team-card" data-program="explorer" data-country="md" style="border-color:rgba(241,182,67,0.18);">
+        <div class="team-card-header">
+
+          <div>
+            <div class="team-name">Capybara</div>
+            <span class="team-program-badge badge-explorer">Explorer</span>
+          </div>
+        </div>
+        <div class="team-topic">Wetlands ecology — studying aquatic ecosystems and species diversity in Moldovan wetland habitats.</div>
+        <div class="team-country">Moldova</div>
+      </div>
+
+      <div class="team-card" data-program="explorer" data-country="md" style="border-color:rgba(241,182,67,0.18);">
+        <div class="team-card-header">
+
+          <div>
+            <div class="team-name">Ice Bee</div>
+            <span class="team-program-badge badge-explorer">Explorer</span>
+          </div>
+        </div>
+        <div class="team-topic">Pollinator health and colony monitoring — studying the impact of environmental change on bee populations.</div>
+        <div class="team-country">Moldova</div>
+      </div>
+
+      <!-- data-country="sy" = Syria. -->
+      <div class="team-card" data-program="explorer" data-country="sy" style="border-color:rgba(241,182,67,0.18);">
+        <div class="team-card-header">
+
+          <div>
+            <div class="team-name">Gravity Goats</div>
+            <span class="team-program-badge badge-explorer">Explorer</span>
+          </div>
+        </div>
+        <div class="team-topic">Physics experiments and engineering challenges — building contraptions to demonstrate gravitational principles.</div>
+        <div class="team-country">Syria</div>
+      </div>
+
+    </div><!-- end .teams-grid -->
+  </div>
+</div><!-- end tab-teams -->
+
+
+<!-- ══════════════════════════════════════════════════
+     TAB PANEL: LEADERBOARD
+     ══════════════════════════════════════════════════
+     Two views: individual rankings and team rankings.
+     Only one is visible at a time — the toggle buttons switch between them
+     by showing/hiding the #lb-individual and #lb-team divs and managing
+     the .active class on whichever button was clicked. -->
+<div id="tab-leaderboard" class="page-panel">
+  <div class="page-wrap">
+    <div class="page-header">
+      <h1>Points Leaderboard</h1>
+      <p>Ambassadors earn points for research, presentations, and contributions.</p>
+    </div>
+
+    <!-- ── INDIVIDUAL / BY TEAM TOGGLE ──
+         The two buttons each do the same three things:
+         1. Mark themselves active.
+         2. Show their table (#lb-individual or #lb-team).
+         3. Hide the other table and remove .active from the other button.
+         Because the logic is simple and self-contained, it's written inline
+         rather than in a separate named function. -->
+    <div class="lb-toggle">
+      <!-- "Individual" starts active. nextElementSibling is the "By Team" button. -->
+      <button class="lb-btn active" onclick="this.classList.add('active');document.getElementById('lb-individual').style.display='block';document.getElementById('lb-team').style.display='none';this.nextElementSibling.classList.remove('active');">Individual</button>
+      <!-- previousElementSibling is the "Individual" button. -->
+      <button class="lb-btn" onclick="this.classList.add('active');document.getElementById('lb-team').style.display='block';document.getElementById('lb-individual').style.display='none';this.previousElementSibling.classList.remove('active');">By Team</button>
+    </div>
+
+    <!-- ── INDIVIDUAL RANKINGS TABLE ──
+         Built from div rows rather than a real <table> element — this gives
+         more styling flexibility (cards, rounded corners, hover effects)
+         than HTML tables allow. Each row uses CSS grid with 3 columns:
+         rank (40px fixed) | person info (1fr flexible) | points (auto).
+
+         The header row (.lb-header) uses the same grid to keep columns aligned.
+         The highlighted row (Maddie at #4) gets a teal tint inline. -->
+    <div id="lb-individual">
+      <div class="lb-table">
+        <!-- Header labels aligned to the data columns below. -->
+        <div class="lb-row lb-header"><span>#</span><span>Ambassador</span><span>Points</span></div>
+        <!-- Gold/silver/bronze rows: trophy emoji as rank, custom avatar colors. -->
+        <div class="lb-row lb-row-data"><div class="lb-rank gold">🥇</div><div class="lb-person"><div class="lb-avatar" style="background:#f1b643;color:#1a1000;">E</div><div><div class="lb-name">Elliana</div><div class="lb-team">Forța</div></div></div><div class="lb-pts">820</div></div>
+        <div class="lb-row lb-row-data"><div class="lb-rank silver">🥈</div><div class="lb-person"><div class="lb-avatar" style="background:#ee4266;">H</div><div><div class="lb-name">Hala</div><div class="lb-team">Stealth</div></div></div><div class="lb-pts">745</div></div>
+        <div class="lb-row lb-row-data"><div class="lb-rank bronze">🥉</div><div class="lb-person"><div class="lb-avatar" style="background:#bbbdf6;color:#0a0f0d;">H</div><div><div class="lb-name">Havah</div><div class="lb-team">Dive Deep</div></div></div><div class="lb-pts">690</div></div>
+        <!-- Maddie's row: teal background tint + teal rank number to highlight
+             the currently-logged-in user among all the other rows. -->
+        <div class="lb-row lb-row-data" style="background:rgba(60,187,177,0.04);"><div class="lb-rank" style="color:var(--teal);">4</div><div class="lb-person"><div class="lb-avatar">M</div><div><div class="lb-name">Maddie</div><div class="lb-team">Code Green</div></div></div><div class="lb-pts" style="color:var(--teal);">245</div></div>
+        <!-- Remaining ranked ambassadors. -->
+        <div class="lb-row lb-row-data"><div class="lb-rank">5</div><div class="lb-person"><div class="lb-avatar" style="background:#ee7733;">A</div><div><div class="lb-name">Alex</div><div class="lb-team">Lab Rats</div></div></div><div class="lb-pts">210</div></div>
+        <div class="lb-row lb-row-data"><div class="lb-rank">6</div><div class="lb-person"><div class="lb-avatar" style="background:#33bbee;color:#0a0f0d;">I</div><div><div class="lb-name">Ion</div><div class="lb-team">Noroc Science</div></div></div><div class="lb-pts">195</div></div>
+        <div class="lb-row lb-row-data"><div class="lb-rank">7</div><div class="lb-person"><div class="lb-avatar" style="background:#3cbbb1;color:#0a0f0d;">A</div><div><div class="lb-name">Ana</div><div class="lb-team">HydroTerra</div></div></div><div class="lb-pts">180</div></div>
+        <div class="lb-row lb-row-data"><div class="lb-rank">8</div><div class="lb-person"><div class="lb-avatar" style="background:#c4903a;color:#0a0f0d;">C</div><div><div class="lb-name">Caleb</div><div class="lb-team">Supernovas</div></div></div><div class="lb-pts">155</div></div>
+      </div>
+    </div>
+
+    <!-- ── TEAM RANKINGS TABLE ──
+         Hidden by default (display:none). Shows average points per team.
+         Structure is the same as the individual table. No avatar circles
+         here — just team name and sub-label (program + country). -->
+    <div id="lb-team" style="display:none;">
+      <div class="lb-table">
+        <div class="lb-row lb-header"><span>#</span><span>Team</span><span>Avg Pts</span></div>
+        <div class="lb-row lb-row-data"><div class="lb-rank gold">🥇</div><div class="lb-person"><div><div class="lb-name">Stealth</div><div class="lb-team">GSA · Yemen</div></div></div><div class="lb-pts">745</div></div>
+        <div class="lb-row lb-row-data"><div class="lb-rank silver">🥈</div><div class="lb-person"><div><div class="lb-name">Forța</div><div class="lb-team">GSA · North Carolina</div></div></div><div class="lb-pts">702</div></div>
+        <div class="lb-row lb-row-data"><div class="lb-rank bronze">🥉</div><div class="lb-person"><div><div class="lb-name">Dive Deep</div><div class="lb-team">GSA · North Carolina</div></div></div><div class="lb-pts">620</div></div>
+        <div class="lb-row lb-row-data"><div class="lb-rank">4</div><div class="lb-person"><div><div class="lb-name">HydroTerra</div><div class="lb-team">GSA · Moldova</div></div></div><div class="lb-pts">480</div></div>
+        <div class="lb-row lb-row-data"><div class="lb-rank">5</div><div class="lb-person"><div><div class="lb-name">Code Green</div><div class="lb-team">GSA · North Carolina</div></div></div><div class="lb-pts">345</div></div>
+      </div>
+    </div>
+  </div>
+</div><!-- end tab-leaderboard -->
+
+
+<!-- ══════════════════════════════════════════════════
+     TAB PANEL: FIND MY TEAM QUIZ
+     ══════════════════════════════════════════════════
+     A 7-question matching quiz. Here's how it works overall:
+
+     1. Questions are defined in a JS array (see the <script> below).
+        Some questions are flagged funny: true — these are personality
+        questions ("Be honest — are you a picky eater?") included for fun
+        and engagement. Their answers are NEVER used in the scoring logic,
+        so they don't affect which team you get matched to.
+
+     2. The first question (#q1) is hardcoded in HTML for instant display.
+        All subsequent questions (2–7) are dynamically rendered into the
+        #quizPlaceholder div by the nextQ() function.
+
+     3. The user clicks an option, which calls selectOpt() and enables
+        the Next button. When Next is clicked, the answer is pushed into
+        the `answers` array and the next question is rendered.
+
+     4. After all 7 questions, showResult() runs a simple if/else scoring
+        pass over the answers array, looking for specific values like
+        'water', 'ocean', 'tech', etc. The first matching condition wins.
+        Funny-question answers ('f1a', 'f1b', 'f2a', etc.) are never in
+        the results lookup table, so they're automatically ignored.
+
+     5. The result card replaces the quiz UI with the matched team's flag,
+        name, and description. -->
+<div id="tab-quiz" class="page-panel">
+  <div class="page-wrap">
+    <div class="page-header">
+      <h1>Find My Team</h1>
+      <p>Answer 7 questions (some serious, some absolutely not) to find your YSA team match.</p>
+    </div>
+
+    <!-- Constrain quiz width for comfortable reading. -->
+    <div class="quiz-wrap">
+
+      <!-- ── PROGRESS PIPS ──
+           Seven thin bars — one per question. The active pip is medium teal;
+           completed pips are fully teal; upcoming pips are dim.
+           updatePips() in JS updates these after each answer. -->
+      <div class="quiz-progress" id="quizProgress">
+        <!-- The first pip starts as .active because we're on question 1. -->
+        <div class="quiz-pip active"></div>
+        <div class="quiz-pip"></div>
+        <div class="quiz-pip"></div>
+        <div class="quiz-pip"></div>
+        <div class="quiz-pip"></div>
+        <div class="quiz-pip"></div>
+        <div class="quiz-pip"></div>
+      </div>
+
+      <div id="quizContent">
+        <!-- ── QUESTION 1 (hardcoded HTML) ──
+             The first question is written directly in HTML so there's no
+             delay or blank state while JS initializes. selectOpt() receives
+             the button element, the containing element's ID ('q1'), and
+             the value string ('env', 'tech', etc.) as arguments. -->
+        <div class="quiz-question" id="q1">
+          <h3>What kind of science excites you most?</h3>
+          <div class="quiz-options">
+            <button class="quiz-option" onclick="selectOpt(this, 'q1', 'env')">🌱 Environmental &amp; ecosystem research</button>
+            <button class="quiz-option" onclick="selectOpt(this, 'q1', 'tech')">🚀 Technology &amp; engineering challenges</button>
+            <button class="quiz-option" onclick="selectOpt(this, 'q1', 'ocean')">🌊 Marine &amp; ocean science</button>
+            <button class="quiz-option" onclick="selectOpt(this, 'q1', 'chem')">🧪 Chemistry &amp; materials</button>
+          </div>
+        </div>
+
+        <!-- ── DYNAMIC QUESTION PLACEHOLDER (questions 2–7) ──
+             Hidden by default. nextQ() fills in #qText and #qOpts, then
+             makes this visible while hiding #q1. -->
+        <div id="quizPlaceholder" style="display:none;">
+          <div class="quiz-question">
+            <!-- Question text is set by JS. If the question is flagged funny:true,
+                 JS also prepends a pink "Just for fun" label before the question text. -->
+            <h3 id="qText"></h3>
+            <!-- Answer option buttons are dynamically created and appended here by JS. -->
+            <div class="quiz-options" id="qOpts"></div>
+          </div>
+        </div>
+
+        <!-- ── RESULT CARD ──
+             Hidden until all 7 questions are answered. showResult() in JS
+             populates the flag, team name, and description, then shows this div. -->
+        <div id="quizResult" style="display:none;" class="quiz-result">
+          <div class="result-flag" id="resultFlag">🌿</div>
+          <h2>Your match:</h2>
+          <div class="result-team" id="resultTeam">Code Green</div>
+          <p id="resultDesc">Urban greenspace tracking and satellite data analysis in Wilmington, NC. If you care about cities, heat islands, and the intersection of tech + environment — this is your team.</p>
+          <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">
+            <!-- Primary action: go sign up for the ambassador app. -->
+            <a href="ambassadors.html" class="btn-primary">Join the Ambassador App</a>
+            <!-- Secondary action: restart the quiz (calls resetQuiz() in JS). -->
+            <button class="btn-outline" onclick="resetQuiz()">Try Again</button>
+          </div>
+        </div>
+      </div><!-- end #quizContent -->
+
+      <!-- ── QUIZ NAV BAR ──
+           Step counter on the left, Next button on the right.
+           The Next button starts disabled — selectOpt() enables it once an
+           answer is selected. On the last question, nextQ() changes the
+           button text to "See My Team →". -->
+      <div class="quiz-nav" id="quizNav">
+        <span class="quiz-step" id="quizStep">Question 1 of 7</span>
+        <!-- disabled attribute prevents clicking before an answer is selected. -->
+        <button class="btn-primary" id="nextBtn" onclick="nextQ()" disabled>Next &rarr;</button>
+      </div>
+
+    </div><!-- end .quiz-wrap -->
+  </div>
+</div><!-- end tab-quiz -->
+
+
+<!-- ══════════════════════════════════════════════════
+     BOTTOM APP SWITCHER BAR
+     ══════════════════════════════════════════════════
+     Fixed to the bottom of the viewport (position: fixed via .bottom-bar CSS).
+     This is always-dark regardless of the page theme — see the html.dark
+     override at the top of the stylesheet. The .active link is highlighted
+     in teal to show the current section. -->
+<div class="bottom-bar">
+  <a href="index.html" class="switcher-link">Home</a>
+  <!-- This page is the Dashboard, so ambassadors.html is marked .active. -->
+  <a href="ambassadors.html" class="switcher-link active">Dashboard</a>
+  <a href="research.html" class="switcher-link">Research</a>
+  <a href="auth.html" class="switcher-link">Profile</a>
+</div>
+
+
+<script>
+  // ══════════════════════════════════════════════════
+  // SIGN-IN GATE
+  // ══════════════════════════════════════════════════
+  // On page load, check if the user has a saved display name in localStorage.
+  // If not, show the sign-in gate and hide the dashboard content.
+  // If yes, hide the gate and show the dashboard.
+  //
+  // This runs in an IIFE so it fires immediately and doesn't pollute
+  // the global namespace with a function that's only needed once.
+  (function(){
+    var name = localStorage.getItem('ysa-display-name');
+    var gate = document.getElementById('dashSignInGate');
+    var content = document.getElementById('dashContent');
+    if(!name) {
+      // No saved name = not logged in. Show the lock screen.
+      if(gate) gate.style.display = 'block';
+      if(content) content.style.display = 'none';
+    } else {
+      // Saved name exists = user previously signed in. Show the dashboard.
+      if(gate) gate.style.display = 'none';
+      if(content) content.style.display = 'block';
+    }
+  })();
+
+  // ══════════════════════════════════════════════════
+  // TAB SWITCHER
+  // ══════════════════════════════════════════════════
+  // Called by each tab button. Hides all panels and deactivates all tabs,
+  // then shows the requested panel and marks the clicked tab as active.
+  // window.scrollTo() smoothly scrolls to the top so the new tab's content
+  // starts at the top of the viewport, not wherever the user was before.
+  function showTab(name, el) {
+    document.querySelectorAll('.page-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.page-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    el.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ══════════════════════════════════════════════════
+  // TEAM CARD FILTER
+  // ══════════════════════════════════════════════════
+  // Called by the filter buttons above the team grid.
+  // Reads each card's data-program and data-country attribute and sets
+  // display to '' (visible) or 'none' (hidden) accordingly.
+  // Setting display to '' (empty string) restores the element's default
+  // CSS display value (which is 'block' for divs) rather than hardcoding it.
+  function filterTeams(filter, btn) {
+    // Move the .active class to the clicked button.
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    document.querySelectorAll('.team-card').forEach(card => {
+      if (filter === 'all') { card.style.display = ''; return; }
+      // Show only GSA cards.
+      if (filter === 'gsa') { card.style.display = card.dataset.program === 'gsa' ? '' : 'none'; return; }
+      // Show only Explorer cards.
+      if (filter === 'explorer') { card.style.display = card.dataset.program === 'explorer' ? '' : 'none'; return; }
+      // Show only US cards (available filter, no button wired up yet).
+      if (filter === 'us') { card.style.display = card.dataset.country === 'us' ? '' : 'none'; return; }
+      // Show only Moldova cards.
+      if (filter === 'md') { card.style.display = card.dataset.country === 'md' ? '' : 'none'; return; }
+    });
+  }
+
+  // ══════════════════════════════════════════════════
+  // QUIZ DATA
+  // ══════════════════════════════════════════════════
+  // An array of question objects. Each object has:
+  //   text  — the question string
+  //   funny — (optional) if true, this question is for fun only and its
+  //            answers are NEVER used in the scoring logic. Funny questions
+  //            are visually flagged with a "Just for fun" label in the UI.
+  //   opts  — array of { l: "Label text", v: "value" } answer objects.
+  //            The value string is what gets pushed into the answers array.
+  //
+  // Scoring values used in showResult(): 'env', 'tech', 'ocean', 'chem',
+  //   'urban', 'water', 'air', 'satellite', 'sensor', 'lab', 'field',
+  //   'remote', 'collab', 'global', 'local', 'build', 'doc'.
+  // Funny-question values ('f1a'–'f1d', 'f2a'–'f2d') don't match any
+  //   scoring condition in showResult(), so they're silently ignored.
+  const questions = [
+    // Q1 is rendered in HTML — this entry in the array is still here so
+    // the index math works (currentQ starts at 0 = Q1).
+    { text: "What kind of science excites you most?", opts: [{l:"🌱 Environmental & ecosystem research",v:"env"},{l:"🚀 Technology & engineering",v:"tech"},{l:"🌊 Marine & ocean science",v:"ocean"},{l:"🧪 Chemistry & materials",v:"chem"}] },
+    // Q2: funny question — answers start with 'f1' so they're never scored.
+    { text: "Be honest — are you a picky eater?", funny: true, opts: [{l:"🍽️ I'll eat literally anything, no questions asked",v:"f1a"},{l:"🤔 Depends... what is it exactly?",v:"f1b"},{l:"🙅 I have a whole list of rules",v:"f1c"},{l:"🍕 I only eat things I already know I like",v:"f1d"}] },
+    // Q3: real scoring question.
+    { text: "Which real-world problem matters most to you?", opts: [{l:"🏙️ Urban heat and green space loss",v:"urban"},{l:"💧 Clean water access",v:"water"},{l:"🐠 Ocean health and biodiversity",v:"ocean"},{l:"🌬️ Air quality and climate",v:"air"}] },
+    // Q4: real scoring question.
+    { text: "How do you prefer to collect data?", opts: [{l:"📡 Satellite & remote sensing",v:"satellite"},{l:"🧲 Physical sensors & instruments",v:"sensor"},{l:"🔬 Lab experiments",v:"lab"},{l:"📊 Field surveys & observation",v:"field"}] },
+    // Q5: funny question — answers start with 'f2'.
+    { text: "You see instructions before assembling something. You:", funny: true, opts: [{l:"📖 Read every word before touching anything",v:"f2a"},{l:"👀 Skim them and then figure it out",v:"f2b"},{l:"🤷 Open the box and just start going",v:"f2c"},{l:"🔍 Watch a YouTube video instead",v:"f2d"}] },
+    // Q6: real scoring question.
+    { text: "Where do you do your best thinking?", opts: [{l:"🌿 Outside in nature",v:"field"},{l:"💻 At a computer, building things",v:"lab"},{l:"🔭 Observing from above or afar",v:"remote"},{l:"🤝 Collaborating with a team",v:"collab"}] },
+    // Q7: real scoring question.
+    { text: "What's your vibe?", opts: [{l:"🌍 Global, international, cross-cultural",v:"global"},{l:"🏡 Local, community-focused",v:"local"},{l:"⚙️ Building + engineering solutions",v:"build"},{l:"📝 Documentation + storytelling",v:"doc"}] }
+  ];
+
+  // ══════════════════════════════════════════════════
+  // QUIZ RESULT LOOKUP TABLE
+  // ══════════════════════════════════════════════════
+  // Maps a scoring key to a team result object with:
+  //   flag — emoji shown large above the result
+  //   team — team name
+  //   desc — description shown in the result card
+  // 'default' is the fallback when no specific answer matches.
+  // Each result has:
+  //   flag  — emoji shown large in the result card
+  //   team  — display name
+  //   desc  — description shown in the result card
+  //   slug  — short ID saved to localStorage (used by dashboard.html)
+  //   role  — 'ambassador' (Global STEM Ambassador) or 'explorer' (STEM Explorer)
+  //           Dashboard reads ysa-role from localStorage to show the right panel.
+  const results = {
+    default: { flag: "🌿", team: "Code Green",    slug: "codegreen",   role: "ambassador", desc: "Urban greenspace tracking and satellite data analysis in Wilmington, NC. If you care about cities, heat islands, and the intersection of tech + environment — this is your team." },
+    water:   { flag: "💧", team: "HydroTerra",    slug: "hydroterra",  role: "ambassador", desc: "Water quality research across rural Moldovan communities. If clean drinking water access and field testing are your thing, you belong here." },
+    ocean:   { flag: "🌊", team: "Dive Deep",     slug: "divedeep",    role: "ambassador", desc: "Marine biodiversity along the NC coast. Perfect for ocean lovers who want to document real ecosystems and species health." },
+    air:     { flag: "🌬️", team: "Noroc Science", slug: "noroc",       role: "ambassador", desc: "Air quality monitoring across Chișinău, Moldova. Tracking pollution sources and advocating for cleaner cities." },
+    tech:    { flag: "🚀", team: "Stealth",       slug: "stealth",     role: "ambassador", desc: "Weather balloon engineering — designing, building, and launching high-altitude research payloads. For engineers who want to literally go up." },
+    chem:    { flag: "🧪", team: "20dm³",         slug: "20dm3",       role: "ambassador", desc: "Chemistry and sustainable materials research. If you love lab work and want to develop real solutions, this is your home." },
+    field:   { flag: "🦌", team: "Şacal",         slug: "sacal",       role: "explorer",   desc: "Wildlife ecology in Moldovan forests. Ideal for students who want to be in the field tracking actual animals in a real reserve." },
+    global:  { flag: "🌐", team: "Codrii Minds",  slug: "codrii",      role: "ambassador", desc: "Codrii Reserve biodiversity — documenting Moldova's largest forest. International field science at its finest." },
+  };
+
+  // Quiz state variables (module-level so all quiz functions share them).
+  let currentQ = 0;    // Index of the current question (0 = Q1).
+  let answers = [];    // Accumulated answers, one per completed question.
+  let currentAnswer = null; // The answer value for the question currently on screen.
+
+  // ══════════════════════════════════════════════════
+  // selectOpt(btn, qId, val)
+  // ══════════════════════════════════════════════════
+  // Called when the user clicks an answer option button.
+  //   btn  — the clicked button element
+  //   qId  — the ID of the question container ('q1' or 'quizPlaceholder')
+  //   val  — the value string for this answer (e.g. 'env', 'water', 'f1a')
+  //
+  // Deselects all other options in the same question container, marks
+  // this button selected, stores the answer, and enables the Next button.
+  function selectOpt(btn, qId, val) {
+    // Remove .selected from every option in this question's container.
+    document.querySelectorAll(`#${qId} .quiz-option`).forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    currentAnswer = val;
+    // Enable the Next button now that an answer is selected.
+    document.getElementById('nextBtn').disabled = false;
+  }
+
+  // ══════════════════════════════════════════════════
+  // nextQ()
+  // ══════════════════════════════════════════════════
+  // Called when the Next button is clicked.
+  // 1. Guards against clicking before an answer is selected.
+  // 2. Saves the current answer and increments the question index.
+  // 3. Updates the progress pips.
+  // 4. If all questions are done, shows the result.
+  // 5. Otherwise, renders the next question dynamically into #quizPlaceholder.
+  function nextQ() {
+    if (currentAnswer === null) return; // Safety guard — shouldn't happen since the button is disabled.
+
+    answers.push(currentAnswer); // Save this question's answer.
+    currentAnswer = null;        // Reset for the next question.
+    currentQ++;                  // Move to next question index.
+    updatePips();                // Reflect the new position in the progress bar.
+
+    // If we've answered all questions, show the result instead of another question.
+    if (currentQ >= questions.length) {
+      showResult();
+      return;
+    }
+
+    // Grab the next question definition from the array.
+    const q = questions[currentQ];
+
+    // Hide the hardcoded Q1 element; show the reusable placeholder.
+    document.getElementById('q1').style.display = 'none';
+    document.getElementById('quizPlaceholder').style.display = 'block';
+
+    // If this is a "funny" question, prepend a pink "Just for fun" label
+    // so the user knows their answer here won't affect their match result.
+    const funnyTag = q.funny ? '<span style="font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--pink);margin-bottom:0.5rem;display:block;">Just for fun</span>' : '';
+    document.getElementById('qText').innerHTML = funnyTag + q.text;
+
+    // Clear previous options and create new buttons for this question.
+    const optsEl = document.getElementById('qOpts');
+    optsEl.innerHTML = '';
+    q.opts.forEach(o => {
+      const btn = document.createElement('button');
+      btn.className = 'quiz-option';
+      btn.textContent = o.l;
+      // Note: dynamically created buttons use 'quizPlaceholder' as the container ID,
+      // not 'q1', so selectOpt() deselects within the right element.
+      btn.onclick = function() { selectOpt(this, 'quizPlaceholder', o.v); };
+      optsEl.appendChild(btn);
+    });
+
+    // Disable the Next button until the user picks an answer for this new question.
+    document.getElementById('nextBtn').disabled = true;
+
+    // Update the "Question X of 7" counter.
+    // currentQ is now 1-indexed for display (the +1 makes it human-readable).
+    document.getElementById('quizStep').textContent = `Question ${currentQ + 1} of ${questions.length}`;
+
+    // On the very last question, change "Next" to "See My Team →" so the
+    // user knows this click will reveal their result.
+    if (currentQ === questions.length - 1) document.getElementById('nextBtn').textContent = 'See My Team →';
+  }
+
+  // ══════════════════════════════════════════════════
+  // updatePips()
+  // ══════════════════════════════════════════════════
+  // Syncs the visual progress pips to the current question index.
+  // Pips before currentQ get .done (full teal).
+  // The pip at currentQ gets .active (medium teal).
+  // Pips after currentQ get no class (dim gray).
+  function updatePips() {
+    document.querySelectorAll('.quiz-pip').forEach((p, i) => {
+      p.classList.remove('done', 'active'); // Clear first so we're starting fresh.
+      if (i < currentQ) p.classList.add('done');         // Past question = done.
+      else if (i === currentQ) p.classList.add('active'); // Current question = active.
+      // Future pips: no class added, so they stay dim by default.
+    });
+  }
+
+  // ══════════════════════════════════════════════════
+  // showResult()
+  // ══════════════════════════════════════════════════
+  // Called after the last question is answered.
+  // Hides the question UI, marks all pips done, scores the answers,
+  // fills in the result card, and shows it.
+  function showResult() {
+    // Hide all question UI.
+    document.getElementById('q1').style.display = 'none';
+    document.getElementById('quizPlaceholder').style.display = 'none';
+    document.getElementById('quizNav').style.display = 'none';
+
+    // Mark every pip as done (fully teal) to show completion.
+    document.querySelectorAll('.quiz-pip').forEach(p => { p.classList.remove('active'); p.classList.add('done'); });
+
+    // ── SCORING LOGIC ──
+    // Simple priority-based if/else: the first match in the answers array wins.
+    // Funny-question answers ('f1a'–'f1d', 'f2a'–'f2d') are never present in
+    // any condition here, so they're automatically excluded from scoring.
+    // The order matters: more specific/distinctive interests are checked first.
+    let pick = 'default'; // Fallback if no specific answer matches.
+    if (answers.includes('water')) pick = 'water';
+    else if (answers.includes('ocean')) pick = 'ocean';
+    else if (answers.includes('air')) pick = 'air';
+    // 'tech' (Q1) and 'build' (Q7) both point to engineering-focused Stealth.
+    else if (answers.includes('tech') || answers.includes('build')) pick = 'tech';
+    else if (answers.includes('chem')) pick = 'chem';
+    // 'field' + 'global' together = international field work = Codrii Minds.
+    else if (answers.includes('field') && answers.includes('global')) pick = 'global';
+    // 'field' alone = local wildlife = Şacal.
+    else if (answers.includes('field')) pick = 'field';
+    // All other combinations fall through to 'default' (Code Green).
+
+    // Look up the result object and populate the result card.
+    const r = results[pick];
+    document.getElementById('resultFlag').textContent = r.flag;
+    document.getElementById('resultTeam').textContent = r.team;
+    document.getElementById('resultDesc').textContent = r.desc;
+    document.getElementById('quizResult').style.display = 'block';
+
+    // ── SAVE TO PROFILE ──
+    // Store the matched team and role in localStorage so dashboard.html
+    // can read them and automatically show the right role panel (GSA Ambassador
+    // vs STEM Explorer) when the user is "logged in".
+    // ysa-role:      'ambassador' or 'explorer'
+    // ysa-team-slug: short team ID (e.g. 'codegreen', 'hydroterra')
+    // ysa-team-name: display name (e.g. 'Code Green')
+    localStorage.setItem('ysa-role',      r.role);
+    localStorage.setItem('ysa-team-slug', r.slug);
+    localStorage.setItem('ysa-team-name', r.team);
+  }
+
+  // ══════════════════════════════════════════════════
+  // resetQuiz()
+  // ══════════════════════════════════════════════════
+  // Called by the "Try Again" button on the result card.
+  // Resets all state variables and the UI back to the initial state
+  // (Q1 visible, placeholder hidden, result hidden, pips reset, Next disabled).
+  function resetQuiz() {
+    currentQ = 0; answers = []; currentAnswer = null;
+    document.getElementById('q1').style.display = 'block';
+    document.getElementById('quizPlaceholder').style.display = 'none';
+    document.getElementById('quizResult').style.display = 'none';
+    document.getElementById('quizNav').style.display = 'flex';
+    document.getElementById('nextBtn').textContent = 'Next →';
+    document.getElementById('nextBtn').disabled = true;
+    document.getElementById('quizStep').textContent = 'Question 1 of 7';
+    // Deselect any lingering .selected class from Q1's options.
+    document.querySelectorAll('.quiz-option').forEach(b => b.classList.remove('selected'));
+    updatePips(); // Reset pips to initial state (only pip 0 active).
+  }
+</script>
+
+<script>
+// ══════════════════════════════════════════════════
+// FLOATING BACKGROUND PARTICLES
+// ══════════════════════════════════════════════════
+// Creates 28 small shapes (circles, squares, triangles) and appends them
+// to the #particles container. Each one is given random size, position,
+// animation duration, and delay so they don't all move in sync.
+//
+// The CSS @keyframes float-up animation handles the actual movement —
+// this script just creates the elements and sets the inline style variables
+// that control each particle's individual properties.
+(function() {
+  const container = document.getElementById('particles');
+  if (!container) return; // Safety: exit if the container isn't found.
+
+  const colors = ['#3cbbb1','#bbbdf6','#ee4266','#f1b643']; // Brand palette.
+  const shapes = ['circle','square','triangle'];
+
+  for (let i = 0; i < 28; i++) {
+    const p = document.createElement('div');
+    // Cycle through shapes and colors in order (modulo wraps around).
+    const shape = shapes[i % shapes.length];
+    const color = colors[i % colors.length];
+    const size  = Math.random() * 7 + 5;  // 5–12px
+    const dur   = Math.random() * 14 + 12; // 12–26s animation duration
+    const delay = Math.random() * 14;       // 0–14s delay, negative = already mid-animation
+    const left  = Math.random() * 100;     // 0–100% horizontal position
+
+    p.className = `particle ${shape}`;
+
+    if (shape === 'triangle') {
+      // Triangles are made with CSS border tricks (see .particle.triangle CSS).
+      // We pass the dimensions and color as custom CSS variables on the element.
+      const half = size / 2, h = size * 0.866; // 0.866 = sin(60°) for equilateral triangle
+      p.style.cssText = `--tri-half:${half}px;--tri-h:${h}px;--tri-color:${color};left:${left}%;animation-duration:${dur}s;animation-delay:-${delay}s;`;
+    } else {
+      // Circles and squares: set actual width/height and background color.
+      // Negative animation-delay means the particle starts mid-animation,
+      // so particles appear immediately rather than all starting from the bottom.
+      p.style.cssText = `width:${size}px;height:${size}px;left:${left}%;background:${color};animation-duration:${dur}s;animation-delay:-${delay}s;`;
+    }
+    container.appendChild(p);
+  }
+})();
+</script>
+</body>
+</html>

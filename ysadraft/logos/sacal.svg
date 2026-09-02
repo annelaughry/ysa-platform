@@ -1,0 +1,99 @@
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bgS" cx="50%" cy="42%" r="68%">
+      <stop offset="0%" stop-color="#152216"/>
+      <stop offset="100%" stop-color="#070e07"/>
+    </radialGradient>
+  </defs>
+
+  <circle cx="250" cy="250" r="248" fill="url(#bgS)"/>
+
+  <!-- Moon glow top-right (wolf howls at it) -->
+  <circle cx="368" cy="88" r="46" fill="#e8e0c0" opacity="0.13"/>
+  <circle cx="368" cy="88" r="30" fill="#e8e0c0" opacity="0.10"/>
+
+  <!-- Stars -->
+  <circle cx="72"  cy="80"  r="2"   fill="white" opacity="0.45"/>
+  <circle cx="155" cy="50"  r="1.5" fill="white" opacity="0.38"/>
+  <circle cx="430" cy="54"  r="1.5" fill="white" opacity="0.38"/>
+  <circle cx="48"  cy="165" r="1"   fill="white" opacity="0.3"/>
+
+  <!-- ── WOLF FACE (front-on, flat design) ── -->
+
+  <!-- LEFT EAR (outer) -->
+  <polygon points="162,222 130,130 215,222" fill="#e8e5da"/>
+  <!-- LEFT EAR (inner) -->
+  <polygon points="166,222 142,148 208,222" fill="#b89870"/>
+
+  <!-- RIGHT EAR (outer) -->
+  <polygon points="338,222 370,130 285,222" fill="#e8e5da"/>
+  <!-- RIGHT EAR (inner) -->
+  <polygon points="334,222 358,148 292,222" fill="#b89870"/>
+
+  <!-- FACE oval — main head shape -->
+  <ellipse cx="250" cy="298" rx="108" ry="118" fill="#e8e5da"/>
+  <!-- Forehead bridge (fills the gap between ears and oval) -->
+  <rect x="168" y="210" width="164" height="70" rx="20" fill="#e8e5da"/>
+
+  <!-- CHEEK fur patches (darker, gives shape) -->
+  <ellipse cx="175" cy="318" rx="38" ry="30" fill="#d4cfc0" opacity="0.55"/>
+  <ellipse cx="325" cy="318" rx="38" ry="30" fill="#d4cfc0" opacity="0.55"/>
+
+  <!-- ── EYES ── -->
+  <!-- Left brow ridge (wolf fierce) -->
+  <rect x="182" y="255" width="72" height="9" rx="4.5" fill="#8a7a60"
+        transform="rotate(-12 218 259)"/>
+  <!-- Right brow ridge -->
+  <rect x="246" y="255" width="72" height="9" rx="4.5" fill="#8a7a60"
+        transform="rotate(12 282 259)"/>
+
+  <!-- Left eye socket -->
+  <ellipse cx="206" cy="286" rx="30" ry="24" fill="#1a1208"/>
+  <!-- Left iris -->
+  <circle  cx="206" cy="286" r="18" fill="#3cbbb1"/>
+  <!-- Left pupil -->
+  <ellipse cx="206" cy="286" rx="7" ry="11" fill="#0a0806"/>
+  <!-- Left catchlight -->
+  <circle  cx="213" cy="280" r="5" fill="white" opacity="0.6"/>
+  <!-- Left glow ring -->
+  <circle  cx="206" cy="286" r="22" fill="none" stroke="#3cbbb1" stroke-width="1.5" opacity="0.4"/>
+
+  <!-- Right eye socket -->
+  <ellipse cx="294" cy="286" rx="30" ry="24" fill="#1a1208"/>
+  <!-- Right iris -->
+  <circle  cx="294" cy="286" r="18" fill="#3cbbb1"/>
+  <!-- Right pupil -->
+  <ellipse cx="294" cy="286" rx="7" ry="11" fill="#0a0806"/>
+  <!-- Right catchlight -->
+  <circle  cx="301" cy="280" r="5" fill="white" opacity="0.6"/>
+  <!-- Right glow ring -->
+  <circle  cx="294" cy="286" r="22" fill="none" stroke="#3cbbb1" stroke-width="1.5" opacity="0.4"/>
+
+  <!-- ── MUZZLE ── -->
+  <ellipse cx="250" cy="345" rx="64" ry="46" fill="#d4cfc0"/>
+  <!-- Center stripe -->
+  <rect x="244" y="312" width="12" height="42" rx="6" fill="#c4bfb0" opacity="0.6"/>
+  <!-- Nose -->
+  <ellipse cx="250" cy="325" rx="26" ry="18" fill="#2a1e14"/>
+  <!-- Nose shine -->
+  <ellipse cx="245" cy="320" rx="8" ry="5" fill="#483a2e" opacity="0.6"/>
+  <!-- Nostrils -->
+  <ellipse cx="238" cy="328" rx="7" ry="5" fill="#1a1208"/>
+  <ellipse cx="262" cy="328" rx="7" ry="5" fill="#1a1208"/>
+
+  <!-- MOUTH — open for howling, showing fangs -->
+  <path d="M 216,360 Q 250,375 284,360" stroke="#8a7a60" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- Fang hints -->
+  <line x1="232" y1="360" x2="228" y2="372" stroke="#e8e5da" stroke-width="3" stroke-linecap="round"/>
+  <line x1="268" y1="360" x2="272" y2="372" stroke="#e8e5da" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- ── TEXT ── -->
+  <text x="250" y="460" text-anchor="middle"
+        font-family="'Arial Black', Impact, sans-serif"
+        font-weight="900" font-size="50" letter-spacing="6"
+        fill="#e8e5da">ŞACAL</text>
+  <text x="250" y="484" text-anchor="middle"
+        font-family="Arial, sans-serif" font-weight="600"
+        font-size="12" letter-spacing="5"
+        fill="rgba(232,229,218,0.42)">BIODIVERSITY</text>
+</svg>

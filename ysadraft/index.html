@@ -1,0 +1,2701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Young Scientist Academy</title>
+  <meta name="description" content="The Young Scientist Academy empowers all youth to be community ambassadors of science and technology."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet"/>
+  <style>
+    /* ============================================================
+       DESIGN SYSTEM — CSS Custom Properties (variables)
+       These are defined on :root so they're available everywhere.
+       We use variables instead of hardcoded colors so that
+       switching themes (dark/light/colorblind) only requires
+       redefining the variable — every element using it updates
+       automatically. Think of variables as named color slots.
+       ============================================================ */
+
+    /* DEFAULT THEME: light mode (--dark is the page background,
+       --off-white is the text color — confusingly named because
+       they were originally dark-mode values and got flipped) */
+        :root {
+      --teal: #3cbbb1; --lavender: #bbbdf6; --pink: #ee4266;
+      --dark: #f7faf8; --off-white: #0d1a15; --card-bg: #ffffff;
+      --border: rgba(10,20,15,0.1); --gold: #f1b643; --amber: #c4903a;
+    }
+
+    /* DARK MODE: when the JS adds class="dark" to <html>,
+       these variable redefinitions take over. Nothing else
+       in the CSS needs to change — every rule that says
+       var(--dark) or var(--card-bg) automatically uses the
+       dark values. This is why we NEVER hardcode #f5f5f0
+       anywhere except inside these variable definitions. */
+    html.dark { --dark: #0a0f0d; --off-white: #f5f5f0; --card-bg: #111a15; --border: rgba(245,245,240,0.08); }
+    html.dark .bottom-bar { background: rgba(10,15,13,0.97) !important; border-top-color: rgba(245,245,240,0.06) !important; }
+
+    /* COLORBLIND MODE (deuteranopia): swaps red-green distinctions
+       for blue-orange ones, which are distinguishable by people
+       with the most common form of color blindness. */
+    html.colorblind { --teal: #0077bb; --pink: #cc3311; --gold: #ee7733; }
+
+    /* CSS RESET: removes default browser spacing and ensures
+       padding/border are included in element width calculations
+       (box-sizing: border-box is the modern standard) */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* Smooth scrolling so anchor links (#about, #teams, etc.)
+       animate instead of jumping instantly */
+    html { scroll-behavior: smooth; }
+
+    /* Base body styles. padding-bottom leaves room for the fixed
+       bottom app-switcher bar so content doesn't hide behind it */
+    body { font-family: 'Inter', sans-serif; background: var(--dark); color: var(--off-white); min-height: 100vh; padding-bottom: 68px; }
+
+    /* Remove underlines from all links by default; color inherits
+       from the parent so links blend naturally into surrounding text */
+    a { color: inherit; text-decoration: none; }
+
+    /* ============================================================
+       DARK MODE COMPONENT OVERRIDES
+       When html.dark is active, these rules fine-tune specific
+       components that need more than a variable swap — e.g.
+       the settings panel needs a specific dark background color,
+       card shadows disappear (dark mode uses borders instead),
+       and the footer gets the card-bg color rather than the
+       lighter #edf1ef it uses in light mode.
+       ============================================================ */
+    html.dark { --dark: #0a0f0d; --card-bg: #111a15; --off-white: #f5f5f0; --border: rgba(245,245,240,0.08); }
+    html.dark .settings-panel { background: #111a15; border-color: rgba(245,245,240,0.1); }
+    html.dark .settings-section-label { color: rgba(245,245,240,0.35); }
+    html.dark .theme-btn, html.dark .font-size-btn { background: rgba(245,245,240,0.04); color: rgba(245,245,240,0.45); border-color: rgba(245,245,240,0.12); }
+    html.dark .nav-ysa { background: rgba(10,15,13,0.93) !important; }
+    html.dark .bottom-bar { background: rgba(10,15,13,0.97) !important; }
+    /* DARK MODE nav/footer overrides */
+    html.dark .nav-ysa { background: rgba(10,15,13,0.93) !important; box-shadow: none !important; }
+    html.dark .nav-dropdown { background: rgba(12,18,14,0.97) !important; box-shadow: 0 8px 32px rgba(0,0,0,0.4) !important; }
+    html.dark .bottom-bar { background: rgba(10,15,13,0.97) !important; border-top-color: rgba(245,245,240,0.06) !important; }
+    html.dark footer { background: var(--card-bg) !important; }
+    /* In dark mode, hovering a leaderboard row uses a very subtle
+       tint rather than the white-tinted version used in light mode */
+    html.dark .lb-table tr:hover { background: color-mix(in srgb, var(--off-white) 4%, transparent); }
+    html.dark .newsletter-wrap { background: linear-gradient(135deg, rgba(60,187,177,0.08), rgba(187,189,246,0.06)); }
+    /* Cards use borders instead of box-shadow in dark mode —
+       shadows don't show up well on dark backgrounds */
+    html.dark .card { box-shadow: none; }
+    html.dark .prog-card { box-shadow: none; }
+    html.dark .event-card { box-shadow: none; }
+    /* Gradient text needs slightly different colors in dark mode
+       for better contrast on the dark background */
+    html.dark .gradient-text { background: linear-gradient(135deg, var(--teal), #bbbdf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    html.dark .hero-bracket { border-color: rgba(60,187,177,0.35); }
+    /* The hero background glow is slightly stronger in dark mode
+       to create atmosphere without washing out on light backgrounds */
+    html.dark .hero::before {
+      background:
+        radial-gradient(ellipse 65% 55% at 15% 35%, rgba(60,187,177,0.13) 0%, transparent 70%),
+        radial-gradient(ellipse 45% 45% at 85% 65%, rgba(238,66,102,0.09) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 60% at 50% 80%, rgba(187,189,246,0.06) 0%, transparent 70%);
+    }
+    html.dark .settings-panel { background: #111a15; }
+
+    /* LIGHT MODE card shadows — subtle depth cues that look
+       natural on the white/near-white light mode background.
+       Dark mode removes these because shadows look muddy on dark. */
+    .prog-card { box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .event-card { box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .summit-day { box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .team-card { box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .lb-table { background: var(--card-bg); }
+    /* Newsletter section background — a very faint teal-to-lavender
+       gradient that gives it a distinct identity without shouting */
+    .newsletter-wrap { background: linear-gradient(135deg, rgba(60,187,177,0.06), rgba(85,87,204,0.04)); border: 1px solid rgba(60,187,177,0.2); }
+
+    /* COLORBLIND MODE — full palette override for deuteranopia.
+       All five accent colors get blue-orange replacements.
+       The full set is redefined here (teal, pink, gold, lavender, amber)
+       so the whole design shifts coherently, not just one color. */
+    html.colorblind { --teal: #0077bb; --pink: #cc3311; --gold: #ee7733; --lavender: #33bbee; --amber: #ee3377; }
+
+    /* FONT SIZE — adding these classes to <html> scales the entire
+       page because most font sizes are set in rem units, which are
+       relative to the root (html) font size. Setting it to 17px
+       makes 1rem = 17px everywhere instead of the default 16px. */
+    html.font-lg { font-size: 17px; }
+    html.font-sm { font-size: 13px; }
+
+    /* REDUCED MOTION — setting all animation and transition durations
+       to 0.01ms (effectively instant) kills every CSS animation on
+       the page in one rule. The !important overrides any inline or
+       component-level duration. This respects users with vestibular
+       disorders who get motion-sick from animations. */
+    html.reduced-motion *, html.reduced-motion *::before, html.reduced-motion *::after {
+      animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important;
+    }
+
+    /* ============================================================
+       FLOATING PARTICLES
+       A decorative layer of tiny shapes that drift up the screen.
+       - position:fixed + inset:0 makes it cover the whole viewport
+       - pointer-events:none means clicks pass through to elements below
+       - z-index:2 puts it above the background but below content
+       ============================================================ */
+    .particles { position: fixed; inset: 0; overflow: hidden; z-index: 2; pointer-events: none; }
+    /* Hero content sits at z-index:3 so it renders above particles */
+    .hero > * { position: relative; z-index: 3; }
+    /* Each particle starts invisible, floats up via keyframe animation */
+    .particle { position: absolute; opacity: 0; animation: float-up linear infinite; }
+    .particle.circle  { border-radius: 50%; }
+    .particle.square  { border-radius: 2px; }
+    /* Triangles are CSS-only using the border trick: a zero-width,
+       zero-height element with transparent left/right borders and a
+       colored bottom border creates a triangle pointing up.
+       The --tri-half and --tri-h custom properties are set per-particle
+       by the JS that creates them. */
+    .particle.triangle {
+      background: transparent !important; width: 0 !important; height: 0 !important;
+      border-left: var(--tri-half) solid transparent;
+      border-right: var(--tri-half) solid transparent;
+      border-bottom: var(--tri-h) solid var(--tri-color);
+    }
+    /* float-up: particles rise from below the viewport, spin 360 degrees,
+       and fade in then out at 10% and 90% of the animation — so they
+       fade in quickly after spawning, stay visible most of the way up,
+       then fade out near the top. Negative animation-delay (set by JS)
+       staggers them so they don't all start at the same time. */
+    @keyframes float-up {
+      0%   { transform: translateY(100vh) rotate(0deg) scale(0.6); opacity: 0; }
+      10%  { opacity: 0.18; }
+      90%  { opacity: 0.18; }
+      100% { transform: translateY(-12vh) rotate(360deg) scale(1); opacity: 0; }
+    }
+    /* pulse: used on the pink live-indicator dot in the "What's Happening"
+       header. It scales up and fades at 50%, creating a heartbeat effect. */
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.3)} }
+
+
+    /* Page fade-in (prevents tab-switch glitch) */
+    /* page fade handled per-element via .reveal */
+
+    /* ============================================================
+       NAVIGATION BAR
+       position:sticky keeps it at the top as you scroll.
+       z-index:200 puts it above section content (but below
+       modals and the settings panel which use 290+).
+       backdrop-filter:blur() creates the frosted-glass effect —
+       the background content blurs through the semi-transparent nav.
+       ============================================================ */
+    nav.nav-ysa {
+      position: sticky; top: 0; z-index: 200;
+      height: 72px;
+      background: rgba(255,255,255,0.97);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      box-shadow: 0 1px 8px rgba(0,0,0,0.05);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2.5rem; gap: 1rem; position: relative;
+    }
+    /* Dark mode nav: near-opaque dark background instead of white */
+    html.dark nav.nav-ysa { background: rgba(10,15,13,0.97); border-bottom-color: rgba(255,255,255,0.07); }
+    /* Logo container: flex so the image and text stack nicely.
+       flex-shrink:0 prevents it from shrinking when the nav gets crowded. */
+    .nav-logo { display: flex; align-items: center; text-decoration: none; flex-shrink: 0; cursor: pointer; }
+    .nav-logo img { height: 52px; display: block; }
+    /* The text next to the logo — tight negative letter-spacing is a
+       modern design trend that makes bold text feel more premium */
+    .nav-logo-text { font-weight: 800; font-size: 1rem; color: var(--off-white); letter-spacing: -0.02em; }
+    /* Small teal uppercase tagline below the logo name */
+    .nav-logo-sub  { font-size: 0.65rem; color: var(--teal); font-weight: 600; letter-spacing: .06em; text-transform: uppercase; line-height: 1; }
+
+    /* NAV LINKS with dropdowns
+       flex:1 on .nav-menu lets it expand to fill the middle space
+       between logo and right-side buttons.
+       list-style:none removes bullet points from the <ul>.
+       position:relative on each <li> is required so the dropdown
+       can be positioned absolutely relative to its parent item. */
+    .nav-menu { display: flex; align-items: center; gap: 0.1rem; list-style: none; flex: 1; justify-content: center; }
+    .nav-menu > li { position: relative; }
+    .nav-menu > li > a, .nav-menu > li > button {
+      display: flex; align-items: center; gap: 0.25rem;
+      padding: 0.45rem 0.85rem; border-radius: 6px;
+      color: #444;
+      font-size: 0.9rem; font-weight: 500;
+      transition: color 0.15s, background 0.15s; cursor: pointer;
+      white-space: nowrap; background: none; border: none; font-family: inherit;
+    }
+    html.dark .nav-menu > li > a, html.dark .nav-menu > li > button { color: color-mix(in srgb, var(--off-white) 75%, transparent); }
+    .nav-menu > li > a:hover, .nav-menu > li > button:hover { color: var(--pink); background: rgba(238,66,102,0.05); }
+    .nav-item:hover > button, .nav-item:hover > a { color: var(--pink); }
+    .nav-dropdown a:hover { color: var(--pink) !important; background: rgba(238,66,102,0.06) !important; }
+    html.dark .nav-menu > li > a:hover, html.dark .nav-menu > li > button:hover { background: rgba(245,245,240,0.07); }
+    .nav-menu > li > a.active, .nav-menu > li > button.active { color: var(--pink); font-weight: 600; }
+    .nav-chevron { font-size: 0.6rem; opacity: 0.6; transition: transform 0.2s; }
+    .nav-item:hover .nav-chevron { transform: rotate(180deg); }
+
+    /* DROPDOWN MENU
+       Hidden by default with opacity:0 + visibility:hidden (not display:none)
+       because display:none prevents CSS transitions. opacity allows the
+       fade-in animation to work. left:50% + translateX(-50%) horizontally
+       centers the dropdown under the parent nav item. The translateY(-4px)
+       starting position creates the subtle slide-up-into-place effect. */
+    .nav-dropdown {
+      position: absolute; top: 100%; left: 50%; transform: translateX(-50%); padding-top: 8px;
+      background: rgba(247,250,248,0.98); backdrop-filter: blur(16px);
+      border: 1px solid var(--border); border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+      padding: 0.5rem; min-width: 200px;
+      opacity: 0; visibility: hidden; pointer-events: none;
+      transition: opacity 0.18s, transform 0.18s;
+      transform: translateX(-50%) translateY(-4px);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+    }
+    .nav-item:hover .nav-dropdown { opacity: 1; visibility: visible; pointer-events: auto; transform: translateX(-50%) translateY(0); }
+    .nav-dropdown a {
+      display: block; padding: 0.55rem 0.9rem; border-radius: 8px;
+      font-size: 0.85rem; color: color-mix(in srgb, var(--off-white) 70%, transparent);
+      transition: background 0.12s, color 0.12s;
+    }
+    .nav-dropdown a:hover { background: rgba(245,245,240,0.07); color: var(--off-white); }
+    .nav-dropdown .dd-tag { font-size: 0.65rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--teal); padding: 0.7rem 0.9rem 0.25rem; }
+
+    .nav-right { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
+    .nav-search-btn {
+      display: flex; align-items: center; justify-content: center;
+      width: 38px; height: 38px; border-radius: 50%;
+      background: none; border: none;
+      color: #555; transition: color 0.15s, background 0.15s; cursor: pointer;
+    }
+    .nav-search-btn:hover { color: var(--pink); background: rgba(238,66,102,0.07); }
+    html.dark .nav-search-btn { color: color-mix(in srgb, var(--off-white) 60%, transparent); }
+    html.dark .nav-search-btn:hover { color: var(--off-white); background: rgba(245,245,240,0.07); }
+    /* EXPANDABLE SEARCH BAR
+       Normally hidden (display:none). The JS toggleSearchBar() adds
+       class .open which switches it to display:flex. It's positioned
+       absolute below the nav (top:100%) so it pushes no layout. */
+    .nav-search-bar {
+      position: absolute; top: 100%; left: 0; right: 0; z-index: 199;
+      background: rgba(255,255,255,0.98); border-bottom: 1px solid rgba(0,0,0,0.1);
+      padding: 0.75rem 2.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      display: none;
+    }
+    html.dark .nav-search-bar { background: rgba(10,15,13,0.98); border-color: rgba(255,255,255,0.07); }
+    .nav-search-bar.open { display: flex; align-items: center; gap: 0.75rem; }
+    .nav-search-bar input {
+      flex: 1; border: none; outline: none; font-size: 1rem; background: transparent;
+      color: var(--off-white); font-family: inherit;
+    }
+    .nav-search-bar input::placeholder { color: #aaa; }
+    .nav-cta {
+      display: flex; align-items: center; gap: 0.35rem;
+      padding: 0.45rem 1.1rem; background: var(--pink); color: #fff;
+      border-radius: 6px; font-size: 0.85rem; font-weight: 700;
+      transition: background 0.15s, transform 0.1s; white-space: nowrap;
+    }
+    .nav-cta:hover { background: #d43359; transform: translateY(-1px); }
+    .nav-cta-secondary {
+      display: flex; align-items: center; gap: 0.35rem;
+      padding: 0.45rem 1rem; background: transparent; color: var(--pink);
+      border: 1.5px solid var(--pink); border-radius: 6px; font-size: 0.85rem; font-weight: 700;
+      transition: background 0.15s; white-space: nowrap;
+    }
+    .nav-cta-secondary:hover { background: rgba(238,66,102,0.07); }
+    .nav-hamburger { display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 4px; }
+    .nav-hamburger span { display: block; width: 22px; height: 2px; background: var(--off-white); border-radius: 2px; }
+
+    /* MOBILE NAV — at 860px and below, the horizontal nav menu is hidden
+       by default and shown via .open class when the hamburger is tapped.
+       Dropdowns become inline (position:static) rather than floating,
+       because on mobile there's no hover — they're always visible as
+       indented sub-items under their parent. */
+    @media (max-width: 860px) {
+      .nav-menu { display: none; flex-direction: column; align-items: stretch; position: absolute; top: var(--nav-h); left: 0; right: 0; background: rgba(10,15,13,0.98); border-bottom: 1px solid var(--border); padding: 0.75rem 1.25rem 1rem; gap: 0.25rem; }
+      .nav-menu.open { display: flex; }
+      .nav-hamburger { display: flex; }
+      .nav-dropdown { position: static; transform: none; opacity: 1; visibility: visible; pointer-events: auto; background: transparent; border: none; box-shadow: none; padding: 0.25rem 0 0.25rem 1rem; }
+      .nav-item:hover .nav-dropdown { transform: none; }
+    }
+
+    /* ============================================================
+       BUTTONS — four variants used across the page.
+       All use inline-flex so icon + text align nicely side by side.
+       transform:translateY(-1px) on hover gives a subtle lift effect.
+       ============================================================ */
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.7rem 1.6rem; border-radius: 6px;
+      background: var(--pink); color: #ffffff;
+      font-weight: 700; font-size: 0.9rem; letter-spacing: 0.01em;
+      transition: background 0.15s, transform 0.1s, box-shadow 0.15s; border: none; cursor: pointer;
+    }
+    .btn-primary:hover { background: #d43359; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(238,66,102,0.3); }
+    .btn-outline {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.7rem 1.6rem; border-radius: 6px;
+      border: 1.5px solid color-mix(in srgb, var(--off-white) 35%, transparent);
+      color: var(--off-white); font-weight: 600; font-size: 0.9rem;
+      transition: border-color 0.15s, background 0.15s; background: none; cursor: pointer;
+    }
+    .btn-outline:hover { border-color: var(--pink); color: var(--pink); background: rgba(238,66,102,0.04); }
+    .btn-gold {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.7rem 1.6rem; border-radius: 6px;
+      background: var(--gold); color: #1a1000; font-weight: 700; font-size: 0.9rem;
+      transition: background 0.15s, transform 0.1s, box-shadow 0.15s; border: none; cursor: pointer;
+    }
+    .btn-gold:hover { background: #d4a034; transform: translateY(-1px); }
+    .btn-pink {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.7rem 1.6rem; border-radius: 6px;
+      background: var(--pink); color: #fff; font-weight: 700; font-size: 0.9rem;
+      transition: background 0.15s, transform 0.1s; border: none; cursor: pointer;
+    }
+    .btn-pink:hover { background: #d43359; transform: translateY(-1px); }
+
+    /* ============================================================
+       SCROLL REVEAL
+       Elements start invisible and 28px lower than their final position.
+       When the IntersectionObserver JS adds .visible, they fade in
+       and slide up to their final spot (transform:translateY(0)).
+       The .reveal-delay-* classes stagger sibling elements so they
+       don't all appear at exactly the same time — creates a cascade.
+       ============================================================ */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.55s ease, transform 0.55s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+
+    /* GRADIENT TEXT — the hero headline effect.
+       The trick: set the gradient as the background, then clip it to
+       the text shape only (-webkit-background-clip: text), and make
+       the text itself transparent (-webkit-text-fill-color: transparent)
+       so the gradient shows through. The -webkit- prefix is needed for
+       Chrome/Safari; the unprefixed version covers Firefox. */
+    .gradient-text {
+      background: linear-gradient(135deg, #2aa89e, #5557cc);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    /* ============================================================
+       LAYOUT HELPERS
+       content-wrap: centers content and caps it at 1100px wide.
+       section-pad: consistent vertical padding between sections.
+       section-tag: the tiny all-caps teal label above each heading.
+       clamp() in section-h2: fluid font size — never smaller than
+       1.75rem, never larger than 2.6rem, scales between on viewports.
+       ============================================================ */
+    .content-wrap { max-width: 1100px; margin: 0 auto; padding: 0 2rem; }
+    .section-pad { padding: 5rem 0; }
+    .section-tag { font-size: 0.72rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--teal); margin-bottom: 0.75rem; display: block; }
+    .section-h2 { font-family: 'Playfair Display', serif; font-size: clamp(1.75rem, 3.5vw, 2.6rem); font-weight: 700; line-height: 1.2; margin-bottom: 0.85rem; }
+    /* <em> tags inside section headings get teal color + italic — used
+       for the styled accent word in each section title */
+    .section-h2 em { color: var(--teal); font-style: italic; }
+    .section-sub { font-size: 1rem; color: color-mix(in srgb, var(--off-white) 60%, transparent); line-height: 1.7; max-width: 560px; }
+    .section-header-block { margin-bottom: 3rem; }
+
+    /* ============================================================
+       CARD — reusable content block.
+       The left-border color variants (.card-teal, .card-pink, etc.)
+       add a 3px colored stripe on the left edge as a category indicator.
+       The hover effect lifts the card (-3px on Y axis) with a teal
+       border glow to signal interactivity.
+       ============================================================ */
+    .card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1.75rem;
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+    .card:hover { border-color: rgba(60,187,177,0.4); transform: translateY(-3px); }
+    .card-icon { font-size: 1.75rem; margin-bottom: 0.85rem; }
+    .card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .card p { font-size: 0.88rem; color: color-mix(in srgb, var(--off-white) 60%, transparent); line-height: 1.65; }
+    .card-teal  { border-left: 3px solid var(--teal); }
+    .card-pink  { border-left: 3px solid var(--pink); }
+    .card-gold  { border-left: 3px solid var(--gold); }
+    .card-lavender { border-left: 3px solid var(--lavender); }
+
+    /* CSS GRID HELPERS — shorthand classes for common column layouts.
+       1fr means "one fraction of available space" — equal columns.
+       repeat(3, 1fr) = three equal columns. The responsive breakpoints
+       below collapse these grids to 1 or 2 columns on small screens. */
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+
+    /* ============================================================
+       HERO SECTION
+       min-height:100vh makes it fill the full screen height.
+       overflow:clip (not overflow:hidden) clips content without
+       creating a scroll container, which allows position:sticky
+       inside child elements to still work.
+       The ::before pseudo-element is the atmospheric glow background —
+       three overlapping radial gradients (teal, pink, lavender) at
+       different corners. z-index:0 keeps them behind content.
+       ============================================================ */
+    .hero {
+      min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 6rem 2rem 7rem; position: relative; overflow: clip;
+      background: var(--dark); color: var(--off-white);
+    }
+    html.dark .hero { background: #0a0f0d; }
+    .hero h1 {
+      -webkit-text-fill-color: transparent;
+      background: linear-gradient(135deg, var(--teal), #bbbdf6);
+      -webkit-background-clip: text; background-clip: text;
+      /* Center the heading explicitly (hero has text-align:center but this reinforces it) */
+      text-align: center; width: 100%;
+      /* padding-bottom gives the 'g' descender room so it isn't clipped
+         by the background-clip: the clip region matches the text bounding box
+         and without extra padding the bottom of letters like g/y get cut off */
+      padding-bottom: 0.15em;
+    }
+    .hero-sub { color: color-mix(in srgb, var(--off-white) 65%, transparent) !important; }
+    .hero-stat .num { color: var(--teal) !important; }
+    .hero-stat .lbl { color: color-mix(in srgb, var(--off-white) 45%, transparent) !important; }
+    .hero::before {
+      content: ''; position: absolute; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 65% 55% at 15% 35%, rgba(60,187,177,0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 45% 45% at 85% 65%, rgba(238,66,102,0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 60% at 50% 80%, rgba(85,87,204,0.06) 0%, transparent 70%);
+    }
+    .hero > * { position: relative; z-index: 1; }
+    /* CORNER BRACKETS — decorative teal corner accents (like [ ]).
+       Each bracket is a zero-content div with only two of its four
+       borders visible. e.g. top-left (.tl) shows only the top and
+       left borders, creating an L-shape in the corner. */
+    .hero-bracket {
+      position: absolute; z-index: 1;
+      width: 32px; height: 32px;
+      border-color: rgba(60,187,177,0.35);
+      border-style: solid;
+    }
+    .hero-bracket.tl { top: 3rem; left: 3rem; border-width: 2px 0 0 2px; }
+    .hero-bracket.tr { top: 3rem; right: 3rem; border-width: 2px 2px 0 0; }
+    .hero-bracket.bl { bottom: 4rem; left: 3rem; border-width: 0 0 2px 2px; }
+    .hero-bracket.br { bottom: 4rem; right: 3rem; border-width: 0 2px 2px 0; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.35rem 0.9rem; border-radius: 4px;
+      border: 1px solid rgba(60,187,177,0.4);
+      background: rgba(60,187,177,0.08);
+      font-size: 0.78rem; font-weight: 600;
+      color: var(--teal); letter-spacing: 0.02em; margin-bottom: 2rem;
+    }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.6rem, 5.5vw, 4.2rem); font-weight: 700; line-height: 1.12;
+      letter-spacing: -0.025em; max-width: 760px; margin: 0 auto 1.35rem;
+    }
+    .hero-sub {
+      font-size: clamp(1rem, 1.8vw, 1.12rem);
+      color: color-mix(in srgb, var(--off-white) 62%, transparent);
+      max-width: 560px; line-height: 1.8; margin: 0 auto 2.75rem;
+    }
+    .hero-ctas { display: flex; gap: 0.85rem; justify-content: center; flex-wrap: wrap; margin-bottom: 4rem; }
+    .hero-stats { display: flex; gap: 3.5rem; flex-wrap: wrap; justify-content: center; }
+    .hero-stat .num { font-size: 2.1rem; font-weight: 800; color: var(--teal); line-height: 1; }
+    .hero-stat .lbl { font-size: 0.72rem; color: color-mix(in srgb, var(--off-white) 40%, transparent); font-weight: 500; margin-top: 0.3rem; letter-spacing: 0.03em; text-transform: uppercase; }
+    /* SCROLL HINT — the "Scroll" label at the bottom of the hero.
+       Centered via left:50% + translateX(-50%).
+       The ::after pseudo-element adds a thin vertical line that fades
+       to transparent at the bottom, mimicking a downward pointer.
+       The bounce @keyframes nudges it 6px down and back, reinforcing
+       the "scroll down" signal. */
+    .hero-scroll-hint { position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%); z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 0.35rem; font-size: 0.7rem; color: color-mix(in srgb, var(--off-white) 30%, transparent); letter-spacing: .08em; text-transform: uppercase; animation: bounce 2s ease infinite; }
+    @keyframes bounce { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(6px)} }
+    .hero-scroll-hint::after { content: ''; display: block; width: 1px; height: 32px; background: linear-gradient(to bottom, color-mix(in srgb, var(--off-white) 20%, transparent), transparent); }
+
+    /* WHAT'S HAPPENING */
+    .news-scroll-wrap { overflow-x: auto; scrollbar-width: none; padding-bottom: 0.5rem; }
+    .news-scroll-wrap::-webkit-scrollbar { display: none; }
+    .news-scroll { display: flex; gap: 1rem; width: max-content; }
+    .news-card {
+      flex-shrink: 0; width: 270px;
+      border-radius: 20px; padding: 2.5rem 3rem;
+      cursor: pointer; transition: transform .2s, border-color .2s;
+      text-align: center;
+    }
+    .news-card:hover { transform: translateY(-3px); }
+
+    /* DIVIDER */
+    .divider { height: 1px; background: var(--border); margin: 0 2rem; }
+
+    /* PROGRAMS */
+    .prog-card {
+      background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px;
+      padding: 1.75rem 2rem; display: flex; flex-direction: column; gap: 0.75rem;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .prog-card:hover { border-color: color-mix(in srgb, var(--off-white) 15%, transparent); transform: translateY(-3px); }
+    .prog-card .icon { font-size: 2rem; }
+    .prog-card h3 { font-size: 1.1rem; font-weight: 700; }
+    .prog-card p { font-size: 0.875rem; color: color-mix(in srgb, var(--off-white) 60%, transparent); line-height: 1.65; flex: 1; }
+    .prog-tag { display: block; font-size: 0.68rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; }
+
+
+    /* PROFILE MODAL */
+    .pf-overlay { position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9000;display:flex;align-items:center;justify-content:center;padding:1.5rem;opacity:0;pointer-events:none;transition:opacity 0.2s; }
+    .pf-overlay.open { opacity:1;pointer-events:auto; }
+    .pf-card { background:var(--card-bg);border:1px solid var(--border);border-radius:24px;padding:2rem;max-width:420px;width:100%;position:relative;transform:translateY(20px);transition:transform 0.25s;box-shadow:0 16px 48px rgba(0,0,0,0.18); }
+    .pf-overlay.open .pf-card { transform:translateY(0); }
+    .pf-close { position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:1.3rem;cursor:pointer;color:color-mix(in srgb, var(--off-white) 45%, transparent);transition:color 0.15s;line-height:1; }
+    .pf-close:hover { color:var(--off-white); }
+    .pf-avatar { width:72px;height:72px;border-radius:50%;background:color-mix(in srgb, var(--teal) 12%, transparent);border:2px solid color-mix(in srgb, var(--teal) 30%, transparent);margin-bottom:1rem; }
+    .pf-name { font-size:1.35rem;font-weight:800;line-height:1.2; }
+    .pf-pronouns { font-size:0.78rem;color:color-mix(in srgb, var(--off-white) 45%, transparent);margin-top:0.2rem; }
+    .pf-status { display:inline-block;background:rgba(60,187,177,0.13);color:var(--teal);border:1px solid rgba(60,187,177,0.3);border-radius:100px;font-size:0.72rem;font-weight:700;padding:0.2rem 0.75rem;margin:0.75rem 0; }
+    .pf-row { display:flex;gap:1.5rem;margin:0.9rem 0;flex-wrap:wrap; }
+    .pf-stat { flex:1;min-width:80px; }
+    .pf-stat-label { font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:color-mix(in srgb, var(--off-white) 40%, transparent);margin-bottom:0.25rem; }
+    .pf-stat-val { font-size:1rem;font-weight:700; }
+    .pf-bio { font-size:0.87rem;line-height:1.6;color:color-mix(in srgb, var(--off-white) 70%, transparent);margin-top:0.9rem;padding-top:0.9rem;border-top:1px solid var(--border); }
+    .pf-team-banner { display:flex;align-items:center;gap:0.75rem;background:color-mix(in srgb, var(--teal) 7%, transparent);border:1px solid color-mix(in srgb, var(--teal) 18%, transparent);border-radius:12px;padding:0.65rem 0.9rem;margin-top:1rem; }
+    .pf-team-label { font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:color-mix(in srgb, var(--off-white) 40%, transparent);margin-bottom:0.15rem; }
+    .pf-team-name { font-size:0.92rem;font-weight:700; }
+    .lb-table tr { cursor:pointer; }
+    .lb-table tr:hover .lb-name { color:var(--teal); }
+    /* TEAM MODAL extras */
+    .pf-research { font-size:0.82rem;font-weight:600;color:var(--teal);margin-top:0.5rem; }
+    .pf-members { margin-top:0.9rem;padding-top:0.9rem;border-top:1px solid var(--border); }
+    .pf-members-label { font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:color-mix(in srgb, var(--off-white) 40%, transparent);margin-bottom:0.5rem; }
+    .pf-member-chip { display:inline-block;background:color-mix(in srgb, var(--off-white) 5%, transparent);border:1px solid var(--border);border-radius:100px;font-size:0.76rem;padding:0.2rem 0.65rem;margin:0.15rem; }
+
+    /* LEADERBOARD */
+    .lb-table { width: 100%; border-collapse: collapse; }
+    .lb-table tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+    .lb-table tr:hover { background: color-mix(in srgb, var(--off-white) 3%, transparent); }
+    .lb-table td { padding: 0.9rem 1rem; vertical-align: middle; }
+    .lb-rank { font-size: 1.5rem; font-weight: 800; color: color-mix(in srgb, var(--off-white) 15%, transparent); width: 3.5rem; }
+    .lb-rank.top { color: var(--teal); }
+    .lb-name { font-weight: 700; font-size: 0.95rem; }
+    .lb-team { font-size: 0.78rem; color: color-mix(in srgb, var(--off-white) 45%, transparent); margin-top: 0.15rem; }
+    .lb-pts { font-size: 1.05rem; font-weight: 800; color: var(--teal); text-align: right; }
+    .lb-tab-bar { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
+    .lb-tab { padding: 0.45rem 1.1rem; border-radius: 100px; border: 1px solid var(--border); background: none; color: color-mix(in srgb, var(--off-white) 55%, transparent); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+    .lb-tab.active { background: rgba(60,187,177,0.12); border-color: rgba(60,187,177,0.35); color: var(--teal); }
+
+    /* ============================================================
+       MEET THE TEAMS — circular logo grid
+       Each team shows a square-rounded logo icon + name label.
+       Clicking opens an inline panel below the grid (not a modal)
+       via the selectTeam() JS function.
+       The --tc CSS variable is set per-item via inline style on each
+       .team-circle-item element, allowing each team's accent color to
+       be used for the border glow without extra CSS classes.
+       ============================================================ */
+    .team-circles-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.2rem 2rem; margin-bottom: 0.5rem; }
+    .team-circle-item { display: flex; flex-direction: column; align-items: center; gap: 0.55rem; cursor: pointer; transition: transform 0.2s; user-select: none; }
+    .team-circle-item:hover { transform: translateY(-5px); }
+    .team-circle-item:hover .team-circle-logo { border-color: var(--tc, var(--teal)); }
+    .team-circle-item.active .team-circle-logo { border-color: var(--tc, var(--teal)); box-shadow: 0 0 0 4px rgba(255,255,255,0.08), 0 0 16px rgba(60,187,177,0.25); }
+    .team-circle-logo { width: 96px; height: 96px; border-radius: 22px; overflow: hidden; border: 2.5px solid var(--border); background: color-mix(in srgb, var(--off-white) 4%, transparent); display: flex; align-items: center; justify-content: center; transition: border-color 0.2s, box-shadow 0.2s; }
+    .team-circle-logo img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
+    .team-circle-name { font-size: 0.68rem; font-weight: 700; color: color-mix(in srgb, var(--off-white) 60%, transparent); letter-spacing: 0.03em; text-align: center; max-width: 90px; line-height: 1.3; }
+    .team-panel-box { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 1.8rem 2rem; margin: 1.5rem 0; animation: panelSlideIn 0.22s ease; }
+    @keyframes panelSlideIn { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
+    .team-group-label { font-size: 0.7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: color-mix(in srgb, var(--off-white) 40%, transparent); margin-bottom: 0.85rem; margin-top: 1.75rem; }
+    /* ============================================================
+       SIDEBAR NAVIGATION — the vertical dot nav on the right edge.
+       Centered vertically via top:50% + translateY(-50%).
+       Each dot is a tiny circle that glows teal when that section
+       is active (set by the scrollspy JS below).
+
+       How the label reveal works:
+       - .sidebar-tab-label starts at opacity:0 and 8px to the right
+       - On hover OR when .label-peek is added by JS, it slides in
+         (translateX(0)) and fades in (opacity:1)
+       - .label-peek is added briefly by the scrollspy when the
+         active section changes, so the label flashes then hides
+         after 1.8 seconds — giving a "what section am I on?" hint.
+
+       Hidden on mobile (max-width:900px) since there's no room.
+       ============================================================ */
+    .sidebar-nav { position: fixed; right: 1.5rem; top: 50%; transform: translateY(-50%); z-index: 90; display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-end; }
+    .sidebar-tab { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; text-decoration: none; }
+    .sidebar-tab-label { background: rgba(247,250,248,0.92); border: 1px solid var(--border); color: color-mix(in srgb, var(--off-white) 45%, transparent); font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.3rem 0.7rem; border-radius: 50px; opacity: 0; transform: translateX(8px); transition: all 0.2s; white-space: nowrap; }
+    html.dark .sidebar-tab-label { background: rgba(10,15,13,0.88); }
+    .sidebar-tab:hover .sidebar-tab-label, .sidebar-tab.label-peek .sidebar-tab-label { opacity: 1; transform: translateX(0); color: var(--off-white); }
+    .sidebar-dot { width: 9px; height: 9px; border-radius: 50%; background: color-mix(in srgb, var(--off-white) 35%, transparent); border: 1.5px solid color-mix(in srgb, var(--off-white) 50%, transparent); flex-shrink: 0; transition: all 0.2s; }
+    .sidebar-tab:hover .sidebar-dot, .sidebar-tab.active .sidebar-dot { background: var(--teal); border-color: var(--teal); box-shadow: 0 0 6px rgba(60,187,177,0.5); }
+    @media (max-width: 900px) { .sidebar-nav { display: none; } }
+
+    /* ABOUT / STORY */
+    .story-two-col { display: grid; grid-template-columns: 1fr 340px; gap: 4rem; align-items: start; }
+    .story-text p { color: color-mix(in srgb, var(--off-white) 70%, transparent); line-height: 1.8; margin-bottom: 1.1rem; font-size: 0.96rem; }
+    .stat-pill {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1rem 1.25rem;
+      display: flex; align-items: center; gap: 0.9rem; margin-bottom: 0.75rem;
+    }
+    .stat-pill .sp-num { font-size: 1.5rem; font-weight: 800; color: var(--teal); line-height: 1; flex-shrink: 0; }
+    .stat-pill .sp-lbl { font-size: 0.8rem; color: color-mix(in srgb, var(--off-white) 55%, transparent); font-weight: 500; }
+
+    /* AMOEBA */
+    .amoeba-rules { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin: 2rem 0; }
+    .amoeba-rule { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 1.25rem; }
+    .amoeba-rule .ar-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .amoeba-rule h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .amoeba-rule p { font-size: 0.8rem; color: color-mix(in srgb, var(--off-white) 55%, transparent); line-height: 1.55; }
+    .amoeba-submit { background: linear-gradient(135deg, rgba(238,66,102,0.1), rgba(238,66,102,0.03)); border: 1px solid rgba(238,66,102,0.25); border-radius: 18px; padding: 2.25rem; text-align: center; }
+
+    /* SUMMIT */
+    .summit-timeline { display: grid; grid-template-columns: repeat(5,1fr); gap: 1rem; margin: 2rem 0; }
+    .summit-day { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 1.15rem 1rem; }
+    .summit-day .day-label { font-size: 0.65rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--teal); margin-bottom: 0.3rem; }
+    .summit-day h4 { font-size: 0.85rem; font-weight: 700; margin-bottom: 0.35rem; line-height: 1.3; }
+    .summit-day p { font-size: 0.75rem; color: color-mix(in srgb, var(--off-white) 50%, transparent); line-height: 1.5; }
+
+    /* EVENTS */
+    .event-card {
+      background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px;
+      padding: 2rem; display: flex; flex-direction: column; gap: 0.75rem;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .event-card:hover { border-color: color-mix(in srgb, var(--off-white) 15%, transparent); transform: translateY(-3px); }
+    .event-card .ev-icon { font-size: 2.2rem; }
+    .event-card .ev-tag { font-size: 0.68rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--teal); }
+    .event-card h3 { font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 700; line-height: 1.3; }
+    .event-card p { font-size: 0.875rem; color: color-mix(in srgb, var(--off-white) 60%, transparent); line-height: 1.65; flex: 1; }
+
+    /* SPONSOR STRIP */
+    .sponsor-strip { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; align-items: center; margin-top: 2rem; }
+    .sponsor-pill { padding: 0.55rem 1.25rem; border-radius: 50px; border: 1px solid var(--border); font-size: 0.82rem; font-weight: 600; color: color-mix(in srgb, var(--off-white) 50%, transparent); transition: border-color 0.15s, color 0.15s; }
+    .sponsor-pill:hover { border-color: color-mix(in srgb, var(--off-white) 25%, transparent); color: var(--off-white); }
+
+    /* NEWSLETTER */
+    .newsletter-wrap { background: linear-gradient(135deg, rgba(60,187,177,0.08), rgba(187,189,246,0.06)); border: 1px solid rgba(60,187,177,0.2); border-radius: 8px; padding: 3.5rem 2.5rem; text-align: center; }
+    .newsletter-form { display: flex; gap: 0.75rem; max-width: 440px; margin: 1.5rem auto 0; flex-wrap: wrap; justify-content: center; }
+    .newsletter-input { flex: 1; min-width: 200px; padding: 0.75rem 1.25rem; border-radius: 6px; border: 1.5px solid var(--border); background: color-mix(in srgb, var(--off-white) 5%, transparent); color: var(--off-white); font-size: 0.9rem; font-family: inherit; outline: none; transition: border-color 0.15s; }
+    .newsletter-input:focus { border-color: rgba(60,187,177,0.5); }
+    .newsletter-input::placeholder { color: color-mix(in srgb, var(--off-white) 30%, transparent); }
+
+    /* SOCIAL */
+    .social-row { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin-top: 2rem; }
+    .social-pill { display: flex; align-items: center; gap: 0.6rem; padding: 0.65rem 1.35rem; border-radius: 6px; border: 1px solid var(--border); font-size: 0.875rem; font-weight: 600; color: color-mix(in srgb, var(--off-white) 70%, transparent); transition: all 0.15s; }
+    .social-pill:hover { border-color: var(--teal); color: var(--off-white); background: rgba(60,187,177,0.08); }
+
+    /* FOOTER */
+    footer { background: #edf1ef; border-top: 1px solid var(--border); padding: 4rem 2rem 2rem; }
+    .footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 3rem; max-width: 1100px; margin: 0 auto 3rem; }
+    .footer-brand h4 { font-weight: 800; font-size: 1.05rem; margin-bottom: 0.5rem; }
+    .footer-brand p { font-size: 0.82rem; color: color-mix(in srgb, var(--off-white) 40%, transparent); line-height: 1.7; max-width: 240px; }
+    .footer-col h5 { font-size: 0.7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: color-mix(in srgb, var(--off-white) 40%, transparent); margin-bottom: 1rem; }
+    .footer-col a { display: block; font-size: 0.85rem; color: color-mix(in srgb, var(--off-white) 55%, transparent); margin-bottom: 0.55rem; transition: color 0.15s; }
+    .footer-col a:hover { color: var(--off-white); }
+    .footer-col p { font-size: 0.82rem; color: color-mix(in srgb, var(--off-white) 45%, transparent); line-height: 1.7; }
+    .footer-bottom { max-width: 1100px; margin: 0 auto; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; }
+    .footer-bottom p { font-size: 0.75rem; color: color-mix(in srgb, var(--off-white) 30%, transparent); }
+    .footer-social { display: flex; gap: 0.75rem; margin-top: 1rem; }
+    .footer-social a { font-size: 1.1rem; color: color-mix(in srgb, var(--off-white) 35%, transparent); transition: color 0.15s; }
+    .footer-social a:hover { color: var(--teal); }
+
+    /* ============================================================
+       SETTINGS PANEL — slides in from the right.
+       The overlay (semi-transparent dark backdrop) and the panel
+       itself both need the .open class to appear.
+       The panel starts translated 100% to the right (fully off-screen)
+       and slides to transform:translateX(0) when .open is added.
+       z-index:300 puts it above the nav (200) and overlay (290).
+       The overlay sits at z-index:290 — clicking it calls toggleSettings()
+       to close the panel (see the onclick on the overlay div in HTML).
+       ============================================================ */
+    .settings-overlay { position: fixed; inset: 0; z-index: 290; background: rgba(0,0,0,0.4); opacity: 0; visibility: hidden; transition: opacity 0.25s, visibility 0.25s; }
+    .settings-overlay.open { opacity: 1; visibility: visible; }
+    .settings-panel { position: fixed; top: 0; right: 0; bottom: 0; z-index: 300; width: 300px; background: var(--card-bg); border-left: 1px solid var(--border); box-shadow: -8px 0 32px rgba(0,0,0,0.08); padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem; overflow-y: auto; transform: translateX(100%); transition: transform 0.3s ease; }
+    .settings-panel.open { transform: translateX(0); }
+    .settings-header { display: flex; justify-content: space-between; align-items: center; }
+    .settings-header h3 { font-size: 1rem; font-weight: 700; }
+    .settings-close { background: none; border: none; cursor: pointer; font-size: 1.1rem; color: color-mix(in srgb, var(--off-white) 50%, transparent); padding: 0.25rem; transition: color 0.15s; }
+    .settings-close:hover { color: var(--off-white); }
+    .settings-section { display: flex; flex-direction: column; gap: 0.6rem; }
+    .settings-section-label { font-size: 0.65rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: color-mix(in srgb, var(--off-white) 35%, transparent); margin-bottom: 0.15rem; }
+    .theme-toggle { display: flex; gap: 0.5rem; }
+    .font-size-btns-row { display: flex; gap: 0.5rem; margin-top: .25rem; }
+    .theme-btn { flex: 1; padding: 0.5rem; border-radius: 6px; border: 1px solid var(--border); background: color-mix(in srgb, var(--off-white) 4%, transparent); color: color-mix(in srgb, var(--off-white) 45%, transparent); font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+    .font-size-btn { width: 38px; height: 38px; border-radius: 6px; border: 1px solid var(--border); background: color-mix(in srgb, var(--off-white) 4%, transparent); color: color-mix(in srgb, var(--off-white) 55%, transparent); font-weight: 700; cursor: pointer; transition: all 0.15s; display: inline-flex; align-items: center; justify-content: center; }
+    .theme-btn.active, .font-size-btn.active { background: rgba(60,187,177,0.12); border-color: rgba(60,187,177,0.35); color: var(--teal); }
+    .accent-swatches { display: flex; gap: 0.65rem; flex-wrap: wrap; }
+    .accent-swatch { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: border-color 0.15s, transform 0.15s; }
+    .accent-swatch.active { border-color: var(--off-white); transform: scale(1.15); }
+    .compact-row { display: flex; align-items: center; justify-content: space-between; }
+    .compact-row span { font-size: 0.85rem; }
+    .toggle-switch { width: 38px; height: 22px; border-radius: 11px; background: color-mix(in srgb, var(--off-white) 15%, transparent); border: none; cursor: pointer; position: relative; transition: background 0.2s; flex-shrink: 0; }
+    .toggle-switch::after { content: ''; position: absolute; width: 16px; height: 16px; border-radius: 50%; background: #fff; top: 3px; left: 3px; transition: left 0.2s; }
+    .toggle-switch.on { background: var(--teal); }
+    .toggle-switch.on::after { left: 19px; }
+
+    /* ============================================================
+       BOTTOM APP SWITCHER — fixed bar at the very bottom of the screen.
+       z-index:999 keeps it above everything else.
+       This matches the mobile pattern of apps like Twitter/Instagram
+       where the main navigation lives at the bottom of the screen.
+       ============================================================ */
+    .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 56px; background: rgba(247,250,248,0.97); backdrop-filter: blur(12px); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: center; gap: 2.5rem; z-index: 999; }
+    .switcher-link { color: color-mix(in srgb, var(--off-white) 40%, transparent); font-size: 0.75rem; text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 2px; transition: color 0.2s; }
+    .switcher-link:hover, .switcher-link.active { color: var(--teal); }
+
+    /* MOBILE */
+    @media (max-width: 768px) {
+      nav.nav-ysa { padding: 0 1.25rem; }
+      [style*="grid-template-columns:1fr 340px"] { grid-template-columns: 1fr !important; }
+      .grid-3, .grid-4 { grid-template-columns: 1fr; }
+      .grid-2 { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 2rem; }
+      .story-two-col { grid-template-columns: 1fr; }
+      .summit-timeline { grid-template-columns: repeat(2,1fr); }
+      .amoeba-rules { grid-template-columns: 1fr; }
+      .hero-stats { gap: 2rem; }
+      .hero h1 { font-size: 2.4rem; }
+      .hero-bracket { display: none; }
+      .content-wrap { padding: 0 1.25rem; }
+    }
+    @media (max-width: 480px) {
+      .footer-grid { grid-template-columns: 1fr; }
+      .nav-logo-text { display: none; }
+    }
+
+    /* ANNOUNCEMENT BANNER */
+    .announce-bar {
+      width: 100%; background: var(--pink); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0.6rem 3rem 0.6rem 1rem; gap: 1.25rem; position: relative;
+      font-size: 0.85rem; font-weight: 600; text-align: center;
+      cursor: pointer; transition: background 0.15s;
+      text-decoration: none; flex-wrap: wrap;
+    }
+    .announce-bar:hover { background: #d43359; }
+    .announce-bar .ab-label { font-size: .68rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; background: rgba(255,255,255,0.2); padding: .2rem .6rem; border-radius: 3px; flex-shrink: 0; }
+    .announce-bar .ab-text { flex: 1; min-width: 0; }
+    .announce-bar .ab-cta { background: rgba(255,255,255,0.22); padding: .25rem .85rem; border-radius: 4px; font-size: .78rem; font-weight: 700; white-space: nowrap; transition: background .15s; }
+    .announce-bar:hover .ab-cta { background: rgba(255,255,255,0.35); }
+    .announce-bar .ab-close { position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: rgba(255,255,255,0.7); font-size: 1rem; cursor: pointer; padding: .2rem .4rem; line-height: 1; transition: color .15s; }
+    .announce-bar .ab-close:hover { color: #fff; }
+    html.dark .announce-bar { background: #c4294d; }
+    /* Announce bar slide-in animation — runs when JS adds .ab-reveal class after popup dismiss */
+    .announce-bar.ab-reveal {
+      animation: abSlideIn 0.4s cubic-bezier(.4,0,.2,1) forwards;
+    }
+    @keyframes abSlideIn {
+      from { max-height: 0; opacity: 0; padding-top: 0; padding-bottom: 0; }
+      to   { max-height: 60px; opacity: 1; padding-top: 0.6rem; padding-bottom: 0.6rem; }
+    }
+
+    /* SPARKLE POPUP OVERLAY — full-screen dark backdrop */
+    .sparkle-overlay {
+      position: fixed; inset: 0; z-index: 3000;
+      background: rgba(0,0,0,0.78);
+      display: flex; align-items: center; justify-content: center;
+      padding: 1.5rem;
+      opacity: 1; transition: opacity 0.35s ease;
+    }
+    .sparkle-overlay.leaving { opacity: 0; pointer-events: none; }
+
+    /* SPARKLE POPUP CARD */
+    .sparkle-popup {
+      background: var(--card-bg);
+      border: 1px solid rgba(238,66,102,0.35);
+      border-radius: 20px;
+      box-shadow: 0 24px 80px rgba(238,66,102,0.22), 0 4px 20px rgba(0,0,0,0.5);
+      max-width: 700px; width: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+    /* Pink glow bar at top of modal */
+    .sparkle-popup::before {
+      content: ''; display: block;
+      height: 4px; background: linear-gradient(90deg, var(--pink), #f7835a);
+    }
+    .sparkle-popup-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+    /* Poster image column */
+    .sparkle-popup-poster {
+      background: #0a0408;
+      display: flex; align-items: stretch;
+      min-height: 320px;
+    }
+    .sparkle-popup-poster img {
+      width: 100%; height: 100%; object-fit: contain; display: block;
+    }
+    /* Info column */
+    .sparkle-popup-info {
+      padding: 1.75rem 1.5rem 1.5rem;
+      display: flex; flex-direction: column; gap: 1rem;
+    }
+    .sparkle-popup-badge {
+      display: inline-block;
+      background: var(--pink); color: #fff;
+      font-size: .62rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase; padding: .25rem .65rem;
+      border-radius: 4px; align-self: flex-start;
+    }
+    .sparkle-popup-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.4rem, 3vw, 1.85rem);
+      font-weight: 700; line-height: 1.15;
+      color: var(--off-white); margin: 0;
+    }
+    .sparkle-popup-title em { font-style: italic; color: var(--pink); }
+    .sparkle-popup-desc {
+      font-size: .84rem;
+      color: color-mix(in srgb, var(--off-white) 62%, transparent);
+      line-height: 1.7; margin: 0;
+    }
+    .sparkle-popup-details {
+      display: flex; flex-direction: column; gap: .35rem;
+      font-size: .82rem;
+      color: color-mix(in srgb, var(--off-white) 68%, transparent);
+    }
+    .sparkle-popup-actions {
+      display: flex; align-items: center; gap: .75rem; flex-wrap: wrap;
+      margin-top: .25rem;
+    }
+    .sparkle-popup-actions .btn-tickets {
+      background: var(--pink); color: #fff;
+      padding: .55rem 1.1rem; border-radius: 8px;
+      font-size: .82rem; font-weight: 700;
+      text-decoration: none; transition: opacity .15s;
+    }
+    .sparkle-popup-actions .btn-tickets:hover { opacity: .88; }
+    .sparkle-popup-actions .btn-later {
+      background: none; border: none; cursor: pointer;
+      font-size: .8rem; color: color-mix(in srgb, var(--off-white) 50%, transparent);
+      transition: color .15s; padding: 0;
+    }
+    .sparkle-popup-actions .btn-later:hover { color: var(--off-white); }
+    /* Close X in top-right corner */
+    .sparkle-popup-close {
+      position: absolute; top: 1rem; right: 1rem;
+      background: color-mix(in srgb, var(--off-white) 8%, transparent);
+      border: none; border-radius: 50%; width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: color-mix(in srgb, var(--off-white) 60%, transparent);
+      font-size: .9rem; transition: background .15s, color .15s;
+    }
+    .sparkle-popup-close:hover {
+      background: color-mix(in srgb, var(--off-white) 15%, transparent);
+      color: var(--off-white);
+    }
+    /* On small phones: stack poster above info */
+    @media (max-width: 480px) {
+      .sparkle-popup-body { grid-template-columns: 1fr; }
+      .sparkle-popup-poster { max-height: 160px; }
+    }
+
+    /* TABLET — slide-in sidebar nav */
+    @media (max-width: 860px) {
+      .nav-menu { display: none !important; }
+      .nav-right .nav-cta, .nav-right .nav-cta-secondary { display: none !important; }
+      .nav-hamburger { display: flex !important; }
+      .sidebar-nav { display: none !important; }
+      .grid-3 { grid-template-columns: repeat(2,1fr) !important; }
+      .summit-timeline { grid-template-columns: repeat(2,1fr) !important; }
+    }
+    /* PHONE */
+    @media (max-width: 480px) {
+      .announce-bar { display: none !important; }
+      nav.nav-ysa { padding: 0 1rem; height: 60px; }
+      .content-wrap { padding-left: 1.25rem !important; padding-right: 1.25rem !important; }
+      .hero { padding: 3.5rem 1.25rem 4rem !important; }
+      .hero-title { font-size: 2.2rem !important; }
+      .hero-sub { font-size: .9rem !important; }
+      .hero-ctas { flex-direction: column !important; align-items: center !important; }
+      .hero-stats { gap: 1rem !important; flex-wrap: wrap; justify-content: center; }
+      .hero-stat .num { font-size: 1.5rem !important; }
+      .grid-3, .grid-2, .story-two-col, .team-grid { grid-template-columns: 1fr !important; }
+      .section-h2 { font-size: 1.5rem !important; }
+      .summit-timeline { grid-template-columns: 1fr !important; }
+    }
+
+    /* ============================================================
+       SLIDE-IN DRAWER (tablet/phone hamburger menu)
+       Same slide-in technique as the settings panel: starts translated
+       100% off-screen to the right, slides to position 0 when .open
+       is added by openDrawer(). z-index:2000 puts it above everything
+       else, including the bottom bar (999) and settings panel (300).
+       cubic-bezier(.4,0,.2,1) is Google's "standard easing" — fast
+       start, smooth deceleration into final position.
+       ============================================================ */
+    #deviceDrawer {
+      position: fixed; top: 0; right: 0; bottom: 0; width: 280px; z-index: 2000;
+      background: var(--card-bg); border-left: 1px solid var(--border);
+      padding: 2rem 1.75rem; display: flex; flex-direction: column; gap: .25rem;
+      transform: translateX(100%); transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+      box-shadow: -8px 0 40px rgba(0,0,0,0.15);
+    }
+    #deviceDrawer.open { transform: translateX(0); }
+    #drawerOverlay {
+      position: fixed; inset: 0; z-index: 1999; background: rgba(0,0,0,0.35);
+      backdrop-filter: blur(3px); display: none;
+    }
+    #drawerOverlay.open { display: block; }
+    .drawer-link {
+      display: block; padding: .75rem 1rem; border-radius: 10px;
+      font-size: .95rem; font-weight: 600; color: var(--off-white);
+      text-decoration: none; transition: background .15s, color .15s;
+    }
+    .drawer-link:hover { background: rgba(60,187,177,0.08); color: var(--teal); }
+    .drawer-close {
+      position: absolute; top: 1rem; right: 1rem;
+      background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--off-white); padding: .3rem .5rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- =============================================================
+     THEME INIT SCRIPT — runs immediately before the page renders.
+     This is the most important script on the page. It reads the
+     user's saved preferences from localStorage and applies the
+     correct theme classes to <html> BEFORE the browser paints
+     anything. Without this, you'd get a flash of the wrong theme
+     (e.g. light mode rendering for a split second before dark kicks in).
+
+     It's wrapped in an IIFE (Immediately Invoked Function Expression) —
+     the (function(){...})() pattern runs the function instantly.
+
+     VERSION MIGRATION: if the user has stale "dark-default" settings
+     from a previous version of the site, this clears them and sets
+     the version flag to '2' so this migration only runs once.
+
+     localStorage is a key-value store built into every browser.
+     It persists across page reloads and browser sessions. We store:
+       ysa-theme        → 'dark' or 'light'
+       ysa-colorblind   → '1' or '0'
+       ysa-font-size    → 'sm', 'md', or 'lg'
+       ysa-reduced-motion → '1' or '0'
+       ysa-accent-hex   → hex color string like '#ee4266'
+     ============================================================= -->
+<script>
+(function(){
+  // v2: light-default. Clear stale dark-default settings.
+  if(localStorage.getItem('ysa-platform-version') !== '2') {
+    ['ysa-theme','ysa-accent-hex','ysa-accent-name'].forEach(function(k){localStorage.removeItem(k);});
+    localStorage.setItem('ysa-platform-version','2');
+  }
+  var h=document.documentElement;
+  var t=localStorage.getItem('ysa-theme'),c=localStorage.getItem('ysa-colorblind'),
+      f=localStorage.getItem('ysa-font-size'),r=localStorage.getItem('ysa-reduced-motion'),
+      acc=localStorage.getItem('ysa-accent-hex');
+  if(t==='dark') h.classList.add('dark');
+  if(c==='1') h.classList.add('colorblind');
+  if(f) h.classList.add('font-'+f);
+  if(r==='1') h.classList.add('reduced-motion');
+  // Override the --teal CSS variable with the user's chosen accent color
+  if(acc) h.style.setProperty('--teal',acc);
+})();
+</script>
+
+<div class="particles" id="particles"></div>
+
+<!-- =============================================================
+     ANNOUNCEMENT BANNER
+     A dismissable top banner linking to the Sparkle for STEM event.
+     It's an <a> element (the whole bar is clickable and links to #sparkle)
+     with onclick="dismissBanner(event)" — the event is passed so the
+     dismiss function can call event.preventDefault() to stop the link
+     from navigating when the close X button is clicked.
+     The close button inside calls event.stopPropagation() so clicking
+     it doesn't also trigger the parent <a>'s click handler.
+     ============================================================= -->
+<!-- =============================================================
+     SPARKLE FOR STEM POPUP
+     Shows on first visit each session (sessionStorage tracks it).
+     Dismissing it fades out this overlay and reveals the announce
+     bar above — giving the feeling it "collapsed" into the bar.
+     ============================================================= -->
+<div class="sparkle-overlay" id="sparkleOverlay" style="display:none;">
+  <div class="sparkle-popup" role="dialog" aria-modal="true" aria-label="Sparkle for STEM event">
+    <!-- Top-right close button — calls dismissSparklePopup() -->
+    <button class="sparkle-popup-close" onclick="dismissSparklePopup()" aria-label="Close">&#x2715;</button>
+    <div class="sparkle-popup-body">
+      <!-- Left: event poster image -->
+      <div class="sparkle-popup-poster">
+        <img src="sparkle-poster2.png" alt="Sparkle for STEM poster" loading="eager"/>
+      </div>
+      <!-- Right: event info -->
+      <div class="sparkle-popup-info">
+        <span class="sparkle-popup-badge">&#10024; On the Horizon</span>
+        <h2 class="sparkle-popup-title">Sparkle <em>for</em> STEM</h2>
+        <p class="sparkle-popup-desc">A fabulous fall fundraiser supporting YSA young scientists. Dinner by Spoonfed Kitchen, dancing, and community.</p>
+        <div class="sparkle-popup-details">
+          <span>&#128197;&nbsp; September 19, 2026</span>
+          <span>&#128336;&nbsp; 7:00 &ndash; 9:30 PM</span>
+          <span>&#128205;&nbsp; Azalea Station, Wilmington NC</span>
+        </div>
+        <div class="sparkle-popup-actions">
+          <a href="https://givebutter.com/c/sparkle-for-stem-gt0ouh" target="_blank" class="btn-tickets" onclick="dismissSparklePopup()">Get Tickets &rarr;</a>
+          <button class="btn-later" onclick="dismissSparklePopup()">Maybe later</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<a href="#sparkle" class="announce-bar" id="announceBanner" onclick="dismissBanner(event)">
+  <span class="ab-label">&#10024; On the Horizon</span>
+  <span class="ab-text">Sparkle for STEM &mdash; September 19th &middot; 7:00&ndash;9:30 PM &middot; Azalea Station, Wilmington NC</span>
+  <span class="ab-cta">Get Tickets &rarr;</span>
+  <button class="ab-close" onclick="event.preventDefault();event.stopPropagation();dismissBanner()">&#x2715;</button>
+</a>
+
+<!-- =============================================================
+     SETTINGS PANEL — slide-in accessibility/appearance controls.
+     The overlay div covers the whole page when the panel is open.
+     Clicking it calls toggleSettings() to close the panel.
+     The panel itself contains:
+       - Theme: dark/light buttons
+       - Accent color: 5 colored swatches (clicking changes --teal)
+       - Text size: S/M/XL (changes html font-size via CSS class)
+       - Accessibility: TTS toggle, colorblind mode, reduced motion
+     All settings are saved to localStorage and applied by the
+     theme-init script at the top of the page on every load.
+     ============================================================= -->
+<div class="settings-overlay" id="settingsOverlay" onclick="toggleSettings()"></div>
+<div class="settings-panel" id="settingsPanel">
+  <div class="settings-header">
+    <h3>&#9881;&#65039; Appearance</h3>
+    <button class="settings-close" onclick="toggleSettings()">&#x2715;</button>
+  </div>
+  <div class="settings-section">
+    <div class="settings-section-label">Theme</div>
+    <div class="theme-toggle">
+      <button class="theme-btn" id="btn-dark" onclick="setTheme('dark')">&#127769; Dark</button>
+      <button class="theme-btn active" id="btn-light" onclick="setTheme('light')">&#9728;&#65039; Light</button>
+    </div>
+  </div>
+  <div class="settings-section">
+    <div class="settings-section-label">Accent Color</div>
+    <div class="accent-swatches">
+      <div class="accent-swatch active" data-color="teal"     style="background:#3cbbb1;" onclick="setAccent('teal','#3cbbb1')" title="Teal"></div>
+      <div class="accent-swatch"        data-color="pink"     style="background:#ee4266;" onclick="setAccent('pink','#ee4266')" title="Pink"></div>
+      <div class="accent-swatch"        data-color="gold"     style="background:#f1b643;" onclick="setAccent('gold','#f1b643')" title="Gold"></div>
+      <div class="accent-swatch"        data-color="lavender" style="background:#bbbdf6;" onclick="setAccent('lavender','#bbbdf6')" title="Lavender"></div>
+      <div class="accent-swatch"        data-color="amber"    style="background:#c4903a;" onclick="setAccent('amber','#c4903a')" title="Amber"></div>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-section-label">Text Size</div>
+    <div class="font-size-btns-row">
+      <button class="font-size-btn sz-sm" id="btn-sm" onclick="setFontSize('sm')" style="font-size:.8rem;">A</button>
+      <button class="font-size-btn sz-md active" id="btn-md" onclick="setFontSize('md')" style="font-size:1rem;">A</button>
+      <button class="font-size-btn sz-lg" id="btn-lg" onclick="setFontSize('lg')" style="font-size:1.2rem;">A</button>
+    </div>
+  </div>
+  <div class="settings-section">
+    <div class="settings-section-label">Accessibility</div>
+    <div class="compact-row" style="margin-bottom:.85rem;">
+      <div><div style="font-size:.85rem;font-weight:500;">&#128266; Text-to-Speech</div><div style="font-size:.72rem;color:color-mix(in srgb,var(--off-white) 45%,transparent);margin-top:1px;">Read page content aloud</div></div>
+      <button class="toggle-switch" id="ttsToggle" onclick="toggleTTS()"></button>
+    </div>
+    <div id="tts-controls" style="display:none;margin-bottom:.85rem;padding:.65rem;background:rgba(60,187,177,0.07);border:1px solid rgba(60,187,177,0.18);border-radius:8px;">
+      <div style="display:flex;gap:.4rem;margin-bottom:.4rem;">
+        <button onclick="ttsSpeak()" style="flex:1;padding:.35rem;background:rgba(60,187,177,0.15);border:1px solid rgba(60,187,177,0.3);border-radius:5px;color:var(--teal);font-size:.72rem;font-weight:600;cursor:pointer;">&#9654; Read</button>
+        <button onclick="ttsPause()" style="flex:1;padding:.35rem;background:color-mix(in srgb,var(--off-white) 6%,transparent);border:1px solid var(--border);border-radius:5px;color:color-mix(in srgb,var(--off-white) 50%,transparent);font-size:.72rem;cursor:pointer;">&#9208; Pause</button>
+        <button onclick="ttsStop()" style="flex:1;padding:.35rem;background:color-mix(in srgb,var(--off-white) 6%,transparent);border:1px solid var(--border);border-radius:5px;color:color-mix(in srgb,var(--off-white) 50%,transparent);font-size:.72rem;cursor:pointer;">&#9209; Stop</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:.4rem;">
+        <span style="font-size:.68rem;color:color-mix(in srgb,var(--off-white) 40%,transparent);">Speed</span>
+        <input type="range" id="ttsRate" min="0.5" max="2" step="0.1" value="1" style="flex:1;accent-color:var(--teal);" oninput="document.getElementById('ttsRateVal').textContent=this.value+'x'"/>
+        <span id="ttsRateVal" style="font-size:.68rem;color:var(--teal);min-width:2rem;">1x</span>
+      </div>
+    </div>
+    <div class="compact-row" style="margin-bottom:.85rem;">
+      <div><div style="font-size:.85rem;font-weight:500;">Colorblind Mode</div><div style="font-size:.72rem;color:color-mix(in srgb,var(--off-white) 45%,transparent);margin-top:1px;">Blue-orange instead of red-green</div></div>
+      <button class="toggle-switch" id="colorblindToggle" onclick="toggleColorblind()"></button>
+    </div>
+    <div class="compact-row">
+      <div><div style="font-size:.85rem;font-weight:500;">Reduced Motion</div><div style="font-size:.72rem;color:color-mix(in srgb,var(--off-white) 45%,transparent);margin-top:1px;">Pause animations</div></div>
+      <button class="toggle-switch" id="reducedMotionToggle" onclick="toggleReducedMotion()"></button>
+    </div>
+  </div>
+  <div class="settings-section" style="margin-top:auto;padding-top:1rem;border-top:1px solid var(--border);">
+    <div class="settings-section-label">About</div>
+    <p style="font-size:.8rem;color:color-mix(in srgb, var(--off-white) 40%, transparent);line-height:1.65;">YSA Platform &middot; Draft v2<br/>youngscientistacademy.org</p>
+    <br/>
+    <button onclick="resetSettings()" style="font-size:.8rem;color:color-mix(in srgb, var(--off-white) 30%, transparent);background:none;border:none;cursor:pointer;padding:0;text-decoration:underline;">Reset to defaults</button>
+  </div>
+</div>
+
+<!-- =============================================================
+     NAVIGATION BAR
+     Contains: YSA logo (links to index.html), center nav menu with
+     dropdown items, right-side search + settings buttons + hamburger.
+     The hamburger button is hidden on desktop via CSS and shown at
+     <=860px breakpoint. Clicking it calls openDrawer() which slides
+     in the #deviceDrawer panel from the right.
+     The "About" and "Events" and "Programs" items use <button> elements
+     (not links) because they only trigger their dropdown — they don't
+     navigate anywhere themselves. The dropdown links inside them do.
+     ============================================================= -->
+<nav class="nav-ysa">
+  <a href="index.html" class="nav-logo">
+    <img src="https://ysalive.netlify.app/ysa-primarybrandmark-transparent.png" alt="YSA logo" onerror="this.style.display='none'"/>
+  </a>
+
+  <ul class="nav-menu" id="navMenu">
+    <li><a href="index.html" id="navHome" class="active">Home</a></li>
+    <li><a href="#sparkle" data-spy="sparkle">On the Horizon</a></li>
+    <li><a href="#programs" data-spy="programs">Learn. Teach. Apply.</a></li>
+    <li><a href="#teams" data-spy="teams">Meet the Teams</a></li>
+    <li class="nav-item">
+      <button>About <span class="nav-chevron">&#9660;</span></button>
+      <div class="nav-dropdown">
+        <div class="dd-tag">Learn More</div>
+        <a href="#about" data-spy="about">Our Story</a>
+        <a href="https://www.youngscientistacademy.org/staff-and-board.html" target="_blank">Staff &amp; Board</a>
+        <a href="#sponsors">Sponsors</a>
+        <a href="https://www.youngscientistacademy.org/in-the-news.html" target="_blank">In the News</a>
+        <a href="https://www.youngscientistacademy.org/job-opportunities.html" target="_blank">Job Opportunities</a>
+      </div>
+    </li>
+    <li class="nav-item">
+      <button>Events <span class="nav-chevron">&#9660;</span></button>
+      <div class="nav-dropdown">
+        <div class="dd-tag">Upcoming</div>
+        <a href="#events">Sparkle for STEM</a>
+        <a href="#summit">Youth Summit</a>
+        <a href="#events">YSA Hackathon</a>
+      </div>
+    </li>
+    <li class="nav-item">
+      <button>Programs <span class="nav-chevron">&#9660;</span></button>
+      <div class="nav-dropdown">
+        <div class="dd-tag">Our Programs</div>
+        <a href="#programs">Learn STEM</a>
+        <a href="https://www.youngscientistacademy.org/registration-971003-187895.html" target="_blank">Teach STEM</a>
+        <a href="ambassadors.html">Global STEM Ambassadors</a>
+        <a href="#programs">Summer STEM Explorers</a>
+      </div>
+    </li>
+    <li><a href="https://youngscientistacademy.org/donate.html" target="_blank">Donate</a></li>
+  </ul>
+
+  <div class="nav-right">
+    <button class="nav-search-btn" onclick="toggleSearchBar()" title="Search" aria-label="Search">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </button>
+    <button class="nav-search-btn" onclick="toggleSettings()" title="Accessibility Settings" aria-label="Accessibility Settings">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+    <button class="nav-hamburger" onclick="openDrawer()" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+<div class="nav-search-bar" id="navSearchBar">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+  <input type="text" placeholder="Search YSA..." id="navSearchInput" onkeydown="if(event.key==='Escape')toggleSearchBar()"/>
+</div>
+
+<!-- =============================================================
+     HERO SECTION
+     The full-screen opening section. Contains:
+     - Four corner bracket divs (decorative teal L-shapes)
+     - Gradient headline (teal → purple via CSS clip trick)
+     - Subheading (hero-sub class)
+     - Three CTA buttons (primary/outline/gold styles)
+     - Stats row: 350+ youth, 5 countries, founded 2017, 5th summit
+     - Animated scroll hint at the bottom
+     The atmospheric glow comes from the ::before pseudo-element
+     defined in CSS (three overlapping radial gradients).
+     ============================================================= -->
+<section id="hero" class="hero">
+  <!-- Corner bracket decorations — pure CSS borders, no images -->
+  <div class="hero-bracket tl"></div>
+  <div class="hero-bracket tr"></div>
+  <div class="hero-bracket bl"></div>
+  <div class="hero-bracket br"></div>
+
+  <h1 class="gradient-text">Empowering the <em style="font-style:italic;">next generation</em> of scientists.</h1>
+  <p class="hero-sub">The Young Scientist Academy gives all youth the tools to be community ambassadors of science and technology. Across 6 countries and counting, students learn, teach, and apply real science to real problems.</p>
+  <div class="hero-ctas">
+    <a href="#programs" class="btn-primary">Explore Programs &#8594;</a>
+    <a href="#about" class="btn-outline">Our Story</a>
+    <a href="https://youngscientistacademy.org/donate.html" target="_blank" class="btn-gold">Support YSA</a>
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="num">350+</div><div class="lbl">Youth Each Week</div></div>
+    <div class="hero-stat"><div class="num">5</div><div class="lbl">Countries</div></div>
+    <div class="hero-stat"><div class="num">2017</div><div class="lbl">Founded</div></div>
+    <div class="hero-stat"><div class="num">5th</div><div class="lbl">Annual Summit</div></div>
+  </div>
+  <div class="hero-scroll-hint">Scroll</div>
+</section>
+
+<!-- =============================================================
+     "WHAT'S HAPPENING" NEWS CAROUSEL
+     A horizontal card carousel showing 5 news/update cards.
+     The pulsing pink dot (animation:pulse) signals "live" or current.
+
+     HOW THE CAROUSEL WORKS:
+     - All 5 cards sit side-by-side inside #nsTrack (display:flex)
+     - Each card has min-width:100% so it fills the viewport width
+     - The parent has overflow:hidden so only one card is visible
+     - Sliding left/right is done by changing transform:translateX(-N%)
+       where N = card index × 100. So card 0 = 0%, card 1 = -100%, etc.
+     - The dots (ev-dot) highlight the active card index
+     - Arrow buttons call nsSlide(-1) or nsSlide(1)
+     The same pattern is reused in the Events carousel below.
+     ============================================================= -->
+<section style="padding: 3.5rem 0 2rem;">
+  <div class="content-wrap">
+    <!-- Pulsing live dot + "What's Happening" label -->
+    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.25rem;">
+      <div style="width:8px;height:8px;border-radius:50%;background:var(--pink);animation:pulse 2s infinite;flex-shrink:0;"></div>
+      <span style="font-size:0.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:color-mix(in srgb, var(--off-white) 50%, transparent);">What's Happening</span>
+    </div>
+    <!-- NEWS CAROUSEL -->
+    <div style="position:relative;max-width:700px;margin:0 auto;">
+      <button onclick="nsSlide(-1)" class="ns-arrow" style="left:-3rem;">&#8592;</button>
+      <button onclick="nsSlide(1)"  class="ns-arrow" style="right:-3rem;">&#8594;</button>
+      <div style="overflow:hidden;border-radius:16px;">
+        <div id="nsTrack" style="display:flex;transition:transform 0.38s cubic-bezier(.4,0,.2,1);">
+          <a href="#summit" class="news-card" style="min-width:100%;background:linear-gradient(135deg,rgba(60,187,177,0.12),rgba(60,187,177,0.03));border:1px solid rgba(60,187,177,0.25);">
+            <div style="font-size:2.5rem;margin-bottom:1rem;">&#127880;</div>
+            <div style="font-size:.75rem;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.6rem;">Just happened</div>
+            <div style="font-weight:800;font-size:1.4rem;line-height:1.35;margin-bottom:.75rem;">5th Annual Summit wrapped in Moldova</div>
+            <div style="font-size:.9rem;color:color-mix(in srgb, var(--off-white) 60%, transparent);">Weather balloon, 14 research teams, Codrii Reserve &#8594;</div>
+          </a>
+          <a href="#amoeba" class="news-card" style="min-width:100%;background:linear-gradient(135deg,rgba(238,66,102,0.1),rgba(238,66,102,0.03));border:1px solid rgba(238,66,102,0.2);">
+            <div style="font-size:2.5rem;margin-bottom:1rem;">&#127912;</div>
+            <div style="font-size:.75rem;font-weight:700;color:var(--pink);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.6rem;">Now Open</div>
+            <div style="font-weight:800;font-size:1.4rem;line-height:1.35;margin-bottom:.75rem;">Project Amoeba Design Competition</div>
+            <div style="font-size:.9rem;color:color-mix(in srgb, var(--off-white) 60%, transparent);">Submit your mascot concept. No AI. Hand-drawn welcome &#8594;</div>
+          </a>
+          <a href="https://givebutter.com/c/sparkle-for-stem-gt0ouh" target="_blank" class="news-card" style="min-width:100%;background:linear-gradient(135deg,rgba(238,66,102,0.1),rgba(238,66,102,0.03));border:1px solid rgba(238,66,102,0.3);">
+            <div style="font-size:2.5rem;margin-bottom:1rem;">&#10024;</div>
+            <div style="font-size:.75rem;font-weight:700;color:var(--pink);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.6rem;">Sept 19 &middot; 7:00-9:30pm</div>
+            <div style="font-weight:800;font-size:1.4rem;line-height:1.35;margin-bottom:.75rem;">Sparkle for STEM</div>
+            <div style="font-size:.9rem;color:color-mix(in srgb, var(--off-white) 60%, transparent);">Azalea Station &middot; Tickets on sale now! &#8594;</div>
+          </a>
+          <a href="ambassadors.html" class="news-card" style="min-width:100%;background:linear-gradient(135deg,rgba(241,182,67,0.1),rgba(241,182,67,0.03));border:1px solid rgba(241,182,67,0.2);">
+            <div style="font-size:2.5rem;margin-bottom:1rem;">&#127942;</div>
+            <div style="font-size:.75rem;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.6rem;">Live Now</div>
+            <div style="font-weight:800;font-size:1.4rem;line-height:1.35;margin-bottom:.75rem;">26-27 Season Preview</div>
+            <div style="font-size:.9rem;color:color-mix(in srgb, var(--off-white) 60%, transparent);">Incoming cohort graduating from Explorers &middot; Season opens Oct 2026 &#8594;</div>
+          </a>
+          <a href="https://instagram.com/youngscientistacademy" target="_blank" class="news-card" style="min-width:100%;background:linear-gradient(135deg,rgba(60,187,177,0.07),rgba(60,187,177,0.02));border:1px solid rgba(60,187,177,0.15);">
+            <div style="font-size:2.5rem;margin-bottom:1rem;">&#128247;</div>
+            <div style="font-size:.75rem;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.6rem;">Follow Us</div>
+            <div style="font-weight:800;font-size:1.4rem;line-height:1.35;margin-bottom:.75rem;">@youngscientistacademy</div>
+            <div style="font-size:.9rem;color:color-mix(in srgb, var(--off-white) 60%, transparent);">Instagram &middot; Facebook &middot; YouTube &#8594;</div>
+          </a>
+        </div>
+      </div>
+      <div id="nsDots" style="display:flex;gap:.45rem;margin-top:1rem;">
+        <button onclick="nsGo(0)" class="ev-dot active"></button>
+        <button onclick="nsGo(1)" class="ev-dot"></button>
+        <button onclick="nsGo(2)" class="ev-dot"></button>
+        <button onclick="nsGo(3)" class="ev-dot"></button>
+        <button onclick="nsGo(4)" class="ev-dot"></button>
+      </div>
+    </div>
+    <style>
+      .ns-arrow { position:absolute;top:50%;transform:translateY(-50%);z-index:10;background:var(--card-bg);border:1px solid var(--border);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--off-white);font-size:1rem;transition:border-color 0.15s; }
+      .ns-arrow:hover { border-color:var(--teal); }
+    </style>
+    <script>
+      // nsIdx tracks which carousel slide is currently shown (0-4)
+      var nsIdx=0,nsTotal=5;
+      // nsGo(i): jump to slide i. Moves the track by -100% × i.
+      // Then updates dot highlights using classList.toggle('active', bool).
+      function nsGo(i){nsIdx=i;document.getElementById('nsTrack').style.transform='translateX(-'+(i*100)+'%)';document.querySelectorAll('#nsDots .ev-dot').forEach(function(d,j){d.classList.toggle('active',j===i);});}
+      // nsSlide(dir): move +1 or -1 from current position.
+      // The % nsTotal wraps around (so slide 4 → right → slide 0).
+      // Adding nsTotal before % prevents negative modulo issues in JS.
+      function nsSlide(dir){nsGo((nsIdx+dir+nsTotal)%nsTotal);}
+    </script>
+  </div>
+</section>
+
+<!-- =============================================================
+     SPARKLE FOR STEM SPOTLIGHT
+     A two-column feature section: event poster on the left,
+     event details on the right. Uses a CSS grid with
+     grid-template-columns:1fr 1fr (two equal columns).
+     The poster uses aspect-ratio:4/5 to maintain a portrait
+     shape, with object-fit:contain so the image isn't cropped.
+     Has the .reveal class so it fades in on scroll.
+     ============================================================= -->
+<!-- SPARKLE FOR STEM SPOTLIGHT -->
+<section id="sparkle" style="padding:3rem 0 3.5rem;">
+  <div class="content-wrap">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;" class="reveal">
+      <!-- poster — full image, no crop -->
+      <div style="border-radius:16px;overflow:hidden;box-shadow:0 8px 40px rgba(238,66,102,0.18);aspect-ratio:4/5;background:rgba(238,66,102,0.04);">
+        <img src="sparkle-poster2.png" alt="Sparkle for STEM poster" style="width:100%;height:100%;object-fit:contain;display:block;background:#0a0408;"/>
+      </div>
+      <!-- text — vertically centred, clean stack -->
+      <div style="display:flex;flex-direction:column;justify-content:center;gap:1.4rem;">
+        <span style="background:var(--pink);color:#fff;font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:.3rem .75rem;border-radius:4px;align-self:flex-start;">On the Horizon</span>
+        <h2 style="font-family:'Playfair Display',serif;font-size:clamp(2rem,4vw,3rem);font-weight:700;line-height:1.15;color:var(--off-white);margin:0;">Sparkle <em style="font-style:italic;color:var(--pink);">for</em> STEM</h2>
+        <p style="font-size:.97rem;color:color-mix(in srgb, var(--off-white) 65%, transparent);line-height:1.8;margin:0;">A fabulous fall fundraiser supporting YSA young scientists. Dinner by Spoonfed Kitchen, a night of dancing, and community at its finest.</p>
+        <div style="display:flex;flex-direction:column;gap:.6rem;font-size:.9rem;color:color-mix(in srgb, var(--off-white) 70%, transparent);">
+          <span>&#128197;&nbsp; September 19, 2026</span>
+          <span>&#128336;&nbsp; 7:00 &ndash; 9:30 PM</span>
+          <span>&#128205;&nbsp; Azalea Station, Wilmington NC</span>
+        </div>
+        <div style="display:flex;gap:.85rem;flex-wrap:wrap;margin-top:.25rem;">
+          <a href="https://givebutter.com/c/sparkle-for-stem-gt0ouh" target="_blank" class="btn-primary" style="background:var(--pink);">Get Tickets &#8594;</a>
+          <a href="#events" style="display:flex;align-items:center;font-size:.88rem;color:var(--pink);font-weight:600;">See all events</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- PROGRAMS -->
+<section id="programs" class="section-pad">
+  <div class="content-wrap">
+    <div class="section-header-block reveal">
+      <span class="section-tag">Our Programs</span>
+      <h2 class="section-h2">Learn. Teach. <em>Apply.</em></h2>
+      <p class="section-sub">From free in-school programs to international research partnerships, YSA meets students and educators wherever they are.</p>
+    </div>
+    <div class="grid-3" style="margin-bottom:1.25rem;">
+      <div class="prog-card reveal">
+        <div class="icon">&#129514;</div>
+        <span class="prog-tag" style="color:var(--teal);">Free Program</span>
+        <h3>Learn STEM</h3>
+        <p>Free in-school, after-school, and summer programs across the Cape Fear region and Moldova. Students learn the scientific method through real fieldwork and hands-on labs.</p>
+        <a href="https://youngscientistacademy.org" target="_blank" style="font-size:.85rem;color:var(--teal);font-weight:600;">Learn more &#8594;</a>
+      </div>
+      <div class="prog-card reveal reveal-delay-1">
+        <div class="icon">&#128218;</div>
+        <span class="prog-tag" style="color:var(--gold);">For Educators</span>
+        <h3>Teach STEM</h3>
+        <p>Year-long teacher mentorship program. Educators earn CEU credits and a stipend while bringing the YSA method to their classrooms. Applications open now.</p>
+        <a href="https://www.youngscientistacademy.org/registration-971003-187895.html" target="_blank" style="font-size:.85rem;color:var(--gold);font-weight:600;">Apply to Teach STEM &#8594;</a>
+      </div>
+      <div class="prog-card reveal reveal-delay-2">
+        <div class="icon">&#128300;</div>
+        <span class="prog-tag" style="color:var(--pink);">Community Impact</span>
+        <h3>Apply STEM</h3>
+        <p>Students tackle real community challenges and present findings to city council and local leaders. Science as civic action. Problem-solving that leaves a mark.</p>
+        <a href="https://youngscientistacademy.org" target="_blank" style="font-size:.85rem;color:var(--pink);font-weight:600;">Learn more &#8594;</a>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="prog-card reveal">
+        <div class="icon">&#128196;</div>
+        <span class="prog-tag" style="color:var(--lavender);">Peer Review</span>
+        <h3>Frontiers for Young Minds</h3>
+        <p>Youth peer-review real scientific journal articles for Frontiers for Young Minds. Students engage with cutting-edge research and develop critical scientific literacy skills.</p>
+        <a href="https://youngscientistacademy.org" target="_blank" style="font-size:.85rem;color:var(--lavender);font-weight:600;">Learn more &#8594;</a>
+      </div>
+      <div class="prog-card reveal reveal-delay-1" style="border:1px solid rgba(60,187,177,0.3);background:linear-gradient(135deg,rgba(60,187,177,0.07),rgba(60,187,177,0.02));">
+        <div class="icon">&#127758;</div>
+        <span class="prog-tag" style="color:var(--teal);">Ages 14-18 &middot; Applications Closed</span>
+        <h3>Global STEM Ambassadors</h3>
+        <p>YSA's highest-level program. 25-30 ambassadors accepted per cohort. Applications for the 26-27 cohort are closed. The incoming class graduates from the Explorer program and begins their official season in October 2026. Students conduct original research, present at international summits, and represent YSA worldwide.</p>
+        <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-top:.25rem;">
+          <a href="mailto:maddie@youngscientistacademy.org?subject=GSA Interest 27-28" class="btn-primary" style="padding:.6rem 1.3rem;font-size:.85rem;background:var(--teal);">Get Notified for 27-28 &#8594;</a>
+          <a href="ambassadors.html" style="font-size:.85rem;color:var(--teal);font-weight:600;display:flex;align-items:center;">View Ambassadors &#8594;</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="divider"></div>
+
+<!-- =============================================================
+     AMBASSADOR LEADERBOARD
+     Shows a placeholder card explaining that the 26-27 season
+     hasn't started yet (opens October 2026). When the season is
+     live, this will be replaced with the actual lb-table component
+     showing ranked ambassadors. The leaderboard data and table
+     styles are defined in the CSS above and the JS AMBASSADORS
+     object below, ready to be wired up.
+     ============================================================= -->
+<!-- AMBASSADOR LEADERBOARD -->
+<section id="leaderboard" class="section-pad">
+  <div class="content-wrap">
+    <div style="display:grid;grid-template-columns:1fr auto;align-items:start;gap:2rem;margin-bottom:2.5rem;" class="reveal">
+      <div>
+        <span class="section-tag">Points Leaderboard</span>
+        <h2 class="section-h2">2026-27 Ambassador <em>Season</em></h2>
+      </div>
+      <a href="ambassadors.html" class="btn-outline" style="margin-top:1rem;white-space:nowrap;">Full Leaderboard &#8594;</a>
+    </div>
+    <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:20px;overflow:hidden;box-shadow:0 1px 8px rgba(0,0,0,0.07);" class="reveal">
+      <div style="padding:3rem 2rem;text-align:center;">
+        <div style="width:64px;height:64px;border-radius:50%;background:rgba(60,187,177,0.1);border:1.5px solid rgba(60,187,177,0.25);display:flex;align-items:center;justify-content:center;font-size:1.75rem;margin:0 auto 1.25rem;">&#127942;</div>
+        <div style="font-size:0.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin-bottom:.6rem;">Season Opens October 2026</div>
+        <h3 style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;margin-bottom:.75rem;line-height:1.3;">The 26-27 cohort is on deck</h3>
+        <p style="font-size:.9rem;color:color-mix(in srgb, var(--off-white) 55%, transparent);max-width:420px;margin:0 auto 1.75rem;line-height:1.7;">This year's ambassadors are graduating from the Explorer program and gearing up for their first official season. Come back in October to follow the standings live.</p>
+        <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">
+          <span style="padding:.45rem 1rem;border-radius:100px;border:1px solid var(--border);font-size:.8rem;color:color-mix(in srgb, var(--off-white) 50%, transparent);">&#128100; 25+ Incoming Ambassadors</span>
+          <span style="padding:.45rem 1rem;border-radius:100px;border:1px solid var(--border);font-size:.8rem;color:color-mix(in srgb, var(--off-white) 50%, transparent);">&#127758; 4 Countries#127758; 5 Countries</span>
+          <span style="padding:.45rem 1rem;border-radius:100px;border:1px solid var(--border);font-size:.8rem;color:color-mix(in srgb, var(--off-white) 50%, transparent);">&#127381; Launching Oct 2026</span>
+        </div>
+      </div>
+      <div style="padding:1.1rem 1.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:0.78rem;color:color-mix(in srgb, var(--off-white) 40%, transparent);">26-27 cohort: Explorer graduates preparing for official season</span>
+        <a href="ambassadors.html" style="font-size:0.82rem;color:var(--teal);font-weight:600;">Meet the teams &#8594;</a>
+      </div>
+    </div>
+    </div>
+  </div>
+</section>
+<div class="divider"></div>
+
+<!-- MEET THE TEAMS -->
+<section id="teams" class="section-pad">
+  <div class="content-wrap">
+    <div class="section-header-block reveal">
+      <span class="section-tag">The Research Teams</span>
+      <h2 class="section-h2">Meet the <em>Teams</em></h2>
+      <p class="section-sub">9 teams across 5 countries conducting original research.</p>
+    </div>
+
+    <!-- GSA -->
+    <div class="team-group-label" style="color:var(--teal);">&#127758; Global STEM Ambassador Program</div>
+    <details style="max-width:560px;margin:-0.4rem 0 1.2rem;">
+      <summary style="display:inline-flex;align-items:center;gap:0.4rem;font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:rgba(60,187,177,0.65);cursor:pointer;list-style:none;-webkit-appearance:none;user-select:none;">
+        <span class="prog-arrow" style="display:inline-block;font-size:0.6rem;transition:transform 0.2s;">&#9658;</span> About this program
+      </summary>
+      <div style="margin:0.65rem 0 0;font-size:0.85rem;line-height:1.65;color:color-mix(in srgb, var(--off-white) 60%, transparent);background:rgba(60,187,177,0.07);border:1px solid rgba(60,187,177,0.22);border-radius:12px;padding:0.9rem 1.1rem;">
+        YSA&rsquo;s advanced research and leadership track. A year-long commitment where student teams conduct original field research, produce formal presentations, and represent their communities at international events. 10 teams across North Carolina, Moldova, and Yemen.
+      </div>
+    </details>
+    <div class="team-circles-grid reveal">
+      <div class="team-circle-item" data-team="codegreen" onclick="selectTeam(this)" style="--tc:#3cbbb1">
+        <div class="team-circle-logo"><img src="logos/codegreen_new.png" alt="Code Green"></div>
+        <div class="team-circle-name">Code Green</div>
+      </div>
+      <div class="team-circle-item" data-team="labrats" onclick="selectTeam(this)" style="--tc:#bbbdf6">
+        <div class="team-circle-logo"><img src="logos/labrats_new.png" alt="Lab Rats"></div>
+        <div class="team-circle-name">Lab Rats</div>
+      </div>
+      <div class="team-circle-item" data-team="forta" onclick="selectTeam(this)" style="--tc:#ee4266">
+        <div class="team-circle-logo" style="background:#ee4266;"><img src="logos/fuerza_notxt.png" alt="Forța" style="object-fit:cover;"></div>
+        <div class="team-circle-name">For&#x21B;a</div>
+      </div>
+      <div class="team-circle-item" data-team="divedeep" onclick="selectTeam(this)" style="--tc:#3cbbb1">
+        <div class="team-circle-logo"><img src="logos/divedeep.png" alt="Dive Deep"></div>
+        <div class="team-circle-name">Dive Deep</div>
+      </div>
+      <div class="team-circle-item" data-team="stealth" onclick="selectTeam(this)" style="--tc:#f1b643">
+        <div class="team-circle-logo" style="background:#e8e4dc;"><img src="logos/stealth.png" alt="Stealth" style="mix-blend-mode:multiply;object-fit:contain;"></div>
+        <div class="team-circle-name">Stealth</div>
+      </div>
+      <div class="team-circle-item" data-team="supernovas" onclick="selectTeam(this)" style="--tc:#bbbdf6">
+        <div class="team-circle-logo"><img src="logos/supernovas_new.png" alt="Supernovas"></div>
+        <div class="team-circle-name">Supernovas</div>
+      </div>
+      <div class="team-circle-item" data-team="codrii" onclick="selectTeam(this)" style="--tc:#3cbbb1">
+        <div class="team-circle-logo"><img src="logos/codrii_minds.svg" alt="Codrii Minds"></div>
+        <div class="team-circle-name">Codrii Minds</div>
+      </div>
+      <div class="team-circle-item" data-team="noroc" onclick="selectTeam(this)" style="--tc:#bbbdf6">
+        <div class="team-circle-logo" style="background:#fff;"><img src="logos/noroc.jpg" alt="Noroc Science" style="object-fit:contain;"></div>
+        <div class="team-circle-name">Noroc</div>
+      </div>
+      <div class="team-circle-item" data-team="dm3" onclick="selectTeam(this)" style="--tc:#f1b643">
+        <div class="team-circle-logo"><img src="logos/20dm3.svg" alt="20dm&#xB3;"></div>
+        <div class="team-circle-name">20dm&#xB3;</div>
+      </div>
+      <div class="team-circle-item" data-team="hydroterra" onclick="selectTeam(this)" style="--tc:#3cbbb1">
+        <div class="team-circle-logo"><img src="logos/hydroterra.svg" alt="HydroTerra"></div>
+        <div class="team-circle-name">HydroTerra</div>
+      </div>
+    </div>
+    <div id="gsa-team-panel"></div>
+
+    <!-- Explorers -->
+    <div class="team-group-label" style="color:#c4903a;margin-top:2.5rem;">&#128300; STEM Explorer Program</div>
+    <details style="max-width:560px;margin:-0.4rem 0 1.2rem;">
+      <summary style="display:inline-flex;align-items:center;gap:0.4rem;font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:rgba(196,144,58,0.65);cursor:pointer;list-style:none;-webkit-appearance:none;user-select:none;">
+        <span class="prog-arrow" style="display:inline-block;font-size:0.6rem;transition:transform 0.2s;">&#9658;</span> About this program
+      </summary>
+      <p style="margin:0.65rem 0 0;font-size:0.85rem;line-height:1.6;color:color-mix(in srgb, var(--off-white) 60%, transparent);background:rgba(196,144,58,0.08);border:1px solid rgba(196,144,58,0.25);border-radius:12px;padding:0.9rem 1.1rem;">
+        STEM Explorers is the entry-level program for students starting their science journey. After a year, Explorers can apply to graduate into the Global STEM Ambassador Program.
+      </p>
+    </details>
+    <div class="team-circles-grid reveal">
+      <div class="team-circle-item" data-team="sacal" onclick="selectTeam(this)" style="--tc:#c4903a">
+        <div class="team-circle-logo"><img src="logos/sacal.svg" alt="&#350;acal"></div>
+        <div class="team-circle-name">&#350;acal</div>
+      </div>
+      <div class="team-circle-item" data-team="capybara" onclick="selectTeam(this)" style="--tc:#a07850">
+        <div class="team-circle-logo" style="background:#fff;"><img src="capybara.png" alt="Capybara" style="object-fit:cover;"></div>
+        <div class="team-circle-name">Capybara</div>
+      </div>
+      <div class="team-circle-item" data-team="icebee" onclick="selectTeam(this)" style="--tc:#7dd3fc">
+        <div class="team-circle-logo" style="background:#fff;"><img src="ice bees.png" alt="Ice Bee" style="object-fit:cover;"></div>
+        <div class="team-circle-name">Ice Bee</div>
+      </div>
+      <div class="team-circle-item" data-team="goats" onclick="selectTeam(this)" style="--tc:#f0b429">
+        <div class="team-circle-logo"><img src="logos/gravity_goats.svg" alt="Gravity Goats"></div>
+        <div class="team-circle-name">Gravity Goats</div>
+      </div>
+    </div>
+    <div id="exp-team-panel"></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- =============================================================
+     PROJECT AMOEBA — DESIGN COMPETITION
+     Centered layout with an expandable rules accordion.
+     The "View Rules" button calls toggleAmoebaRules() which animates
+     the #amoebaRules div open by changing max-height from 0 to a
+     large value (CSS transition handles the animation).
+     max-height animation is the standard CSS trick for collapsible
+     sections — height:auto can't be transitioned, but max-height can.
+     ============================================================= -->
+<!-- PROJECT AMOEBA -->
+<section id="amoeba" class="section-pad">
+  <div class="content-wrap">
+    <div style="max-width:640px;margin:0 auto;text-align:center;" class="reveal">
+      <span class="section-tag" style="color:var(--pink);">Design Competition</span>
+      <h2 class="section-h2">&#127912; Project <em style="color:var(--pink);">Amoeba</em></h2>
+      <p style="color:color-mix(in srgb, var(--off-white) 65%, transparent);line-height:1.8;margin-bottom:0.75rem;">YSA is launching a design competition for our new mascot concept. The amoeba adapts to its environment, just like our scientists adapt to new challenges. We want something bold, scalable, and unmistakably YSA.</p>
+      <p style="color:color-mix(in srgb, var(--off-white) 65%, transparent);line-height:1.8;margin-bottom:1.75rem;">Think trendy golf clubhouse meets science lab. Collaborative vibes. A place where people want to hang out and do great things together.</p>
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;margin-bottom:1.25rem;">
+        <a href="mailto:maddie@youngscientistacademy.org?subject=Project Amoeba Submission" class="btn-pink">Submit Design &#8594;</a>
+        <button onclick="toggleAmoebaRules(this)" class="btn-outline" style="cursor:pointer;">View Rules &#9660;</button>
+      </div>
+      <!-- rules accordion -->
+      <div id="amoebaRules" style="max-height:0;overflow:hidden;transition:max-height 0.35s ease;text-align:left;">
+        <div style="background:color-mix(in srgb, var(--pink) 5%, transparent);border:1px solid color-mix(in srgb, var(--pink) 18%, transparent);border-radius:14px;padding:1.5rem 1.75rem;margin-top:0.25rem;">
+          <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:0.9rem;">
+            <li style="display:flex;gap:0.9rem;align-items:flex-start;"><span style="font-size:1.2rem;flex-shrink:0;">&#128683;</span><div><strong style="display:block;font-size:.88rem;margin-bottom:.2rem;">No AI Art</strong><span style="font-size:.84rem;color:color-mix(in srgb, var(--off-white) 62%, transparent);line-height:1.6;">Designs must be original. Hand-drawn, digital, mixed media all welcome. AI-generated images will be disqualified.</span></div></li>
+            <li style="display:flex;gap:0.9rem;align-items:flex-start;"><span style="font-size:1.2rem;flex-shrink:0;">&#128165;</span><div><strong style="display:block;font-size:.88rem;margin-bottom:.2rem;">Core Shape</strong><span style="font-size:.84rem;color:color-mix(in srgb, var(--off-white) 62%, transparent);line-height:1.6;">Must have a dome-shaped core section it builds outward from. Think: amoeba in its natural state, then expanding.</span></div></li>
+            <li style="display:flex;gap:0.9rem;align-items:flex-start;"><span style="font-size:1.2rem;flex-shrink:0;">&#128200;</span><div><strong style="display:block;font-size:.88rem;margin-bottom:.2rem;">Scalable</strong><span style="font-size:.84rem;color:color-mix(in srgb, var(--off-white) 62%, transparent);line-height:1.6;">Must work at any size. From phone screen to banner. Vector-friendly or clean enough to vectorize.</span></div></li>
+            <li style="display:flex;gap:0.9rem;align-items:flex-start;"><span style="font-size:1.2rem;flex-shrink:0;">&#129514;</span><div><strong style="display:block;font-size:.88rem;margin-bottom:.2rem;">YSA Vibes</strong><span style="font-size:.84rem;color:color-mix(in srgb, var(--off-white) 62%, transparent);line-height:1.6;">Innovative, fun, collaborative. It should feel like a place people want to be. Bold but approachable.</span></div></li>
+            <li style="display:flex;gap:0.9rem;align-items:flex-start;"><span style="font-size:1.2rem;flex-shrink:0;">&#127775;</span><div><strong style="display:block;font-size:.88rem;margin-bottom:.2rem;">Adaptable</strong><span style="font-size:.84rem;color:color-mix(in srgb, var(--off-white) 62%, transparent);line-height:1.6;">The logo should feel like it can build into different contexts as the amoeba takes different shapes.</span></div></li>
+            <li style="display:flex;gap:0.9rem;align-items:flex-start;"><span style="font-size:1.2rem;flex-shrink:0;">&#127881;</span><div><strong style="display:block;font-size:.88rem;margin-bottom:.2rem;">Have Fun</strong><span style="font-size:.84rem;color:color-mix(in srgb, var(--off-white) 62%, transparent);line-height:1.6;">This is a real competition with real stakes. But also: be weird, be bold, think outside the dome.</span></div></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="divider"></div>
+
+<!-- SUMMIT '26 -->
+<section id="summit" class="section-pad">
+  <div class="content-wrap">
+    <div class="section-header-block reveal">
+      <span class="section-tag" style="color:var(--gold);">Youth STEM Summit 2026</span> <span style="background:rgba(241,182,67,0.15);color:var(--gold);border:1px solid rgba(241,182,67,0.3);border-radius:50px;font-size:0.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.2rem .65rem;vertical-align:middle;">Recap</span>
+      <h2 class="section-h2">Five days of science <em>in Moldova</em></h2>
+      <p class="section-sub">The 5th Annual YSA Youth STEM Summit was the first joint in-person NC x Moldova summit. 9 teams. 5 countries. One weather balloon launched to 32km.</p>
+    </div>
+    <div style="margin-bottom:2.5rem;" class="reveal">
+      <a href="https://ysalive.netlify.app/" target="_blank" style="display:inline-flex;align-items:center;gap:.6rem;padding:.6rem 1.4rem;background:rgba(241,182,67,0.12);border:1px solid rgba(241,182,67,0.3);border-radius:50px;font-size:.88rem;font-weight:700;color:var(--gold);text-decoration:none;transition:background .15s;" onmouseover="this.style.background='rgba(241,182,67,0.22)'" onmouseout="this.style.background='rgba(241,182,67,0.12)'">View the Summit '26 Site &#8594;</a>
+    </div>
+  </div>
+</section>
+<div class="divider"></div>
+
+<!-- OUR STORY -->
+<section id="about" class="section-pad">
+  <div class="content-wrap">
+    <div class="story-two-col">
+      <div class="story-text reveal">
+        <span class="section-tag">Our Story</span>
+        <h2 class="section-h2">Founded in Wilmington. <em>Growing worldwide.</em></h2>
+        <p>In 2017, the Young Scientist Academy was founded in Wilmington, NC by Dr. Rob Condon. A university science professor with over 20 years of experience, Dr. Condon saw that the standard curriculum prioritized memorization over real problem-solving. He believed even elementary and middle schoolers could execute advanced research if given the chance.</p>
+        <p>YSA started with about 10 students per week. That first group launched YSA's very first weather balloon, taking science to new heights. Since then, YSA students have tackled ionic thrusters, urban heat island mapping, water quality dashboards, and atmospheric science.</p>
+        <p>In 2023, YSA expanded internationally through the NC-Moldova Bilateral Partnership. In October 2025, YSA launched its highest-level initiative: the Global STEM Ambassadors program, connecting youth researchers across North Carolina, Moldova, Yemen, and Syria.</p>
+        <p>Today, YSA serves over 350 youth per week during the school year, and the ambassador cohort continues to grow.</p>
+        <a href="https://www.youngscientistacademy.org/our-story.html" target="_blank" class="btn-outline" style="margin-top:1rem;display:inline-flex;">Read Full Story &#8594;</a>
+      </div>
+      <div class="reveal reveal-delay-1">
+        <div class="stat-pill">
+          <div class="sp-num">350+</div>
+          <div class="sp-lbl">Youth served per week during school year</div>
+        </div>
+        <div class="stat-pill">
+          <div class="sp-num">2017</div>
+          <div class="sp-lbl">Founded by Dr. Rob Condon in Wilmington, NC</div>
+        </div>
+        <div class="stat-pill">
+          <div class="sp-num">2023</div>
+          <div class="sp-lbl">Expanded internationally via NC-Moldova partnership</div>
+        </div>
+        <div class="stat-pill">
+          <div class="sp-num">2025</div>
+          <div class="sp-lbl">Global STEM Ambassadors program launched</div>
+        </div>
+        <div class="stat-pill">
+          <div class="sp-num">4</div>
+          <div class="sp-lbl">Countries with active ambassador teams</div>
+        </div>
+        <div style="margin-top:1.5rem;padding:1.25rem;background:rgba(60,187,177,0.07);border:1px solid rgba(60,187,177,0.2);border-radius:14px;">
+          <div style="font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);margin-bottom:.5rem;">&#127775; Fun Fact</div>
+          <p style="font-size:.85rem;color:color-mix(in srgb, var(--off-white) 65%, transparent);line-height:1.6;">YSA's very first group of students launched a weather balloon in their first year. That same spirit of "why not?" still drives every team today.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="divider"></div>
+
+<!-- EVENTS -->
+<section id="events" class="section-pad">
+  <div class="content-wrap">
+    <div class="section-header-block reveal" style="text-align:center;">
+      <span class="section-tag">Upcoming Events</span>
+      <h2 class="section-h2">What's <em>on the horizon</em></h2>
+    </div>
+    <!-- CAROUSEL -->
+    <div style="position:relative;max-width:620px;margin:0 auto;">
+      <!-- arrows -->
+      <button onclick="evSlide(-1)" style="position:absolute;left:-3rem;top:50%;transform:translateY(-50%);z-index:10;background:var(--card-bg);border:1px solid var(--border);border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--off-white);font-size:1.1rem;transition:background 0.15s;" onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor='var(--border)'">&#8592;</button>
+      <button onclick="evSlide(1)"  style="position:absolute;right:-3rem;top:50%;transform:translateY(-50%);z-index:10;background:var(--card-bg);border:1px solid var(--border);border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--off-white);font-size:1.1rem;transition:background 0.15s;" onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor='var(--border)'">&#8594;</button>
+      <!-- slides -->
+      <div style="overflow:hidden;border-radius:20px;">
+        <div id="evTrack" style="display:flex;transition:transform 0.4s cubic-bezier(.4,0,.2,1);">
+          <div class="event-card" style="min-width:100%;border-top:3px solid var(--pink);text-align:center;">
+            <div class="ev-icon">&#10024;</div>
+            <span class="ev-tag" style="color:var(--pink);">Sept 19 &middot; 7:00-9:30 PM &middot; Azalea Station, Wilmington NC</span>
+            <h3>Sparkle for STEM</h3>
+            <p>A fabulous fall fundraiser — dinner, dancing, and community-building evening. Food by Spoonfed Kitchen. Proceeds directly support YSA young scientists and their research.</p>
+            <a href="https://givebutter.com/c/sparkle-for-stem-gt0ouh" target="_blank" class="btn-primary" style="padding:.6rem 1.25rem;font-size:.85rem;margin-top:1rem;background:var(--pink);display:inline-block;">Get Tickets &#8594;</a>
+          </div>
+          <div class="event-card" style="min-width:100%;border-top:3px solid var(--teal);text-align:center;">
+            <div class="ev-icon">&#128300;</div>
+            <span class="ev-tag">Coming Soon</span>
+            <h3>YSA Hackathon</h3>
+            <p>A science-focused hackathon for young researchers. Build a prototype, present a solution, compete for real. Teams work against the clock to solve community-level STEM challenges.</p>
+            <div style="font-size:.82rem;color:color-mix(in srgb, var(--off-white) 40%, transparent);margin-top:.75rem;font-style:italic;">Details coming soon. Stay tuned.</div>
+          </div>
+          <div class="event-card" style="min-width:100%;border-top:3px solid var(--gold);text-align:center;">
+            <div class="ev-icon">&#127891;</div>
+            <span class="ev-tag">2027 &middot; Location TBD</span>
+            <h3>Youth STEM Summit 2027</h3>
+            <p>The 6th Annual YSA Youth STEM Summit. Ambassadors and Explorers present year-long research to international audiences and community leaders.</p>
+            <div style="font-size:.82rem;color:color-mix(in srgb, var(--off-white) 40%, transparent);margin-top:.75rem;font-style:italic;">Registration opens 2027. Check back!</div>
+          </div>
+        </div>
+      </div>
+      <!-- dots -->
+      <div id="evDots" style="display:flex;justify-content:center;gap:.5rem;margin-top:1.25rem;">
+        <button onclick="evGo(0)" class="ev-dot active"></button>
+        <button onclick="evGo(1)" class="ev-dot"></button>
+        <button onclick="evGo(2)" class="ev-dot"></button>
+      </div>
+    </div>
+  </div>
+</section>
+<style>
+  .ev-dot { width:8px;height:8px;border-radius:50%;border:none;background:color-mix(in srgb, var(--off-white) 20%, transparent);cursor:pointer;padding:0;transition:background 0.2s,transform 0.2s; }
+  .ev-dot.active { background:var(--teal);transform:scale(1.3); }
+  @media(max-width:700px){
+    #events .content-wrap > div { padding: 0 2.5rem; }
+  }
+</style>
+<script>
+  // Events carousel — same sliding mechanism as the news carousel above.
+  // evIdx = current slide (0, 1, or 2)
+  // evGo(i): jump to slide i by shifting the track left by i × 100%
+  // evSlide(dir): step forward (+1) or backward (-1), wraps around
+  var evIdx = 0, evTotal = 3;
+  function evGo(i) {
+    evIdx = i;
+    document.getElementById('evTrack').style.transform = 'translateX(-' + (i * 100) + '%)';
+    document.querySelectorAll('.ev-dot').forEach(function(d,j){ d.classList.toggle('active', j===i); });
+  }
+  function evSlide(dir) { evGo((evIdx + dir + evTotal) % evTotal); }
+</script>
+<div class="divider"></div>
+
+<!-- SOCIAL -->
+<section style="padding:3.5rem 0;">
+  <div class="content-wrap" style="text-align:center;">
+    <span class="section-tag">Follow Along</span>
+    <h2 class="section-h2 reveal">Behind the scenes, student <em>moments</em>, and science in action.</h2>
+    <div class="social-row reveal">
+      <a href="https://instagram.com/youngscientistacademy" target="_blank" class="social-pill">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="20" height="20" rx="5" ry="5" stroke="url(#iggrad)" stroke-width="2"/><circle cx="12" cy="12" r="4.5" stroke="url(#iggrad)" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1" fill="url(#iggrad)"/><defs><linearGradient id="iggrad" x1="2" y1="22" x2="22" y2="2" gradientUnits="userSpaceOnUse"><stop stop-color="#f09433"/><stop offset="0.25" stop-color="#e6683c"/><stop offset="0.5" stop-color="#dc2743"/><stop offset="0.75" stop-color="#cc2366"/><stop offset="1" stop-color="#bc1888"/></linearGradient></defs></svg> @youngscientistacademy
+      </a>
+      <a href="https://facebook.com/YoungSciAcademy" target="_blank" class="social-pill">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="#1877F2" xmlns="http://www.w3.org/2000/svg"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073c0 6.02 4.388 11.008 10.125 11.927v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.235 2.686.235v2.97h-1.514c-1.491 0-1.956.93-1.956 1.874v2.25h3.328l-.532 3.49h-2.796V24C19.612 23.081 24 18.093 24 12.073z"/></svg> YoungSciAcademy
+      </a>
+      <a href="https://www.linkedin.com/company/young-scientist-academy" target="_blank" class="social-pill">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="#0A66C2" xmlns="http://www.w3.org/2000/svg"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg> Young Scientist Academy
+      </a>
+      <a href="https://youtube.com/channel/UCN2oSAeuBfGw9DSGte7c0Nw" target="_blank" class="social-pill">
+        <svg width="18" height="16" viewBox="0 0 24 17" fill="#FF0000" xmlns="http://www.w3.org/2000/svg"><path d="M23.495 2.205a3.02 3.02 0 00-2.122-2.136C19.505 0 12 0 12 0S4.495 0 2.627.069A3.02 3.02 0 00.505 2.205 31.24 31.24 0 000 8.5a31.24 31.24 0 00.505 6.296 3.02 3.02 0 002.122 2.136C4.495 17 12 17 12 17s7.505 0 9.373-.069a3.02 3.02 0 002.122-2.136A31.24 31.24 0 0024 8.5a31.24 31.24 0 00-.505-6.295zM9.546 12.068V4.932L15.818 8.5l-6.272 3.568z"/></svg> YSA Channel
+      </a>
+    </div>
+  </div>
+</section>
+<div class="divider"></div>
+
+<!-- NEWSLETTER -->
+<section style="padding:4rem 0;">
+  <div class="content-wrap">
+    <div class="newsletter-wrap reveal">
+      <span class="section-tag">Stay in the Loop</span>
+      <h2 class="section-h2">Join the YSA newsletter.</h2>
+      <p style="color:color-mix(in srgb, var(--off-white) 55%, transparent);margin-top:.5rem;">Program updates, summit news, and behind-the-scenes science. No spam, ever.</p>
+      <form class="newsletter-form" onsubmit="handleNewsletter(event)">
+        <input type="email" class="newsletter-input" placeholder="your@email.com" required id="newsletterEmail"/>
+        <button type="submit" class="btn-primary" style="padding:.7rem 1.4rem;flex-shrink:0;border-radius:6px;">Subscribe</button>
+      </form>
+      <p id="newsletter-confirm" style="display:none;margin-top:1rem;color:var(--teal);font-weight:600;font-size:.9rem;">Thanks for subscribing! &#127881; We'll be in touch.</p>
+      <p style="font-size:.72rem;color:color-mix(in srgb, var(--off-white) 30%, transparent);margin-top:1rem;">By subscribing, you agree to receive YSA news and program updates. Unsubscribe anytime.</p>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================================
+     MARQUEE TICKER — "NEVER STOP EXPLORING" scrolling band.
+     How the seamless infinite scroll works:
+     1. The outer div has overflow:hidden to clip anything outside it
+     2. The inner div has white-space:nowrap and display:flex so all
+        content stays on one line
+     3. The content is duplicated (two identical groups of text)
+     4. The CSS animation (tickerScroll) moves the whole inner div
+        left by 50% of its width — which is exactly one copy of the content
+     5. When it reaches -50%, it loops back to 0% seamlessly because
+        the duplicate copy looks identical to the starting position
+
+     This is the classic CSS infinite ticker technique — no JS needed.
+     ============================================================= -->
+<!-- TICKER -->
+<div style="overflow:hidden;padding:2.5rem 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin:0;">
+  <div style="display:flex;white-space:nowrap;animation:tickerScroll 22s linear infinite;">
+    <div style="display:flex;align-items:center;gap:2.5rem;padding-right:2.5rem;flex-shrink:0;">
+      <span style="font-size:1rem;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;color:color-mix(in srgb, var(--off-white) 55%, transparent);">NEVER STOP EXPLORING</span>
+      <span style="color:var(--teal);font-size:1rem;">&#9670;</span>
+      <span style="font-size:1rem;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;color:color-mix(in srgb, var(--off-white) 55%, transparent);">NEVER STOP EXPLORING</span>
+      <span style="color:var(--pink);font-size:1rem;">&#9670;</span>
+      <span style="font-size:1rem;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;color:color-mix(in srgb, var(--off-white) 55%, transparent);">NEVER STOP EXPLORING</span>
+      <span style="color:var(--lavender);font-size:1rem;">&#9670;</span>
+      <span style="font-size:1rem;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;color:color-mix(in srgb, var(--off-white) 55%, transparent);">NEVER STOP EXPLORING</span>
+      <span style="color:var(--teal);font-size:1rem;">&#9670;</span>
+      <span style="font-size:1rem;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;color:color-mix(in srgb, var(--off-white) 55%, transparent);">NEVER STOP EXPLORING</span>
+      <span style="color:var(--pink);font-size:1rem;">&#9670;</span>
+      <span style="font-size:1rem;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;color:color-mix(in srgb, var(--off-white) 55%, transparent);">NEVER STOP EXPLORING</span>
+      <span style="color:var(--lavender);font-size:1rem;">&#9670;</span>
+    </div>
+    <!-- duplicate for seamless loop -->
+    <div style="display:flex;align-items:center;gap:2.5rem;padding-right:2.5rem;flex-shrink:0;">
+      <span style="font-size:1rem;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;color:color-mix(in srgb, var(--off-white) 55%, transparent);">NEVER STOP EXPLORING</span>
+      <span style="color:var(--teal);font-size:1rem;">&#9670;</span>
+      <span style="font-size:1rem;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;color:color-mix(in srgb, var(--off-white) 55%, transparent);">NEVER STOP EXPLORING</span>
+      <span style="color:var(--pink);font-size:1rem;">&#9670;</span>
+      <span style="font-size:1rem;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;color:color-mix(in srgb, var(--off-white) 55%, transparent);">NEVER STOP EXPLORING</span>
+      <span style="color:var(--lavender);font-size:1rem;">&#9670;</span>
+      <span style="font-size:1rem;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;color:color-mix(in srgb, var(--off-white) 55%, transparent);">NEVER STOP EXPLORING</span>
+      <span style="color:var(--teal);font-size:1rem;">&#9670;</span>
+      <span style="font-size:1rem;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;color:color-mix(in srgb, var(--off-white) 55%, transparent);">NEVER STOP EXPLORING</span>
+      <span style="color:var(--pink);font-size:1rem;">&#9670;</span>
+      <span style="font-size:1rem;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;color:color-mix(in srgb, var(--off-white) 55%, transparent);">NEVER STOP EXPLORING</span>
+      <span style="color:var(--lavender);font-size:1rem;">&#9670;</span>
+    </div>
+  </div>
+</div>
+<style>
+  @keyframes tickerScroll { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+</style>
+
+<div class="divider"></div>
+
+<!-- SPONSORS -->
+<section id="sponsors" class="section-pad" style="padding:3.5rem 0 4rem;">
+  <div class="content-wrap" style="text-align:center;">
+    <span class="section-tag">Our Partners &amp; Sponsors</span>
+    <h2 class="section-h2" style="margin-bottom:.5rem;">Made <em>Possible By</em></h2>
+    <p style="font-size:.88rem;color:color-mix(in srgb, var(--off-white) 45%, transparent);margin-bottom:2.5rem;">YSA programs are made possible through the generous support of our sponsors and community partners.</p>
+
+    <div style="font-size:.65rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid var(--border);">Major Supporters</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2.5rem;" class="reveal">
+      <div style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:12px;padding:1.25rem;display:flex;align-items:center;justify-content:center;min-height:88px;">
+        <img src="sponsors/ncino.png" alt="nCino" style="max-height:44px;max-width:100%;object-fit:contain;"/>
+      </div>
+      <div style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:12px;padding:1.25rem;display:flex;align-items:center;justify-content:center;min-height:88px;">
+        <img src="sponsors/telus.png" alt="TELUS" style="max-height:44px;max-width:100%;object-fit:contain;"/>
+      </div>
+      <div style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:12px;padding:1.25rem;display:flex;align-items:center;justify-content:center;min-height:88px;">
+        <img src="sponsors/endowment.png" alt="New Hanover Community Endowment" style="max-height:44px;max-width:100%;object-fit:contain;"/>
+      </div>
+      <div style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:12px;padding:1.25rem;display:flex;align-items:center;justify-content:center;min-height:88px;">
+        <img src="sponsors/goldbond.png" alt="Gold Bond" style="max-height:44px;max-width:100%;object-fit:contain;"/>
+      </div>
+      <div style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:12px;padding:1.25rem;display:flex;align-items:center;justify-content:center;min-height:88px;">
+        <img src="sponsors/landfall.png" alt="Landfall Foundation" style="max-height:44px;max-width:100%;object-fit:contain;"/>
+      </div>
+      <div style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:12px;padding:1.25rem;display:flex;align-items:center;justify-content:center;min-height:88px;">
+        <img src="sponsors/goodwill.png" alt="Goodwill Industries" style="max-height:44px;max-width:100%;object-fit:contain;"/>
+      </div>
+      <div style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:12px;padding:1.25rem;display:flex;align-items:center;justify-content:center;min-height:88px;">
+        <img src="sponsors/united way.png" alt="United Way Cape Fear Area" style="max-height:44px;max-width:100%;object-fit:contain;"/>
+      </div>
+      <div style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:12px;padding:1.25rem;display:flex;align-items:center;justify-content:center;min-height:88px;">
+        <img src="sponsors/brady.png" alt="Brady" style="max-height:44px;max-width:100%;object-fit:contain;"/>
+      </div>
+    </div>
+
+    <div style="font-size:.65rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:color-mix(in srgb, var(--off-white) 40%, transparent);margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid var(--border);">Partners</div>
+    <div style="display:flex;flex-wrap:wrap;gap:.65rem;justify-content:center;margin-bottom:2rem;" class="reveal">
+      <span style="display:inline-flex;align-items:center;gap:.4rem;padding:.45rem 1rem;background:color-mix(in srgb, var(--off-white) 6%, transparent);border:1px solid var(--border);border-radius:50px;font-size:.8rem;color:color-mix(in srgb, var(--off-white) 65%, transparent);">&#127760; NC-Moldova Bilateral Partnership for Peace</span>
+      <span style="display:inline-flex;align-items:center;gap:.4rem;padding:.45rem 1rem;background:color-mix(in srgb, var(--off-white) 6%, transparent);border:1px solid var(--border);border-radius:50px;font-size:.8rem;color:color-mix(in srgb, var(--off-white) 65%, transparent);">&#127795; Codrii Reserve</span>
+      <span style="display:inline-flex;align-items:center;gap:.4rem;padding:.45rem 1rem;background:color-mix(in srgb, var(--off-white) 6%, transparent);border:1px solid var(--border);border-radius:50px;font-size:.8rem;color:color-mix(in srgb, var(--off-white) 65%, transparent);">&#127979; LT Mitropolit Nestor Vornicescu, Lozova</span>
+      <span style="display:inline-flex;align-items:center;gap:.4rem;padding:.45rem 1rem;background:color-mix(in srgb, var(--off-white) 6%, transparent);border:1px solid var(--border);border-radius:50px;font-size:.8rem;color:color-mix(in srgb, var(--off-white) 65%, transparent);">&#127979; LT Universul, Scoreni</span>
+      <span style="display:inline-flex;align-items:center;gap:.4rem;padding:.45rem 1rem;background:color-mix(in srgb, var(--off-white) 6%, transparent);border:1px solid var(--border);border-radius:50px;font-size:.8rem;color:color-mix(in srgb, var(--off-white) 65%, transparent);">&#127979; New Hanover County Schools</span>
+      <span style="display:inline-flex;align-items:center;gap:.4rem;padding:.45rem 1rem;background:color-mix(in srgb, var(--off-white) 6%, transparent);border:1px solid var(--border);border-radius:50px;font-size:.8rem;color:color-mix(in srgb, var(--off-white) 65%, transparent);">&#127979; Duplin County Schools</span>
+    </div>
+
+    <a href="https://youngscientistacademy.org/donate.html" target="_blank" style="font-size:.85rem;color:var(--teal);font-weight:600;">Want to support YSA? Donate or learn about sponsorship &#8594;</a>
+  </div>
+</section>
+
+<!-- =============================================================
+     FOOTER
+     A 4-column grid: brand/social | About links | Programs links | Contact.
+     The footer background is a fixed light gray (#edf1ef) in light mode
+     and switches to var(--card-bg) in dark mode via the CSS override.
+     Social icons use inline SVGs with their brand colors hardcoded
+     (these are brand identity colors that should never change with theme).
+     The footer-bottom shows copyright, EIN number, and build credit.
+     ============================================================= -->
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <h4>&#128300; Young Scientist Academy</h4>
+      <p>Empowering all youth to be community ambassadors of science and technology. Founded 2017 in Wilmington, NC.</p>
+      <div class="footer-social">
+        <a href="https://instagram.com/youngscientistacademy" target="_blank" title="Instagram" style="display:flex;align-items:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="20" height="20" rx="5" ry="5" stroke="url(#iggrad)" stroke-width="2"/><circle cx="12" cy="12" r="4.5" stroke="url(#iggrad)" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1" fill="url(#iggrad)"/><defs><linearGradient id="iggrad" x1="2" y1="22" x2="22" y2="2" gradientUnits="userSpaceOnUse"><stop stop-color="#f09433"/><stop offset="0.25" stop-color="#e6683c"/><stop offset="0.5" stop-color="#dc2743"/><stop offset="0.75" stop-color="#cc2366"/><stop offset="1" stop-color="#bc1888"/></linearGradient></defs></svg></a>
+        <a href="https://facebook.com/YoungSciAcademy" target="_blank" title="Facebook" style="display:flex;align-items:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="#1877F2" xmlns="http://www.w3.org/2000/svg"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073c0 6.02 4.388 11.008 10.125 11.927v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.235 2.686.235v2.97h-1.514c-1.491 0-1.956.93-1.956 1.874v2.25h3.328l-.532 3.49h-2.796V24C19.612 23.081 24 18.093 24 12.073z"/></svg></a>
+        <a href="https://www.linkedin.com/company/young-scientist-academy" target="_blank" title="LinkedIn" style="display:flex;align-items:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="#0A66C2" xmlns="http://www.w3.org/2000/svg"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+        <a href="https://youtube.com/channel/UCN2oSAeuBfGw9DSGte7c0Nw" target="_blank" title="YouTube" style="display:flex;align-items:center;"><svg width="18" height="16" viewBox="0 0 24 17" fill="#FF0000" xmlns="http://www.w3.org/2000/svg"><path d="M23.495 2.205a3.02 3.02 0 00-2.122-2.136C19.505 0 12 0 12 0S4.495 0 2.627.069A3.02 3.02 0 00.505 2.205 31.24 31.24 0 000 8.5a31.24 31.24 0 00.505 6.296 3.02 3.02 0 002.122 2.136C4.495 17 12 17 12 17s7.505 0 9.373-.069a3.02 3.02 0 002.122-2.136A31.24 31.24 0 0024 8.5a31.24 31.24 0 00-.505-6.295zM9.546 12.068V4.932L15.818 8.5l-6.272 3.568z"/></svg></a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h5>About</h5>
+      <a href="#about">Our Story</a>
+      <a href="https://www.youngscientistacademy.org/staff-and-board.html" target="_blank">Staff &amp; Board</a>
+      <a href="#sponsors">Sponsors</a>
+      <a href="https://www.youngscientistacademy.org/in-the-news.html" target="_blank">In the News</a>
+      <a href="https://www.youngscientistacademy.org/job-opportunities.html" target="_blank">Job Opportunities</a>
+    </div>
+    <div class="footer-col">
+      <h5>Programs</h5>
+      <a href="#programs">Learn STEM</a>
+      <a href="https://www.youngscientistacademy.org/registration-971003-187895.html" target="_blank">Teach STEM</a>
+      <a href="ambassadors.html">Global STEM Ambassadors</a>
+      <a href="#programs">STEM Explorers</a>
+      <a href="https://youngscientistacademy.org/donate.html" target="_blank">Donate</a>
+    </div>
+    <div class="footer-col">
+      <h5>Contact</h5>
+      <p>226 N Front St, #151<br/>Wilmington, NC 28401</p>
+      <br/>
+      <a href="tel:9103861867">(910) 386-1867</a>
+      <a href="mailto:maddie@youngscientistacademy.org">maddie@youngscientistacademy.org</a>
+      <a href="https://youngscientistacademy.org" target="_blank">youngscientistacademy.org</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2025-2026 Young Scientist Academy &middot; EIN: 81-4999928 &middot; 501(c)(3) Nonprofit</p>
+    <p>Built by Madeline Woodhouse &middot; YSA Platform Draft v2</p>
+  </div>
+</footer>
+
+<!-- =============================================================
+     SIDEBAR NAV (right-edge dot navigation)
+     Ten dots, one per page section. Each is a link with:
+     - .sidebar-tab-label: the text label (hidden, reveals on hover
+       or when .label-peek is added by scrollspy JS)
+     - .sidebar-dot: the visible circle indicator
+     - data-section="X": used by the scrollspy to match it to a section
+
+     The scrollspy JS (at the bottom of the page) watches which
+     section is on screen and adds .active to the matching tab,
+     making its dot glow teal. On section change, it also adds
+     .label-peek briefly so you see the label name flash.
+     ============================================================= -->
+<!-- SIDEBAR NAV -->
+<nav class="sidebar-nav" id="sidebarNav">
+  <a href="#hero"        class="sidebar-tab" data-section="hero"><span class="sidebar-tab-label">Home</span><div class="sidebar-dot"></div></a>
+  <a href="#sparkle"    class="sidebar-tab" data-section="sparkle"><span class="sidebar-tab-label">On the Horizon</span><div class="sidebar-dot"></div></a>
+  <a href="#programs"    class="sidebar-tab" data-section="programs"><span class="sidebar-tab-label">Programs</span><div class="sidebar-dot"></div></a>
+  <a href="#leaderboard" class="sidebar-tab" data-section="leaderboard"><span class="sidebar-tab-label">Season</span><div class="sidebar-dot"></div></a>
+  <a href="#teams"       class="sidebar-tab" data-section="teams"><span class="sidebar-tab-label">Teams</span><div class="sidebar-dot"></div></a>
+  <a href="#amoeba"      class="sidebar-tab" data-section="amoeba"><span class="sidebar-tab-label">Project Amoeba</span><div class="sidebar-dot"></div></a>
+  <a href="#summit"      class="sidebar-tab" data-section="summit"><span class="sidebar-tab-label">Summit</span><div class="sidebar-dot"></div></a>
+  <a href="#about"       class="sidebar-tab" data-section="about"><span class="sidebar-tab-label">About</span><div class="sidebar-dot"></div></a>
+  <a href="#events"      class="sidebar-tab" data-section="events"><span class="sidebar-tab-label">Events</span><div class="sidebar-dot"></div></a>
+  <a href="#sponsors"    class="sidebar-tab" data-section="sponsors"><span class="sidebar-tab-label">Partners</span><div class="sidebar-dot"></div></a>
+</nav>
+
+<!-- =============================================================
+     BOTTOM APP SWITCHER
+     Fixed to the bottom of the screen. Links to the four main
+     pages of the platform: Home, Dashboard (ambassadors), Research,
+     Profile (auth). The .active class on the current page's link
+     highlights it in teal. On mobile this is the primary navigation.
+     ============================================================= -->
+<!-- BOTTOM APP SWITCHER -->
+<div class="bottom-bar">
+  <a href="index.html" class="switcher-link active">Home</a>
+  <a href="ambassadors.html" class="switcher-link">Dashboard</a>
+  <a href="research.html" class="switcher-link">Research</a>
+  <a href="auth.html" class="switcher-link">Profile</a>
+</div>
+
+<script>
+
+// =============================================================
+// SPARKLE POPUP + BANNER LOGIC
+//
+// Flow:
+//   1. Page loads. If user hasn't seen the popup this session
+//      (sessionStorage check), show the popup overlay and hide
+//      the announce bar so they don't appear at the same time.
+//   2. User dismisses popup → popup fades out → announce bar
+//      slides in from the top (if not permanently dismissed).
+//   3. User clicks X on announce bar → hides it permanently
+//      (localStorage) and broadcasts to other tabs.
+//
+// sessionStorage: clears when the browser tab is closed (so the
+//   popup shows again on the next visit, good for a fundraiser).
+// localStorage: persists across sessions (used for the banner X
+//   dismiss — once you close it, it stays gone).
+// =============================================================
+(function(){
+  var banner      = document.getElementById('announceBanner');
+  var overlay     = document.getElementById('sparkleOverlay');
+  var bannerGone  = localStorage.getItem('ysa-banner-dismissed') === '1';
+  var popupSeen   = sessionStorage.getItem('sparkle-popup-seen') === '1';
+
+  if (bannerGone) {
+    // User permanently dismissed the banner — hide it (and skip popup)
+    if (banner) banner.style.display = 'none';
+  } else if (!popupSeen) {
+    // First visit this session: show popup, hide banner until popup is dismissed
+    if (banner)  banner.style.display  = 'none';
+    if (overlay) overlay.style.display = 'flex';
+    // Mark seen so popup doesn't repeat in same session
+    sessionStorage.setItem('sparkle-popup-seen', '1');
+  }
+  // If popup was already seen this session: banner shows normally (no extra logic needed)
+
+  // BroadcastChannel: if user dismisses banner in another tab, hide it here too
+  try {
+    var bc = new BroadcastChannel('ysa-live');
+    bc.addEventListener('message', function(e){
+      if (e.data && e.data.type === 'banner-dismissed') {
+        if (banner) banner.style.display = 'none';
+      }
+    });
+  } catch(e){}
+})();
+
+// dismissSparklePopup(): called when user clicks X, "Maybe later",
+// or "Get Tickets" on the popup.
+// Fades out the overlay, then slides the announce bar in from the top.
+function dismissSparklePopup() {
+  var overlay = document.getElementById('sparkleOverlay');
+  var banner  = document.getElementById('announceBanner');
+
+  // Step 1: trigger CSS fade-out by adding .leaving class
+  if (overlay) {
+    overlay.classList.add('leaving');
+    // Step 2: after the 350ms CSS transition, fully hide the overlay
+    // and reveal the announce bar (if it hasn't been permanently dismissed)
+    setTimeout(function(){
+      overlay.style.display = 'none';
+      if (banner && localStorage.getItem('ysa-banner-dismissed') !== '1') {
+        // Show banner and animate it sliding in via .ab-reveal class
+        banner.style.display     = 'flex';
+        banner.style.overflow    = 'hidden';
+        banner.style.maxHeight   = '0';
+        banner.style.opacity     = '0';
+        banner.style.paddingTop  = '0';
+        banner.style.paddingBottom = '0';
+        // Force a reflow so the browser registers the initial state before animating
+        banner.getBoundingClientRect();
+        banner.style.transition  = 'max-height 0.4s ease, opacity 0.4s ease, padding 0.4s ease';
+        banner.style.maxHeight   = '60px';
+        banner.style.opacity     = '1';
+        banner.style.paddingTop  = '0.6rem';
+        banner.style.paddingBottom = '0.6rem';
+        // Clean up inline styles after animation completes
+        setTimeout(function(){
+          banner.style.transition = '';
+          banner.style.maxHeight  = '';
+          banner.style.overflow   = '';
+          banner.style.opacity    = '';
+          banner.style.paddingTop = '';
+          banner.style.paddingBottom = '';
+        }, 420);
+      }
+    }, 350);
+  }
+}
+
+// dismissBanner(e): permanently hide the announce bar when user clicks
+// the X close button. Saves to localStorage and broadcasts to other tabs.
+// e.preventDefault() stops the parent <a> from navigating to #sparkle.
+function dismissBanner(e) {
+  if(e) e.preventDefault();
+  document.getElementById('announceBanner').style.display='none';
+  localStorage.setItem('ysa-banner-dismissed','1');
+  try { new BroadcastChannel('ysa-live').postMessage({type:'banner-dismissed'}); } catch(err){}
+}
+
+// toggleNav(): shows/hides the mobile nav menu by toggling .open class.
+// NAV
+function toggleNav() { document.getElementById('navMenu').classList.toggle('open'); }
+
+// Global click listener: if the user clicks anywhere outside the nav,
+// close the mobile menu. nav.contains(e.target) checks if the click
+// was inside the nav element — if not, remove .open.
+document.addEventListener('click', function(e) {
+  const nav = document.querySelector('nav.nav-ysa');
+  if (nav && !nav.contains(e.target)) document.getElementById('navMenu').classList.remove('open');
+});
+
+// =============================================================
+// SETTINGS PANEL TOGGLE
+// Opens/closes both the panel and the dim overlay together.
+// classList.toggle() adds the class if absent, removes if present.
+// =============================================================
+// SETTINGS PANEL
+function toggleSettings() {
+  document.getElementById('settingsPanel').classList.toggle('open');
+  document.getElementById('settingsOverlay').classList.toggle('open');
+}
+
+// =============================================================
+// THEME SWITCHER
+// classList.toggle(class, bool) sets the class based on the boolean.
+// So toggle('dark', mode==='dark') adds 'dark' only when mode is dark.
+// Updates the active button highlight and saves to localStorage.
+// =============================================================
+// THEME
+function setTheme(mode) {
+  document.documentElement.classList.toggle('dark', mode === 'dark');
+  document.getElementById('btn-dark').classList.toggle('active', mode === 'dark');
+  document.getElementById('btn-light').classList.toggle('active', mode === 'light');
+  localStorage.setItem('ysa-theme', mode);
+}
+
+// =============================================================
+// ACCENT COLOR SWITCHER
+// Sets the --teal CSS variable directly on the root element.
+// This instantly recolors every teal element on the page.
+// Updates the active swatch indicator and saves both the
+// color name (for UI state) and hex (for the CSS variable) to storage.
+// =============================================================
+// ACCENT
+function setAccent(name, hex) {
+  document.documentElement.style.setProperty('--teal', hex);
+  document.querySelectorAll('.accent-swatch').forEach(s => s.classList.remove('active'));
+  document.querySelector('.accent-swatch[data-color="'+name+'"]').classList.add('active');
+  localStorage.setItem('ysa-accent-name', name);
+  localStorage.setItem('ysa-accent-hex', hex);
+}
+
+// =============================================================
+// FONT SIZE
+// Removes any existing font size class, then adds the new one
+// (unless it's 'md' which is the default — no class needed).
+// Font size classes on <html> scale all rem-based measurements.
+// =============================================================
+// FONT SIZE
+function setFontSize(size) {
+  document.documentElement.classList.remove('font-sm','font-lg');
+  if (size !== 'md') document.documentElement.classList.add('font-'+size);
+  document.querySelectorAll('.font-size-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-'+size).classList.add('active');
+  localStorage.setItem('ysa-font-size', size);
+}
+
+// =============================================================
+// TEXT-TO-SPEECH
+// Uses the browser's built-in SpeechSynthesis API.
+// ttsSpeak() reads up to 2000 characters of page text.
+// innerText extracts visible text (strips HTML tags).
+// replace(/\s+/g,' ') collapses multiple spaces/newlines to single spaces.
+// SpeechSynthesisUtterance is the object that holds what to speak and how.
+// =============================================================
+// TTS
+var ttsEnabled = false;
+function toggleTTS() {
+  ttsEnabled = document.getElementById('ttsToggle').classList.toggle('on');
+  document.getElementById('tts-controls').style.display = ttsEnabled ? 'block' : 'none';
+  localStorage.setItem('ysa-tts', ttsEnabled ? '1' : '0');
+  if (!ttsEnabled) window.speechSynthesis.cancel();
+}
+function ttsSpeak() {
+  window.speechSynthesis.cancel();
+  var text = document.body.innerText.replace(/\s+/g,' ').trim().slice(0,2000);
+  var utt = new SpeechSynthesisUtterance(text);
+  utt.rate = parseFloat(document.getElementById('ttsRate').value);
+  utt.lang = 'en-US';
+  window.speechSynthesis.speak(utt);
+}
+// ttsPause: toggles between pause and resume (checks .paused property)
+function ttsPause() { window.speechSynthesis.paused ? window.speechSynthesis.resume() : window.speechSynthesis.pause(); }
+// ttsStop: cancels speech entirely (unlike pause, cannot be resumed)
+function ttsStop() { window.speechSynthesis.cancel(); }
+
+// =============================================================
+// COLORBLIND MODE — adds/removes the 'colorblind' class on <html>
+// which triggers the CSS variable overrides defined in :root.
+// =============================================================
+// COLORBLIND
+function toggleColorblind() {
+  var isOn = document.getElementById('colorblindToggle').classList.toggle('on');
+  document.documentElement.classList.toggle('colorblind', isOn);
+  localStorage.setItem('ysa-colorblind', isOn ? '1' : '0');
+}
+
+// REDUCED MOTION — adds/removes 'reduced-motion' on <html>,
+// which sets all animation/transition durations to 0.01ms via CSS.
+// REDUCED MOTION
+function toggleReducedMotion() {
+  var isOn = document.getElementById('reducedMotionToggle').classList.toggle('on');
+  document.documentElement.classList.toggle('reduced-motion', isOn);
+  localStorage.setItem('ysa-reduced-motion', isOn ? '1' : '0');
+}
+
+// =============================================================
+// RESET TO DEFAULTS
+// Clears all localStorage settings, then explicitly calls each
+// setter function with the default values. This ensures the UI
+// (button active states, toggle positions, swatch selection) all
+// visually reset, not just the underlying CSS.
+// =============================================================
+// RESET
+function resetSettings() {
+  ['ysa-theme','ysa-accent-name','ysa-accent-hex','ysa-font-size','ysa-reduced-motion','ysa-colorblind','ysa-tts'].forEach(function(k){ localStorage.removeItem(k); });
+  setTheme('light'); setAccent('teal','#3cbbb1'); setFontSize('md');
+  document.documentElement.classList.remove('reduced-motion','colorblind');
+  ['reducedMotionToggle','colorblindToggle','ttsToggle'].forEach(function(id){ document.getElementById(id).classList.remove('on'); });
+  document.getElementById('tts-controls').style.display = 'none';
+  ttsEnabled = false; window.speechSynthesis.cancel();
+}
+
+// =============================================================
+// LOAD SAVED SETTINGS ON PAGE LOAD
+// Reads all settings from localStorage and applies them to the UI.
+// This runs after the DOM is rendered (unlike the theme-init script
+// at the top of <body> which runs before render). This IIFE handles
+// the settings panel UI state — button highlights, toggle positions —
+// which the early init script doesn't touch.
+//
+// Special: if ?settings=1 is in the URL (the nav gear icon uses this
+// on other pages), automatically open the settings panel.
+// =============================================================
+// LOAD SAVED SETTINGS
+(function(){
+  var theme = localStorage.getItem('ysa-theme') || 'light';
+  var aName = localStorage.getItem('ysa-accent-name') || 'teal';
+  var aHex  = localStorage.getItem('ysa-accent-hex')  || '#3cbbb1';
+  var fSize = localStorage.getItem('ysa-font-size')   || 'md';
+  var rm    = localStorage.getItem('ysa-reduced-motion') || '0';
+  var cb    = localStorage.getItem('ysa-colorblind')  || '0';
+  var tts   = localStorage.getItem('ysa-tts')         || '0';
+  setTheme(theme); setAccent(aName, aHex); setFontSize(fSize);
+  if (rm  === '1') { document.documentElement.classList.add('reduced-motion'); document.getElementById('reducedMotionToggle').classList.add('on'); }
+  if (cb  === '1') { document.documentElement.classList.add('colorblind');    document.getElementById('colorblindToggle').classList.add('on'); }
+  if (tts === '1') { ttsEnabled=true; document.getElementById('ttsToggle').classList.add('on'); document.getElementById('tts-controls').style.display='block'; }
+  // URLSearchParams parses the query string (?key=value) from the URL
+  if (new URLSearchParams(window.location.search).get('settings') === '1') toggleSettings();
+})();
+
+// =============================================================
+// NAV SCROLL SPY
+// Watches which section is visible and highlights the matching
+// nav link. Works by checking each section's offsetTop against
+// the current scroll position. The section with the highest
+// offsetTop that is still less than (scrollY + 90) is active.
+// The +90 offset accounts for the sticky nav bar height.
+//
+// { passive: true } on the scroll listener tells the browser
+// this listener won't call preventDefault(), allowing it to
+// optimize scrolling performance (no jank).
+//
+// 'active' starts as null — if no section has scrolled past
+// the top, 'Home' nav link gets the active state.
+// =============================================================
+// SCROLL SPY
+(function(){
+  var spySections = ['sparkle','programs','teams','about'];
+  var spyLinks = {};
+  spySections.forEach(function(id){
+    var el = document.querySelector('a[data-spy="'+id+'"]');
+    if(el) spyLinks[id] = el;
+  });
+  var homeLink = document.getElementById('navHome');
+  var aboutBtn = document.querySelector('.nav-menu .nav-item button');
+  function updateSpy() {
+    var scrollY = window.scrollY + 90;
+    var active = null;
+    spySections.forEach(function(id){
+      var sec = document.getElementById(id);
+      if(sec && sec.offsetTop <= scrollY) active = id;
+    });
+    spySections.forEach(function(id){
+      if(spyLinks[id]) spyLinks[id].classList.toggle('active', id === active);
+    });
+    if(homeLink) homeLink.classList.toggle('active', active === null);
+    // highlight About dropdown button when at #about
+    if(aboutBtn) aboutBtn.classList.toggle('active', active === 'about');
+  }
+  window.addEventListener('scroll', updateSpy, { passive: true });
+  updateSpy(); // run once immediately in case page loads mid-scroll
+})();
+
+// LEADERBOARD TABS
+
+// =============================================================
+// AMBASSADOR DATA OBJECTS
+// AMBASSADORS: individual ambassador profiles. Each key is a
+// short ID (used to look up a person). Properties: name, pronouns,
+// team, country, cohort, points, status level, bio, avatar seed.
+//
+// TEAM_DATA: one entry per research team. Contains logo path, color,
+// research description, bio, and member list. This data is used by
+// selectTeam() to build the inline team panel when you click a logo.
+//
+// This pattern (a JS object as a database) is called a "lookup table"
+// or "dictionary" — it's much faster than searching an array and
+// keeps all related data together in one readable place.
+// =============================================================
+const AMBASSADORS = {
+  elliana: { name:"Elliana K.", pronouns:"she/her", team:"Supernovas", country:"🇺🇸 USA", cohort:"2026-27", pts:820, status:"Researcher", bio:"Atmospheric scientist and YSA top points leader. Elliana studies cloud formation patterns over the Carolinas and their relationship to urban heat island intensity. Presented at the 2025 YSA Summit.", avatar:"Elliana" },
+  hala:    { name:"Hala M.",    pronouns:"she/her", team:"Forța",       country:"🇺🇸 USA", cohort:"2026-27", pts:745, status:"Researcher", bio:"Marine biologist studying jellyfish population dynamics in warming Atlantic waters. Hala connects ocean temperature rise to bloom frequency changes observed off the NC coast.", avatar:"Hala" },
+  havah:   { name:"Havah R.",   pronouns:"she/her", team:"Dive Deep",   country:"🇺🇸 USA", cohort:"2026-27", pts:690, status:"Analyst",    bio:"Marine biodiversity researcher cataloguing species diversity in Carolina coastal ecosystems. Her fieldwork has documented 3 previously unrecorded invertebrate species in local estuary systems.", avatar:"Havah" },
+  maddie:  { name:"Madeline W.",  pronouns:"she/her", team:"Code Green",  country:"🇺🇸 USA", cohort:"2026-27", pts:245, status:"Experimenter", bio:"Youth Programs Lead and app developer at YSA. Building Code Green, a live satellite-driven green space tracker for Wilmington NC using NASA Landsat and Sentinel-2 data. Also architecting this platform.", avatar:"Maddie" },
+  bogdan:  { name:"Bogdan C.",  pronouns:"he/him",  team:"HydroTerra",  country:"🇲🇩 Moldova", cohort:"2026-27", pts:210, status:"Experimenter", bio:"Water quality researcher based in Moldova, testing drinking water contaminants across rural communities. His team open-source sensor network has been deployed in 6 villages.", avatar:"Bogdan" },
+  akram:   { name:"Akram Q.",   pronouns:"he/him",  team:"Stealth",     country:"🇾🇪 Yemen", cohort:"2026-27", pts:185, status:"Experimenter", bio:"Engineering lead for the Stealth team high-altitude weather balloon project. Akram designed the payload electronics system that survived a record 28km ascent in April 2026.", avatar:"Akram" },
+};
+const TEAM_DATA = {
+  codegreen:  { name:'Code Green',    flag:'&#127482;&#127480;', color:'#3cbbb1', logo:'../logos/codegreen_new.png',    research:'Urban Ecology — satellite green space tracking 2019-2025', bio:'Code Green tracks green space coverage in Wilmington NC using NASA Landsat 8 and Sentinel-2 satellite imagery. The team found 2022 recorded the lowest green space in the 7-year study at 68.8%, driven by post-COVID development acceleration.', members:['Madeline W.','Alex R.'] },
+  labrats:    { name:'Lab Rats',      flag:'&#127482;&#127480;', color:'#bbbdf6', logo:'../logos/labrats_new.png',    research:'Space Biology — Martian ecology & extreme environment botany', bio:'Lab Rats test how Mars-like soils and simulated off-world atmospheric conditions affect plant growth, including whether carnivorous plants could survive in extreme environments.', members:['Ethan O.','Finley H.'] },
+  forta:      { name:'Forța',         flag:'&#127482;&#127480;', color:'#ee4266', logo:'../logos/fuerza_notxt.png',    research:'Ocean Biology — jellyfish bloom patterns & warming seas', bio:'Forța investigates how rising sea temperatures drive jellyfish population surges in the Atlantic, using citizen-science observation networks and temperature buoy data.', members:['Hala M.','Avery K.','Perry T.','Ella C.'] },
+  divedeep:   { name:'Dive Deep',     flag:'&#127482;&#127480;', color:'#3cbbb1', logo:'../logos/divedeep.png',    research:'Marine Biodiversity — estuary species cataloguing', bio:'Dive Deep documents the diversity of life in North Carolina coastal estuaries. Their fieldwork has produced a first-of-its-kind invertebrate database for Masonboro Island Reserve.', members:['Havah R.','Omar S.','Leila N.','Chen W.'] },
+  stealth:    { name:'Stealth',       flag:'&#127486;&#127466;', color:'#f1b643', logo:'../logos/stealth.png',    research:'Engineering — high-altitude weather balloon payload design', bio:'Stealth designed the payload electronics for the weather balloon launch, engineering the mounting platform that carried all components to near-space altitudes.', members:['Akram Q.'] },
+  supernovas: { name:'Supernovas',    flag:'&#127482;&#127480;', color:'#bbbdf6', logo:'../logos/supernovas_new.png',    research:'Atmospheric Science — urban heat island & space debris', bio:'Supernovas study atmospheric patterns above the Carolinas, cross-referencing local weather data with NASA satellite imagery to model heat island growth over the past decade.', members:['Elliana K.','Jordan P.'] },
+  codrii:     { name:'Codrii Minds',  flag:'&#127474;&#127465;', color:'#3cbbb1', logo:'../logos/codrii_minds.svg',    research:'Biodiversity — Codrii Reserve wildlife monitoring', bio:'Codrii Minds tests electric fencing in Codrii Reserve to curb deer overgrazing and restore damaged vegetation, using trail cameras, thermal cameras, drones, and Raspberry Pis to monitor recovery.', members:['Dana Z.','Nadina U.','Victor B.'] },
+  noroc:      { name:'Noroc Science', flag:'&#127474;&#127465;', color:'#bbbdf6', logo:'../logos/noroc.jpg',    research:'Air Quality — atmospheric pollution mapping, Chișinău', bio:'Noroc Science monitors air quality across Chișinău, deploying low-cost PM2.5 sensors and correlating pollution spikes with traffic, weather, and seasonal patterns.', members:['Alexandra Z.','Darii B.','Alisa C.'] },
+  dm3:        { name:'20dm³',      flag:'&#127474;&#127465;', color:'#f1b643', logo:'../logos/20dm3.svg',    research:'Chemistry — pollen mapping & allergy research', bio:'20dm³ collects and digitally maps pollen samples from across Chișinău, studying them under a digital microscope to track city-wide allergen distribution.', members:['Madalina R.','Dina C.','Melisa O.'] },
+  hydroterra: { name:'HydroTerra',    flag:'&#127474;&#127465;', color:'#3cbbb1', logo:'../logos/hydroterra.svg',    research:'Water Quality — rural drinking water contaminant mapping', bio:'HydroTerra deploys open-source water quality sensors in underserved Moldovan communities, testing for nitrates, heavy metals, and microbial contamination. Their data has informed local policy in 3 municipalities.', members:['Bogdan C.','Dragos C.'] },
+  sacal:      { name:'Şacal',    flag:'&#127474;&#127465;', color:'#c4903a', logo:'../logos/sacal.svg',    research:'Wildlife — biodiversity monitoring, Moldova', bio:'Şacal measures and maps biodiversity across Moldova, tracking species presence, population health, and ecosystem balance through field research in natural reserves.', members:['Bianca I.','Nadina Z.','Ianos M.'] },
+  capybara:   { name:'Capybara',      flag:'&#127474;&#127465;', color:'#a07850', logo:'capybara.png',    research:'Wetlands — ecosystem research', bio:'Capybara researches wetland ecosystems and biodiversity in Moldova. Research details coming soon.', members:['Ana-Maria A.','Bianca P.','Deborah A.'] },
+  icebee:     { name:'Ice Bee',       flag:'&#127474;&#127465;', color:'#7dd3fc', logo:'ice bees.png',    research:'Pollinators — bee population research', bio:'Ice Bee studies pollinator populations and their relationship to local ecosystem health. Research details coming soon.', members:['Alexa M.','Mirela J.','Olga B.'] },
+  goats:      { name:'Gravity Goats', flag:'&#127480;&#127486;', color:'#f0b429', logo:'../logos/gravity_goats.svg',    research:'Physics — experimental mechanics & engineering', bio:'Gravity Goats conducts physics experiments exploring mechanics, forces, and engineering principles. Research details coming soon.', members:['Bessan A.'] }
+};
+
+// Track which team is currently shown (null = none)
+let activeTeamId = null;
+
+// =============================================================
+// selectTeam(el): called when a team logo is clicked.
+// el = the .team-circle-item div that was clicked.
+//
+// Steps:
+// 1. Get the team ID from data-team attribute
+// 2. Find the panel div that comes right after the grid (nextElementSibling)
+// 3. Remove .active from all team items (deselect previous)
+// 4. If the same team is clicked again, close the panel and return
+// 5. Otherwise, mark this item active, look up team data
+// 6. Build the HTML for the team panel dynamically (logo, bio, members)
+// 7. Inject it into the panel div and smooth-scroll to it
+//
+// The member list is built using .map() on the array, which creates
+// a new array of HTML strings, then .join('') concatenates them.
+// t.color + '33' adds 20% opacity hex to the team color for the border.
+// =============================================================
+function selectTeam(el) {
+  var id = el.dataset.team;
+  var panelId = el.closest('.team-circles-grid').nextElementSibling.id;
+  var panel = document.getElementById(panelId);
+  var allItems = document.querySelectorAll('.team-circle-item');
+  allItems.forEach(function(t) { t.classList.remove('active'); });
+  if (activeTeamId === id) { activeTeamId = null; panel.innerHTML = ''; return; }
+  activeTeamId = id;
+  el.classList.add('active');
+  var t = TEAM_DATA[id]; if (!t) return;
+  var memHtml = t.members.map(function(m) {
+    return '<div style="display:flex;align-items:center;gap:0.5rem;font-size:0.82rem;color:color-mix(in srgb, var(--off-white) 60%, transparent);">' +
+           '<div style="width:22px;height:22px;border-radius:50%;background:color-mix(in srgb, var(--off-white) 7%, transparent);display:flex;align-items:center;justify-content:center;font-size:0.7rem;flex-shrink:0;">&#128100;</div>' + m + '</div>';
+  }).join('');
+  panel.innerHTML = '<div class="team-panel-box" style="border-color:' + t.color + '33;">' +
+    '<div style="display:flex;align-items:center;gap:1.2rem;margin-bottom:1.5rem;flex-wrap:wrap;">' +
+    '<img src="' + t.logo + '" style="width:54px;height:54px;border-radius:14px;object-fit:cover;border:2px solid ' + t.color + ';flex-shrink:0;">' +
+    '<div><div style="font-size:1.15rem;font-weight:800;color:var(--off-white);">' + t.name + '</div>' +
+    '<div style="font-size:0.78rem;color:' + t.color + ';margin-top:0.2rem;font-weight:600;">' + t.research + '</div></div>' +
+    '<button onclick="closeTeamPanel(\'' + panelId + '\')" style="margin-left:auto;background:none;border:1px solid var(--border);border-radius:50%;width:32px;height:32px;color:color-mix(in srgb, var(--off-white) 45%, transparent);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">&#10005;</button>' +
+    '</div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">' +
+    '<div style="font-size:0.87rem;color:color-mix(in srgb, var(--off-white) 68%, transparent);line-height:1.6;">' + t.bio + '</div>' +
+    '<div><div style="font-size:0.62rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:color-mix(in srgb, var(--off-white) 28%, transparent);margin-bottom:0.8rem;">Team Members</div>' +
+    '<div style="display:flex;flex-direction:column;gap:0.55rem;">' + memHtml + '</div></div>' +
+    '</div></div>';
+  // Scroll the panel into view smoothly after injecting content
+  panel.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+// closeTeamPanel(panelId): resets the team selection state.
+// Called by the X button inside the panel (see selectTeam HTML output).
+function closeTeamPanel(panelId) {
+  activeTeamId = null;
+  document.querySelectorAll('.team-circle-item').forEach(function(t) { t.classList.remove('active'); });
+  document.getElementById(panelId).innerHTML = '';
+}
+
+// lbSwitch(which, el): switches between "individual" and "team" leaderboard views.
+// Shows one table, hides the other, and updates the active tab button.
+function lbSwitch(which, el) {
+  document.getElementById('lb-individual').style.display = which === 'individual' ? 'block' : 'none';
+  document.getElementById('lb-team').style.display = which === 'team' ? 'block' : 'none';
+  document.querySelectorAll('.lb-tab').forEach(function(b){ b.classList.remove('active'); });
+  el.classList.add('active');
+}
+
+// handleNewsletter(e): called when the newsletter form is submitted.
+// e.preventDefault() stops the browser from reloading the page
+// (the default form submit behavior). Instead, clears the email field
+// and shows the confirmation message.
+// NEWSLETTER
+function handleNewsletter(e) {
+  e.preventDefault();
+  document.getElementById('newsletterEmail').value = '';
+  document.getElementById('newsletter-confirm').style.display = 'block';
+}
+
+// =============================================================
+// SCROLL REVEAL — fade-in elements as they enter the viewport.
+//
+// Step 1: auto-add .reveal to common element types that weren't
+//         explicitly marked in HTML (so we don't have to add it
+//         manually to every single card and heading).
+//
+// Step 2: create an IntersectionObserver. This browser API fires
+//         a callback whenever a watched element crosses into or out
+//         of the visible area. threshold:0.1 means it fires when
+//         10% of the element is visible.
+//
+// Step 3: for each .reveal element:
+//         - If it's already in the viewport (above the fold), make
+//           it visible immediately (no animation needed)
+//         - Otherwise, add it to the observer to animate later
+//
+// obs.unobserve(e.target): once visible, stop watching — no need
+// to keep tracking elements that have already animated.
+// =============================================================
+// SCROLL REVEAL
+(function(){
+  document.querySelectorAll('.section-h2, .section-header-block, .stat-pill, .event-card, .prog-card, .card, .sponsor-pill, .newsletter-wrap').forEach(function(el){
+    if (!el.classList.contains('reveal')) el.classList.add('reveal');
+  });
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); } });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(function(el){
+    var rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight + 50) {
+      el.classList.add('visible'); // already on screen, show immediately
+    } else {
+      obs.observe(el); // off-screen, watch for it to scroll in
+    }
+  });
+})();
+
+// =============================================================
+// EASTER EGG: click the nav logo 5 times fast.
+//
+// How it works:
+// - Tracks click count in `clicks` variable
+// - Each click increments it; a setTimeout resets it to 0
+//   if 1.8 seconds pass without another click
+// - On the 5th click: launch emoji shower + show toast notification
+// - BroadcastChannel broadcasts the egg to other open tabs so
+//   everyone sees the shower at the same time
+//
+// launchShower(): creates 22 floating emoji divs at random positions,
+//   each with a random size, duration, and delay. An IIFE inside the
+//   loop ((function(){...})()) captures each iteration's variables
+//   so they don't all reference the same final `i` value (closure trap).
+//
+// showLiveToast(): creates a popup notification that slides up,
+//   stays 3.5 seconds, then fades out and removes itself from the DOM.
+//   setTimeout chains: wait 3500ms → start fade → wait 450ms → remove.
+//
+// The inline CSS string injection (document.createElement('style'))
+// adds the animation keyframes needed for the shower + toast — these
+// only exist during the easter egg, so they're created on demand.
+// =============================================================
+// EASTER EGG: click nav logo 5x fast
+(function(){
+  if (!document.getElementById('egg-style')) {
+    var s = document.createElement('style');
+    s.id = 'egg-style';
+    s.textContent = '@keyframes eggFloat{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(-110vh) rotate(20deg);opacity:0}}@keyframes liveToastIn{0%{transform:translateX(-50%) translateY(20px);opacity:0}100%{transform:translateX(-50%) translateY(0);opacity:1}}';
+    document.head.appendChild(s);
+  }
+  function showLiveToast(name, isSelf) {
+    var msg = isSelf ? '&#128300; you found the easter egg!' : '&#128300; '+name+' just found the easter egg!';
+    var bg  = isSelf ? 'var(--teal)' : 'var(--lavender)';
+    var clr = isSelf ? '#fff' : '#0a0f0d';
+    var toast = document.createElement('div');
+    toast.innerHTML = msg;
+    toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:'+bg+';color:'+clr+';padding:.6rem 1.6rem;border-radius:50px;font-size:.85rem;font-weight:600;z-index:9999;pointer-events:none;opacity:0;animation:liveToastIn .3s ease forwards;box-shadow:0 4px 20px rgba(0,0,0,0.4);white-space:nowrap;';
+    document.body.appendChild(toast);
+    setTimeout(function(){ toast.style.transition='opacity .4s'; toast.style.opacity='0'; setTimeout(function(){ toast.remove(); }, 450); }, 3500);
+  }
+  function launchShower() {
+    var emojis = ['&#127880;','&#128300;','&#127807;','&#9879;&#65039;','&#129516;','&#127754;','&#127880;','&#127880;'];
+    for (var i = 0; i < 22; i++) {
+      (function(){
+        var b = document.createElement('div');
+        b.innerHTML = emojis[Math.floor(Math.random()*emojis.length)];
+        b.style.cssText = 'position:fixed;font-size:'+(Math.random()*1.5+1.2)+'rem;left:'+(Math.random()*90+5)+'%;top:100vh;z-index:9998;pointer-events:none;animation:eggFloat '+(Math.random()*2+3)+'s ease-in forwards;animation-delay:'+(Math.random()*1.2)+'s;';
+        document.body.appendChild(b);
+        setTimeout(function(){ b.remove(); }, 6000);
+      })();
+    }
+  }
+  try {
+    var ch = new BroadcastChannel('ysa-live');
+    ch.onmessage = function(e) {
+      if (e.data && e.data.type === 'egg') { launchShower(); showLiveToast(e.data.name, false); }
+    };
+  } catch(err){}
+  var clicks = 0, timer = null;
+  var logo = document.querySelector('.nav-logo');
+  if (!logo) return;
+  logo.addEventListener('click', function(e){
+    e.preventDefault(); clicks++;
+    clearTimeout(timer);
+    // Reset click count if 1.8s passes without another click
+    timer = setTimeout(function(){ clicks = 0; }, 1800);
+    if (clicks >= 5) {
+      clicks = 0;
+      var name = localStorage.getItem('ysa-display-name') || 'anonymous';
+      launchShower(); showLiveToast(name, true);
+      // Tell all other open tabs to also trigger the shower
+      try { new BroadcastChannel('ysa-live').postMessage({type:'egg', name:name}); } catch(err){}
+    }
+  });
+})();
+
+// =============================================================
+// FLOATING PARTICLES — creates 28 small shapes in the background.
+//
+// - shapes cycle: circle, square, triangle (index % 3)
+// - colors cycle: teal, lavender, pink (index % 3)
+// - size, duration, delay are randomized for organic variety
+// - Negative animation-delay (e.g. -7s) starts the animation
+//   mid-cycle, so particles are already scattered when the page loads
+//   instead of all starting from the bottom at the same moment.
+// - Triangles use CSS custom properties set via inline style
+//   (--tri-half, --tri-h, --tri-color) because the CSS triangle
+//   trick requires specific border values that vary per particle.
+// - Math.random()*7+5: produces a number between 5 and 12 (px)
+//   i.e. size range is 5px to 12px for the shapes.
+// =============================================================
+// FLOATING PARTICLES
+(function(){
+  var container = document.getElementById('particles');
+  if (!container) return;
+  var colors = ['#3cbbb1','#bbbdf6','#ee4266','rgba(241,182,67,0.5)','rgba(241,182,67,0.4)'];
+  var shapes = ['circle','square','triangle'];
+  for (var i = 0; i < 28; i++) {
+    var p = document.createElement('div');
+    var shape = shapes[i % shapes.length];
+    var color = colors[i % colors.length];
+    var size  = Math.random()*7+5;  // 5–12px
+    var dur   = Math.random()*14+12; // 12–26s animation duration
+    var delay = Math.random()*14;    // 0–14s (used as negative delay)
+    var left  = Math.random()*100;   // random horizontal position
+    p.className = 'particle '+shape;
+    if (shape === 'triangle') {
+      var half = size/2, h = size*0.866; // 0.866 = sin(60deg) for equilateral triangle height
+      p.style.cssText = '--tri-half:'+half+'px;--tri-h:'+h+'px;--tri-color:'+color+';left:'+left+'%;animation-duration:'+dur+'s;animation-delay:-'+delay+'s;';
+    } else {
+      p.style.cssText = 'width:'+size+'px;height:'+size+'px;left:'+left+'%;background:'+color+';animation-duration:'+dur+'s;animation-delay:-'+delay+'s;';
+    }
+    container.appendChild(p);
+  }
+})();
+
+  // =============================================================
+  // SIDEBAR SCROLLSPY — keeps the right-edge dot nav in sync.
+  //
+  // Uses scrollY + 25% of viewport height as the "trigger line".
+  // This means a section is considered active when its top is within
+  // the top quarter of the screen — feels more natural than waiting
+  // until the section top reaches the very top edge.
+  //
+  // Array.from() converts the NodeList from querySelectorAll into
+  // a real array so we can use .forEach() reliably.
+  //
+  // The label-peek system:
+  // 1. On every scroll event, add .label-peek to the active tab
+  //    (makes the label text slide in and become readable)
+  // 2. clearTimeout + setTimeout: cancels any pending hide and
+  //    starts a fresh 1.8-second countdown
+  // 3. After 1.8s, remove .label-peek from all tabs so labels hide
+  //
+  // DETAILS TOGGLE: the <details> elements for "About this program"
+  // use the native HTML toggle event. When they open/close,
+  // the .prog-arrow span inside them rotates 90 degrees.
+  // =============================================================
+  // Sidebar scrollspy
+  (function() {
+    var tabs = document.querySelectorAll('.sidebar-tab');
+    var sections = Array.from(document.querySelectorAll('section[id]'));
+    var labelTimer;
+    function updateSidebar() {
+      var scrollY = window.scrollY + window.innerHeight * 0.25;
+      var active = 'hero';
+      sections.forEach(function(s) {
+        if (s.offsetTop <= scrollY) active = s.id;
+      });
+      tabs.forEach(function(tab) {
+        tab.classList.toggle('active', tab.dataset.section === active);
+      });
+      // flash label briefly on section change
+      tabs.forEach(function(t) { t.classList.remove('label-peek'); });
+      var activeTab = document.querySelector('.sidebar-tab[data-section="' + active + '"]');
+      if (activeTab) activeTab.classList.add('label-peek');
+      clearTimeout(labelTimer);
+      labelTimer = setTimeout(function() {
+        tabs.forEach(function(t) { t.classList.remove('label-peek'); });
+      }, 1800);
+    }
+    window.addEventListener('scroll', updateSidebar, { passive: true });
+    updateSidebar();
+    // Rotate the arrow inside <details> elements when they open/close
+    document.querySelectorAll('details').forEach(function(d) {
+      d.addEventListener('toggle', function() {
+        var arrow = d.querySelector('.prog-arrow');
+        if (arrow) arrow.style.transform = d.open ? 'rotate(90deg)' : '';
+      });
+    });
+  })();
+
+</script>
+
+<!-- =============================================================
+     PROFILE MODAL (individual ambassador)
+     A centered overlay modal for viewing ambassador profiles.
+     onclick="if(event.target===this)closeProfile()" — clicking the
+     dark backdrop closes it, but clicking inside the card doesn't
+     (event.target===this checks if the exact overlay was clicked,
+     not a child element inside it).
+     The content fields (pfName, pfBio, etc.) are empty divs populated
+     by JS when a leaderboard row is clicked.
+     ============================================================= -->
+<!-- PROFILE MODAL (individual) -->
+<div class="pf-overlay" id="pfOverlay" onclick="if(event.target===this)closeProfile()">
+  <div class="pf-card">
+    <button class="pf-close" onclick="closeProfile()">&#x2715;</button>
+    <img class="pf-avatar" id="pfAvatar" src="" alt="">
+    <div class="pf-name" id="pfName"></div>
+    <div class="pf-pronouns" id="pfPronouns"></div>
+    <div class="pf-status" id="pfStatus"></div>
+    <div class="pf-row">
+      <div class="pf-stat"><div class="pf-stat-label">Points</div><div class="pf-stat-val" id="pfPts"></div></div>
+      <div class="pf-stat"><div class="pf-stat-label">Country</div><div class="pf-stat-val" id="pfCountry"></div></div>
+      <div class="pf-stat"><div class="pf-stat-label">Cohort</div><div class="pf-stat-val" id="pfCohort"></div></div>
+    </div>
+    <div class="pf-bio" id="pfBio"></div>
+    <div class="pf-team-banner">
+      <div>
+        <div class="pf-team-label">Research Team</div>
+        <div class="pf-team-name" id="pfTeam"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- TEAM MODAL — same overlay pattern as the profile modal above,
+     but for showing full team info (research topic, all members, bio).
+     Content fields are populated by JS when a leaderboard team row
+     is clicked. -->
+<!-- TEAM MODAL -->
+<div class="pf-overlay" id="tmOverlay" onclick="if(event.target===this)closeTeam()">
+  <div class="pf-card">
+    <button class="pf-close" onclick="closeTeam()">&#x2715;</button>
+    <div class="pf-name" id="tmName"></div>
+    <div class="pf-pronouns" id="tmLocation"></div>
+    <div class="pf-status" id="tmType"></div>
+    <div class="pf-row">
+      <div class="pf-stat"><div class="pf-stat-label">Team Pts</div><div class="pf-stat-val" id="tmPts"></div></div>
+      <div class="pf-stat"><div class="pf-stat-label">Members</div><div class="pf-stat-val" id="tmCount"></div></div>
+      <div class="pf-stat"><div class="pf-stat-label">Cohort</div><div class="pf-stat-val" id="tmCohort"></div></div>
+    </div>
+    <div class="pf-research" id="tmResearch"></div>
+    <div class="pf-bio" id="tmBio"></div>
+    <div class="pf-members">
+      <div class="pf-members-label">Ambassadors</div>
+      <div id="tmMembers"></div>
+    </div>
+  </div>
+</div>
+<!-- =============================================================
+     MOBILE/TABLET SLIDE-IN DRAWER
+     The hamburger nav menu for screens below 860px wide.
+     drawerOverlay: the dark backdrop — clicking it closes the drawer.
+     deviceDrawer: the actual panel that slides in from the right.
+     Contains the same nav links as the desktop nav menu, plus the
+     app section links (Dashboard, Research, Profile).
+     ============================================================= -->
+<!-- SLIDE-IN DRAWER (tablet/phone) -->
+<div id="drawerOverlay" onclick="closeDrawer()"></div>
+<div id="deviceDrawer">
+  <button class="drawer-close" onclick="closeDrawer()">&#x2715;</button>
+  <div style="font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:.75rem;padding-left:1rem;">Navigation</div>
+  <a href="index.html" class="drawer-link">Home</a>
+  <a href="#sparkle" class="drawer-link" onclick="closeDrawer()">On the Horizon</a>
+  <a href="#programs" class="drawer-link" onclick="closeDrawer()">Learn. Teach. Apply.</a>
+  <a href="#teams" class="drawer-link" onclick="closeDrawer()">Meet the Teams</a>
+  <a href="#summit" class="drawer-link" onclick="closeDrawer()">Summit</a>
+  <a href="#about" class="drawer-link" onclick="closeDrawer()">Our Story</a>
+  <a href="#events" class="drawer-link" onclick="closeDrawer()">Events</a>
+  <div style="margin: .75rem 0; border-top: 1px solid var(--border);"></div>
+  <div style="font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:.75rem;padding-left:1rem;">App</div>
+  <a href="ambassadors.html" class="drawer-link">Dashboard</a>
+  <a href="research.html" class="drawer-link">Research</a>
+  <a href="auth.html" class="drawer-link">Profile</a>
+</div>
+<script>
+  // openDrawer(): adds .open to both the panel and the overlay.
+  // The CSS transition on #deviceDrawer animates it from right to left.
+  function openDrawer() {
+    document.getElementById('deviceDrawer').classList.add('open');
+    document.getElementById('drawerOverlay').classList.add('open');
+  }
+  // closeDrawer(): removes .open, sliding the panel back off-screen.
+  // Called by the X button, overlay click, and each drawer link's onclick.
+  function closeDrawer() {
+    document.getElementById('deviceDrawer').classList.remove('open');
+    document.getElementById('drawerOverlay').classList.remove('open');
+  }
+</script>
+
+<script>
+  // SCROLL RESTORATION FIX
+  // Browsers often remember and restore scroll position between page loads.
+  // Setting scrollRestoration to 'manual' disables that, then scrollTo(0,0)
+  // ensures the page always starts at the top — important for single-page-style
+  // navigation and clean initial load experience.
+  if (history.scrollRestoration) history.scrollRestoration = 'manual';
+  window.scrollTo(0, 0);
+</script>
+</body>
+</html>
