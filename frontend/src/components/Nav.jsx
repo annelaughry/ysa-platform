@@ -2,6 +2,9 @@ import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../AuthContext'
 
+// Main YSA website. Set VITE_YSA_HOME_URL at build time to point somewhere else.
+const YSA_HOME_URL = import.meta.env.VITE_YSA_HOME_URL || 'https://youngscientistacademy.org'
+
 export default function Nav() {
   const { user, logout, isTeacher, isAdmin, isTeachSTEM, isProgramStaff } = useAuth()
   const navigate = useNavigate()
@@ -34,6 +37,8 @@ export default function Nav() {
       </button>
 
       <div className={'nav__links' + (open ? ' nav__links--open' : '')} onClick={() => setOpen(false)}>
+        <a href={YSA_HOME_URL} className="nav__link">YSA Home</a>
+
         {!user && (
           <>
             <NavLink to="/" className={({ isActive }) => 'nav__link' + (isActive ? ' nav__link--active' : '')}>Library</NavLink>
