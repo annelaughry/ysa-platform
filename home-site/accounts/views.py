@@ -1,16 +1,8 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm
 from django import forms
+from django.conf import settings
 from .models import Profile
-
-
-class RegisterForm(UserCreationForm):
-    email = forms.EmailField(required=False, help_text='Optional — used for account recovery.')
-
-    class Meta(UserCreationForm.Meta):
-        fields = ('username', 'email', 'password1', 'password2')
 
 
 class ProfileEditForm(forms.ModelForm):
@@ -25,25 +17,8 @@ class ProfileEditForm(forms.ModelForm):
 
 
 def register(request):
-    if request.user.is_authenticated:
-        return redirect('/ambassadors/')
-
-    if request.method == 'POST':
-        form = RegisterForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            if form.cleaned_data.get('email'):
-                user.email = form.cleaned_data['email']
-                user.save()
-            # authenticate then log in
-            raw_password = form.cleaned_data['password1']
-            user = authenticate(username=user.username, password=raw_password)
-            login(request, user)
-            return redirect('/ambassadors/')
-    else:
-        form = RegisterForm()
-
-    return render(request, 'accounts/register.html', {'form': form})
+    """Accounts are created on the lesson library so one login works on both sites."""
+    return redirect(settings.LESSON_LIBRARY_URL.rstrip('/') + '/register')
 
 
 @login_required

@@ -10,7 +10,14 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +27,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-*xyvb%w3j7g_c6pgpvvqzjq3x2jiv*ru)6@&*pq_kfgy!@y2d3'
+# Set DJANGO_SECRET_KEY in production. The fallback is for local development only.
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-local-dev-only-change-me')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('1', 'true', 'yes')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [h.strip() for h in os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',') if h.strip()]
+CSRF_TRUSTED_ORIGINS = [o.strip() for o in os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',') if o.strip()]
 
 
 # Application definition
@@ -65,6 +74,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'accounts.context_processors.ysa_links',
             ],
         },
     },
@@ -126,6 +136,13 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Auth
+# One login for both apps: accounts live in the lesson library (TeachSTEM).
+# See accounts/backends.py. ModelBackend stays so local superusers can reach /admin/.
+LESSON_LIBRARY_URL = os.environ.get('LESSON_LIBRARY_URL', 'https://teachstem.onrender.com')
+AUTHENTICATION_BACKENDS = [
+    'accounts.backends.LessonLibraryBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/ambassadors/'
 LOGOUT_REDIRECT_URL = '/'

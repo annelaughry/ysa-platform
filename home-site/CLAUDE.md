@@ -326,3 +326,12 @@ When ready to deploy:
 5. Add `requirements.txt`: `pip3 freeze > requirements.txt`
 6. On Render: New Web Service → connect maddi3sky/ysa-platform → build command: `pip install -r requirements.txt && python manage.py migrate` → start command: `gunicorn ysa_platform.wsgi`
 7. Add env var: `DJANGO_SECRET_KEY` (generate a new one for prod)
+
+---
+
+## Update: combined repository
+
+This app now lives in `home-site/` of the combined YSA Platform repository, next to the
+lesson library (`lesson-library/`, formerly TeachSTEM). Logins are shared: the home site
+authenticates against the lesson library's `/api/auth/login/` (see `accounts/backends.py`),
+and registration happens on the lesson library. See the root `README.md`.

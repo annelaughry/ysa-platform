@@ -1,0 +1,39 @@
+# One ignore file for the whole repo (both apps).
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+ENV/
+
+# Django
+db.sqlite3
+db.sqlite3-journal
+*.log
+local_settings.py
+media/
+staticfiles/
+/home-site/static/
+
+# Environment variables / secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Frontend (lesson library React app)
+node_modules/
+frontend/dist/
+npm-debug.log*
+
+# Editors / OS
+.DS_Store
+.AppleDouble
+Thumbs.db
+.vscode/
+.idea/
+*.code-workspace
