@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@1,700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --teal:     #3cbbb1;
+    --lavender: #bbbdf6;
+    --pink:     #ee4266;
+    --dark:     #0a0f0d;
+    --gold:     #f1b643;
+    --amber:    #c4903a;
+    --off-white:#f5f5f0;
+    --card-bg:  #111a15;
+    --border:   color-mix(in srgb, var(--off-white) 8%, transparent);
+  }
+
+  .teams-wrap {
+    min-height: 100vh;
+    background: var(--dark);
+    color: var(--off-white);
+    font-family: 'Inter', sans-serif;
+    padding: 2rem 1.5rem 5rem;
+  }
+
+  .teams-header {
+    max-width: 900px;
+    margin: 0 auto 3rem;
+  }
+
+  .teams-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(2rem, 5vw, 3rem);
+    color: var(--teal);
+    margin-bottom: 0.5rem;
+  }
+
+  .teams-header p {
+    color: color-mix(in srgb, var(--off-white) 50%, transparent);
+    font-size: 1rem;
+  }
+
+  .section-label {
+    max-width: 900px;
+    margin: 0 auto 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .section-label h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: color-mix(in srgb, var(--off-white) 55%, transparent);
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .team-grid {
+    max-width: 900px;
+    margin: 0 auto 4rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .team-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.6rem 1.4rem 1.4rem;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.18s, border-color 0.18s;
+  }
+
+  .team-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--tc);
+    border-radius: 16px 16px 0 0;
+  }
+
+  .team-card:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--off-white) 15%, transparent);
+  }
+
+  .tc-flag {
+    font-size: 2rem;
+    line-height: 1;
+    margin-bottom: 0.6rem;
+  }
+
+  .tc-name {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--tc);
+    margin-bottom: 0.15rem;
+  }
+
+  .tc-country {
+    font-size: 0.78rem;
+    color: color-mix(in srgb, var(--off-white) 38%, transparent);
+    margin-bottom: 0.75rem;
+  }
+
+  .tc-desc {
+    font-size: 0.875rem;
+    color: color-mix(in srgb, var(--off-white) 65%, transparent);
+    line-height: 1.55;
+    margin-bottom: 1rem;
+  }
+
+  .tc-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .tc-members {
+    font-size: 0.75rem;
+    color: color-mix(in srgb, var(--off-white) 35%, transparent);
+  }
+
+  .tc-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    border: 1px solid var(--tc);
+    color: var(--tc);
+  }
+</style>
+
+<div class="teams-wrap">
+  <div class="teams-header">
+    <h1>YSA Summit Teams</h1>
+    <p>14 student research teams from Moldova, USA, Yemen, and Syria.</p>
+  </div>
+
+  <div class="section-label"><h2>🌐 Global STEM Ambassadors</h2></div>
+  <div class="team-grid">
+    {% for team in gsa_teams %}
+    <div class="team-card" style="--tc: {{ team.color }};">
+      <div class="tc-flag">{{ team.flag }}</div>
+      <div class="tc-name">{{ team.name }}</div>
+      <div class="tc-country">{{ team.country }}</div>
+      <div class="tc-desc">{{ team.desc }}</div>
+      <div class="tc-footer">
+        <span class="tc-members">
+          {% if team.member_count == 1 %}1 member{% elif team.member_count > 1 %}{{ team.member_count }} members{% else %}Ambassador team{% endif %}
+        </span>
+        <span class="tc-badge">GSA</span>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="section-label"><h2>🔬 STEM Explorers</h2></div>
+  <div class="team-grid">
+    {% for team in explorer_teams %}
+    <div class="team-card" style="--tc: {{ team.color }};">
+      <div class="tc-flag">{{ team.flag }}</div>
+      <div class="tc-name">{{ team.name }}</div>
+      <div class="tc-country">{{ team.country }}</div>
+      <div class="tc-desc">{{ team.desc }}</div>
+      <div class="tc-footer">
+        <span class="tc-members">
+          {% if team.member_count == 1 %}1 member{% elif team.member_count > 1 %}{{ team.member_count }} members{% else %}Explorer team{% endif %}
+        </span>
+        <span class="tc-badge">Explorer</span>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

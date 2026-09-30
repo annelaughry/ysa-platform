@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Near-Space Launch · YSA STEM Summit 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,800;1,700;1,800&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Design tokens ─────────────────────────────────────────── */
+    :root {
+      --teal:      #3cbbb1;
+      --lavender:  #bbbdf6;
+      --pink:      #ee4266;
+      --dark:      #0a0f0d;
+      --gold:      #f1b643;
+      --amber:     #c4903a;
+      --off-white: #f5f5f0;
+      --card-bg:   rgba(255,255,255,0.04);
+      --card-border: rgba(245,245,240,0.08);
+      --muted:     rgba(245,245,240,0.48);
+    }
+
+    /* ── Reset ─────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--dark);
+      color: var(--off-white);
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+
+    /* ── Layout helpers ─────────────────────────────────────────── */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+    .section { padding: 5rem 0; }
+    .section + .section { border-top: 1px solid var(--card-border); }
+
+    /* ── Typography ─────────────────────────────────────────────── */
+    h2 {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: clamp(1.8rem, 3vw, 2.4rem);
+      color: var(--off-white);
+      margin-bottom: 0.4rem;
+    }
+    h2 .accent { color: var(--teal); }
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 0.6rem;
+    }
+    .section-intro {
+      color: var(--muted);
+      font-size: 1rem;
+      max-width: 620px;
+      margin-bottom: 3rem;
+    }
+
+    /* ── Card ───────────────────────────────────────────────────── */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 1.5rem;
+    }
+
+    /* ── NAV ────────────────────────────────────────────────────── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10,15,13,0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--card-border);
+    }
+    .nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .nav-dots {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+    .nav-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .nav-dot.teal    { background: var(--teal); }
+    .nav-dot.lavender{ background: var(--lavender); }
+    .nav-dot.pink    { background: var(--pink); }
+    .nav-title {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--off-white);
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+    }
+    .nav-back {
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--muted);
+      transition: color 0.2s;
+      white-space: nowrap;
+    }
+    .nav-back:hover { color: var(--teal); }
+
+    /* ── HERO ───────────────────────────────────────────────────── */
+    .hero {
+      position: relative;
+      min-height: 88vh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 60% 40%, rgba(60,187,177,0.10) 0%, transparent 65%),
+        radial-gradient(ellipse 60% 50% at 20% 70%, rgba(187,189,246,0.07) 0%, transparent 60%),
+        linear-gradient(175deg, #0d1a18 0%, #0a0f0d 55%, #080c0b 100%);
+    }
+    /* Stars via box-shadow trick */
+    .stars {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .stars::before, .stars::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-image:
+        radial-gradient(1px 1px at 10% 8%, rgba(245,245,240,0.7) 0%, transparent 100%),
+        radial-gradient(1px 1px at 22% 15%, rgba(245,245,240,0.5) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 35% 4%, rgba(245,245,240,0.9) 0%, transparent 100%),
+        radial-gradient(1px 1px at 47% 11%, rgba(245,245,240,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 58% 7%, rgba(245,245,240,0.6) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 70% 3%, rgba(245,245,240,0.8) 0%, transparent 100%),
+        radial-gradient(1px 1px at 82% 13%, rgba(245,245,240,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 93% 6%, rgba(245,245,240,0.7) 0%, transparent 100%),
+        radial-gradient(1px 1px at 5% 22%, rgba(245,245,240,0.4) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 18% 30%, rgba(245,245,240,0.6) 0%, transparent 100%),
+        radial-gradient(1px 1px at 30% 25%, rgba(245,245,240,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 43% 19%, rgba(245,245,240,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 55% 28%, rgba(245,245,240,0.4) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 67% 21%, rgba(245,245,240,0.7) 0%, transparent 100%),
+        radial-gradient(1px 1px at 79% 26%, rgba(245,245,240,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 88% 18%, rgba(245,245,240,0.6) 0%, transparent 100%),
+        radial-gradient(1px 1px at 96% 32%, rgba(245,245,240,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 12% 40%, rgba(245,245,240,0.4) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 26% 36%, rgba(245,245,240,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 38% 42%, rgba(245,245,240,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 52% 38%, rgba(245,245,240,0.6) 0%, transparent 100%),
+        radial-gradient(1px 1px at 74% 44%, rgba(245,245,240,0.4) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 86% 37%, rgba(245,245,240,0.7) 0%, transparent 100%),
+        radial-gradient(1px 1px at 3% 52%, rgba(245,245,240,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 61% 48%, rgba(60,187,177,0.5) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 91% 49%, rgba(245,245,240,0.4) 0%, transparent 100%);
+    }
+    .stars::after {
+      background-image:
+        radial-gradient(1px 1px at 7% 58%, rgba(245,245,240,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 19% 62%, rgba(245,245,240,0.5) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 33% 55%, rgba(245,245,240,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 45% 68%, rgba(245,245,240,0.6) 0%, transparent 100%),
+        radial-gradient(1px 1px at 57% 61%, rgba(245,245,240,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 71% 72%, rgba(245,245,240,0.5) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 83% 58%, rgba(245,245,240,0.7) 0%, transparent 100%),
+        radial-gradient(1px 1px at 95% 65%, rgba(245,245,240,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 14% 78%, rgba(245,245,240,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 28% 82%, rgba(245,245,240,0.5) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 42% 76%, rgba(187,189,246,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 66% 85%, rgba(245,245,240,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 78% 79%, rgba(245,245,240,0.6) 0%, transparent 100%),
+        radial-gradient(1px 1px at 90% 88%, rgba(245,245,240,0.3) 0%, transparent 100%);
+    }
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      padding: 5rem 0 4rem;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.9rem;
+      border: 1px solid rgba(60,187,177,0.4);
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--teal);
+      letter-spacing: 0.04em;
+      margin-bottom: 1.8rem;
+      background: rgba(60,187,177,0.06);
+    }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-weight: 800;
+      font-size: clamp(3rem, 7vw, 5.5rem);
+      line-height: 1.05;
+      margin-bottom: 1.5rem;
+    }
+    .hero h1 .line2 {
+      display: block;
+      color: var(--teal);
+      font-style: italic;
+    }
+    .hero-sub {
+      font-size: clamp(1rem, 1.5vw, 1.15rem);
+      color: var(--muted);
+      max-width: 560px;
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+    .hero-teams {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-bottom: 2.5rem;
+    }
+    .team-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.4rem 1rem;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+    .team-chip.gold {
+      background: rgba(241,182,67,0.14);
+      border: 1px solid rgba(241,182,67,0.45);
+      color: var(--gold);
+    }
+    .team-chip.lavender {
+      background: rgba(187,189,246,0.12);
+      border: 1px solid rgba(187,189,246,0.40);
+      color: var(--lavender);
+    }
+    .hero-balloon {
+      position: absolute;
+      right: 8%;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: clamp(5rem, 10vw, 9rem);
+      animation: float 3s ease-in-out infinite;
+      filter: drop-shadow(0 0 32px rgba(60,187,177,0.25));
+      z-index: 2;
+      user-select: none;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(-50%) translateY(0); }
+      50%       { transform: translateY(-50%) translateY(-18px); }
+    }
+
+    /* ── SPECS GRID ─────────────────────────────────────────────── */
+    .specs-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+    .spec-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 1.75rem 1.5rem;
+      text-align: center;
+    }
+    .spec-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--teal);
+      line-height: 1.1;
+      margin-bottom: 0.5rem;
+    }
+    .spec-unit {
+      font-size: 0.9rem;
+      font-weight: 400;
+      color: rgba(60,187,177,0.65);
+    }
+    .spec-label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* ── PAYLOAD ────────────────────────────────────────────────── */
+    .payload-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+    .payload-left-text {
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.75;
+      margin-bottom: 1.75rem;
+    }
+    .hardware-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+    .hw-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1rem 1.1rem;
+    }
+    .hw-icon {
+      font-size: 1.3rem;
+      margin-bottom: 0.4rem;
+      display: block;
+    }
+    .hw-name {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--off-white);
+      margin-bottom: 0.15rem;
+    }
+    .hw-desc {
+      font-size: 0.73rem;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    .team-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .team-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      border-left-width: 3px;
+    }
+    .team-card.gold-accent  { border-left-color: var(--gold); }
+    .team-card.lav-accent   { border-left-color: var(--lavender); }
+    .team-card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.6rem;
+    }
+    .team-card-flag { font-size: 1.3rem; }
+    .team-card-name {
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--off-white);
+    }
+    .team-card-person {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--teal);
+      margin-bottom: 0.5rem;
+    }
+    .team-card.gold-accent .team-card-person  { color: var(--gold); }
+    .team-card.lav-accent  .team-card-person  { color: var(--lavender); }
+    .team-card-desc {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ── TIMELINE ───────────────────────────────────────────────── */
+    .timeline {
+      position: relative;
+      padding-left: 2.5rem;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 10px;
+      top: 12px;
+      bottom: 12px;
+      width: 2px;
+      background: repeating-linear-gradient(
+        to bottom,
+        var(--teal) 0px,
+        var(--teal) 6px,
+        transparent 6px,
+        transparent 12px
+      );
+    }
+    .tl-item {
+      position: relative;
+      margin-bottom: 2.5rem;
+    }
+    .tl-item:last-child { margin-bottom: 0; }
+    .tl-dot {
+      position: absolute;
+      left: -2.5rem;
+      top: 3px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--teal);
+      border: 2px solid var(--dark);
+      box-shadow: 0 0 0 2px var(--teal);
+    }
+    .tl-dot.launch {
+      width: 20px;
+      height: 20px;
+      left: calc(-2.5rem - 3px);
+      top: 0;
+      box-shadow: 0 0 0 3px rgba(60,187,177,0.35), 0 0 18px rgba(60,187,177,0.45);
+    }
+    .tl-time {
+      font-size: 0.73rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 0.2rem;
+    }
+    .tl-event {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--off-white);
+      margin-bottom: 0.1rem;
+    }
+    .tl-event.launch-row { font-size: 1.15rem; color: var(--teal); }
+    .tl-detail {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* ── SCIENCE CARDS ──────────────────────────────────────────── */
+    .science-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+    .sci-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 1.75rem 1.5rem;
+    }
+    .sci-icon {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+    .sci-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--off-white);
+      margin-bottom: 0.5rem;
+    }
+    .sci-desc {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ── TRACKER ────────────────────────────────────────────────── */
+    .tracker-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(60,187,177,0.2);
+      border-radius: 16px;
+      padding: 2.5rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 2rem;
+    }
+    .tracker-pulse-wrap {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 56px;
+      height: 56px;
+      position: relative;
+    }
+    .tracker-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--teal);
+      position: relative;
+      z-index: 1;
+    }
+    .tracker-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px solid var(--teal);
+      opacity: 0;
+      animation: pulse-ring 2.2s ease-out infinite;
+    }
+    .tracker-ring:nth-child(2) { animation-delay: 0.7s; }
+    .tracker-ring:nth-child(3) { animation-delay: 1.4s; }
+    @keyframes pulse-ring {
+      0%   { transform: scale(0.5); opacity: 0.7; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+    .tracker-body {}
+    .tracker-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 0.4rem;
+    }
+    .tracker-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--off-white);
+      margin-bottom: 0.6rem;
+    }
+    .tracker-text {
+      font-size: 0.92rem;
+      color: var(--muted);
+      line-height: 1.65;
+      max-width: 600px;
+    }
+    .tracker-bookmark {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--teal);
+    }
+    .tracker-bookmark svg {
+      width: 14px;
+      height: 14px;
+      fill: var(--teal);
+    }
+
+    /* ── FOOTER CTA ─────────────────────────────────────────────── */
+    .footer-cta {
+      padding: 5rem 0 2rem;
+      text-align: center;
+    }
+    .cta-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 3rem;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.85rem 1.75rem;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      transition: opacity 0.2s, transform 0.15s;
+      cursor: pointer;
+    }
+    .btn:hover { opacity: 0.82; transform: translateY(-1px); }
+    .btn-teal {
+      background: var(--teal);
+      color: var(--dark);
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--off-white);
+      border: 1px solid var(--card-border);
+    }
+    .btn-outline:hover { border-color: rgba(245,245,240,0.25); }
+    .footer-copy {
+      font-size: 0.78rem;
+      color: var(--muted);
+      letter-spacing: 0.03em;
+    }
+
+    /* ── RESPONSIVE ─────────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .specs-grid { grid-template-columns: repeat(2, 1fr); }
+      .payload-layout { grid-template-columns: 1fr; gap: 2rem; }
+      .science-grid { grid-template-columns: repeat(2, 1fr); }
+      .hero-balloon { display: none; }
+    }
+    @media (max-width: 600px) {
+      .specs-grid { grid-template-columns: repeat(2, 1fr); }
+      .hardware-grid { grid-template-columns: 1fr; }
+      .science-grid { grid-template-columns: 1fr; }
+      .tracker-card { flex-direction: column; gap: 1.25rem; padding: 1.75rem; }
+      .cta-buttons { flex-direction: column; align-items: center; }
+      .nav-title { display: none; }
+    }
+    @media (max-width: 420px) {
+      .hero h1 { font-size: 2.6rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── NAV ─────────────────────────────────────────────────────── -->
+  <nav>
+    <div class="nav-inner">
+      <div class="nav-left">
+        <div class="nav-dots">
+          <span class="nav-dot teal"></span>
+          <span class="nav-dot lavender"></span>
+          <span class="nav-dot pink"></span>
+        </div>
+        <span class="nav-title">Young Scientist Academy &middot; STEM Summit 2026</span>
+      </div>
+      <a href="index.html" class="nav-back">&#8592; Summit Hub</a>
+    </div>
+  </nav>
+
+  <!-- ── HERO ─────────────────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="stars"></div>
+    <div class="hero-balloon" aria-hidden="true">🎈</div>
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-badge">🎈 Sunday &middot; July 12 &middot; 9:00 AM EEST</div>
+        <h1>
+          Near-Space
+          <span class="line2">Launch</span>
+        </h1>
+        <p class="hero-sub">
+          A student-designed payload climbs to 32 km above Moldova &mdash; carrying sensors built by Stealth and Supernovas into the stratosphere.
+        </p>
+        <div class="hero-teams">
+          <span class="team-chip gold">Stealth &#x1F1FE;&#x1F1EA;</span>
+          <span class="team-chip lavender">Supernovas &#x1F1FA;&#x1F1F8;</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── MISSION SPECS ──────────────────────────────────────────── -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Mission Specs</p>
+      <h2>By the <span class="accent">numbers</span></h2>
+      <p class="section-intro">Key parameters for the YSA near-space balloon flight over Codrii Nature Reserve.</p>
+      <div class="specs-grid">
+        <div class="spec-card">
+          <div class="spec-value">~32 <span class="spec-unit">km</span></div>
+          <div class="spec-label">Target Altitude</div>
+          <div style="margin-top:0.35rem;font-size:0.75rem;color:var(--muted);">~105,000 ft</div>
+        </div>
+        <div class="spec-card">
+          <div class="spec-value">~5 <span class="spec-unit">m/s</span></div>
+          <div class="spec-label">Ascent Rate</div>
+          <div style="margin-top:0.35rem;font-size:0.75rem;color:var(--muted);">Average during climb</div>
+        </div>
+        <div class="spec-card">
+          <div class="spec-value">~90 <span class="spec-unit">min</span></div>
+          <div class="spec-label">Flight Time</div>
+          <div style="margin-top:0.35rem;font-size:0.75rem;color:var(--muted);">Launch to landing</div>
+        </div>
+        <div class="spec-card">
+          <div class="spec-value" style="font-size:1.15rem;padding-top:0.25rem;">Codrii</div>
+          <div class="spec-label">Landing Zone</div>
+          <div style="margin-top:0.35rem;font-size:0.75rem;color:var(--muted);">Reserve Area, Moldova</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── PAYLOAD ─────────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Payload</p>
+      <h2>What's <span class="accent">flying</span></h2>
+      <div class="payload-layout">
+        <!-- Left: description + hardware -->
+        <div>
+          <p class="payload-left-text">
+            The payload box carries a student-built electronics stack designed and assembled by Stealth and Supernovas over months of engineering work. Every component was selected, tested, and integrated by the teams &mdash; from the pressure-rated housing to the parachute recovery system.
+          </p>
+          <p class="payload-left-text" style="margin-top:-0.75rem;">
+            Supernovas' VISION mission links the near-space atmospheric dataset to their ongoing study of orbital debris patterns, making this flight scientifically valuable well beyond the summit itself.
+          </p>
+          <div class="hardware-grid">
+            <div class="hw-card">
+              <span class="hw-icon">🖥️</span>
+              <div class="hw-name">Raspberry Pi 5</div>
+              <div class="hw-desc">Main flight computer &mdash; data logging &amp; telemetry</div>
+            </div>
+            <div class="hw-card">
+              <span class="hw-icon">⚡</span>
+              <div class="hw-name">Arduino Mega</div>
+              <div class="hw-desc">Sensor controller &amp; real-time signal processing</div>
+            </div>
+            <div class="hw-card">
+              <span class="hw-icon">📡</span>
+              <div class="hw-name">GPS Module</div>
+              <div class="hw-desc">Real-time position tracking &amp; flight path data</div>
+            </div>
+            <div class="hw-card">
+              <span class="hw-icon">🌡️</span>
+              <div class="hw-name">Sensor Suite</div>
+              <div class="hw-desc">Temp, pressure, humidity &amp; UV sensors</div>
+            </div>
+          </div>
+        </div>
+        <!-- Right: team cards -->
+        <div class="team-cards">
+          <div class="team-card gold-accent">
+            <div class="team-card-header">
+              <span class="team-card-flag">🇾🇪</span>
+              <span class="team-card-name">Stealth</span>
+            </div>
+            <div class="team-card-person">Akram Qasim &mdash; Payload Lead</div>
+            <div class="team-card-desc">
+              Payload engineering &amp; hardware &mdash; designed the mounting frame, sensor integration, and launch checklist. Akram led the structural and electrical build from the first prototype to flight day.
+            </div>
+          </div>
+          <div class="team-card lav-accent">
+            <div class="team-card-header">
+              <span class="team-card-flag">🇺🇸</span>
+              <span class="team-card-name">Supernovas</span>
+            </div>
+            <div class="team-card-person">Susan Yanez &mdash; VISION Mission</div>
+            <div class="team-card-desc">
+              VISION mission &mdash; tracking orbital debris patterns and correlating near-space atmospheric data. The stratospheric dataset from this flight feeds directly into Supernovas' research model.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── LAUNCH TIMELINE ────────────────────────────────────────── -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Launch Day</p>
+      <h2>July <span class="accent">12</span> timeline</h2>
+      <p class="section-intro">All times EEST. Meet at the lake field &mdash; watch for Summit staff with the orange flag.</p>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-time">7:00 AM</div>
+          <div class="tl-event">Payload check &amp; balloon inflation</div>
+          <div class="tl-detail">Teams gather at the lake field. Final sensor checks, battery loads, and balloon fill with hydrogen or helium under Akram's checklist.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot launch"></div>
+          <div class="tl-time">9:00 AM</div>
+          <div class="tl-event launch-row">🎈 LAUNCH &mdash; Balloon and payload released</div>
+          <div class="tl-detail">Lift-off. The balloon enters the stratosphere over roughly 90 minutes. Live tracker goes active.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-time">9:30 AM</div>
+          <div class="tl-event">Recovery mission begins</div>
+          <div class="tl-detail">Tracking signal active. Recovery crew follows predicted landing path using the SPOT tracker data.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-time">~10:30 AM</div>
+          <div class="tl-event">Payload lands &mdash; recovery crew retrieves it</div>
+          <div class="tl-detail">Balloon bursts at peak altitude. Parachute deploys, payload descends into the Codrii Reserve area for retrieval.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-time">Afternoon</div>
+          <div class="tl-event">Data download &amp; analysis</div>
+          <div class="tl-detail">Payload returned to Reserve HQ. Raw sensor data downloaded, and Supernovas begins the first pass of atmospheric analysis.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SCIENCE ────────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Science Objectives</p>
+      <h2>What we're <span class="accent">measuring</span></h2>
+      <p class="section-intro">Three core datasets the payload captures from ground to stratosphere and back.</p>
+      <div class="science-grid">
+        <div class="sci-card">
+          <span class="sci-icon">🌡️</span>
+          <div class="sci-title">Atmospheric Temperature</div>
+          <div class="sci-desc">
+            Temperature gradient from ground level to stratosphere &mdash; capturing the dramatic drop through the troposphere and the inversion layer above.
+          </div>
+        </div>
+        <div class="sci-card">
+          <span class="sci-icon">📊</span>
+          <div class="sci-title">Barometric Pressure</div>
+          <div class="sci-desc">
+            Pressure drop from 101 kPa at sea level to approximately 1 kPa at 32 km altitude &mdash; a 100x reduction that validates our sensor stack's range.
+          </div>
+        </div>
+        <div class="sci-card">
+          <span class="sci-icon">🛰️</span>
+          <div class="sci-title">GPS Flight Path</div>
+          <div class="sci-desc">
+            Real-time latitude, longitude, altitude, and maximum height reached &mdash; producing a full 3D trajectory log of the entire flight.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TRACKER ────────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Track the Balloon</p>
+      <h2>Live <span class="accent">tracker</span></h2>
+      <div class="tracker-card">
+        <div class="tracker-pulse-wrap" aria-hidden="true">
+          <div class="tracker-ring"></div>
+          <div class="tracker-ring"></div>
+          <div class="tracker-ring"></div>
+          <div class="tracker-dot"></div>
+        </div>
+        <div class="tracker-body">
+          <div class="tracker-label">Live SPOT Tracker</div>
+          <div class="tracker-title">Tracking goes live on launch day</div>
+          <p class="tracker-text">
+            A live tracking link will be posted here on July 12 starting at 9:00 AM EEST. Bookmark this page and check back on launch day to follow the balloon's ascent in real time.
+          </p>
+          <div class="tracker-bookmark">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 2a2 2 0 0 0-2 2v18l8-3.5L20 22V4a2 2 0 0 0-2-2H6Z"/>
+            </svg>
+            Bookmark this page to get the link first
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER CTA ─────────────────────────────────────────────── -->
+  <section class="footer-cta">
+    <div class="container">
+      <p class="section-label" style="text-align:center;margin-bottom:0.5rem;">Join us</p>
+      <h2 style="text-align:center;margin-bottom:1rem;">Be there on <span class="accent">launch day</span></h2>
+      <p style="color:var(--muted);text-align:center;max-width:480px;margin:0 auto 2.5rem;font-size:0.95rem;">
+        The launch is open to all summit attendees. RSVP to the summit to secure your spot on site.
+      </p>
+      <div class="cta-buttons">
+        <a href="agenda.html#d12" class="btn btn-outline">&#8592; See full summit agenda</a>
+        <a href="rsvp.html" class="btn btn-teal">RSVP to attend &#8594;</a>
+      </div>
+      <div class="footer-copy">
+        YSA Youth STEM Summit 2026 &middot; Lozova &amp; Codrii Nature Reserve, Moldova
+      </div>
+    </div>
+  </section>
+
+</body>
+</html>

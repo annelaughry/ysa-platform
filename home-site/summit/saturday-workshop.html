@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Community STEM Field Workshop, July 11, YSA Summit 2026</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(160deg, #e8faf8 0%, #f4f6f9 60%);
+      min-height: 100vh;
+      padding: 24px 16px 60px;
+      color: #1a3c3a;
+    }
+    .page-wrap { max-width: 520px; margin: 0 auto; }
+    .header-card {
+      background: linear-gradient(135deg, #2ec4b6 0%, #1a9e92 100%);
+      border-radius: 20px; padding: 34px 28px 28px;
+      text-align: center; margin-bottom: 20px;
+    }
+    .header-eyebrow {
+      color: rgba(255,255,255,0.8); font-size: 11px;
+      font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .header-card h1 { color: white; font-size: 23px; font-weight: 800; line-height: 1.3; margin-bottom: 8px; }
+    .header-card p { color: rgba(255,255,255,0.9); font-size: 14px; line-height: 1.5; }
+    .header-card a { color: white; font-weight: 700; text-decoration: underline; }
+    .form-card {
+      background: white; border-radius: 16px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+      padding: 26px 26px 30px;
+      margin-bottom: 16px;
+    }
+    .field { margin-bottom: 18px; }
+    .field:last-child { margin-bottom: 0; }
+    label.field-label {
+      display: block; font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.8px;
+      color: #888; margin-bottom: 7px;
+    }
+    .required-star { color: #ef4444; margin-left: 2px; }
+    input[type="text"], input[type="email"], input[type="number"] {
+      width: 100%; padding: 11px 14px;
+      border: 2px solid #e0f5f3; border-radius: 10px;
+      font-size: 14px; font-family: inherit; color: #1a3c3a;
+      outline: none; transition: border 0.2s;
+      background: #fafeff;
+    }
+    input:focus { border-color: #2ec4b6; background: white; }
+    .guest-row { display: flex; align-items: center; gap: 12px; }
+    .guest-row input { max-width: 100px; }
+    #guest-names-field { display: none; margin-top: 14px; }
+    .submit-btn {
+      width: 100%; padding: 15px;
+      background: linear-gradient(135deg, #2ec4b6 0%, #1a9e92 100%);
+      color: white; border: none; border-radius: 12px;
+      font-size: 16px; font-weight: 800; cursor: pointer;
+      transition: opacity 0.2s; margin-top: 8px;
+    }
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .error-msg { display: none; color: #ef4444; font-size: 13px; margin-top: 10px; text-align: center; }
+    #success-screen {
+      display: none; background: white; border-radius: 16px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+      padding: 40px 28px; text-align: center;
+    }
+    .success-icon { font-size: 48px; margin-bottom: 14px; }
+    #success-screen h2 { font-size: 20px; margin-bottom: 10px; color: #1a3c3a; }
+    .success-conf {
+      background: #f0fbfa; border: 1.5px solid #c0ede9; border-radius: 12px;
+      padding: 16px; margin: 16px 0; text-align: center;
+    }
+    .success-conf p { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #1a9e92; margin-bottom: 6px; }
+    .success-conf span { font-size: 22px; font-weight: 900; color: #1a3c3a; font-family: monospace; letter-spacing: 2px; }
+    #success-screen .sub { font-size: 13px; color: #667; line-height: 1.6; }
+    .back-link { display: block; text-align: center; margin-top: 18px; font-size: 12px; color: #7a9; text-decoration: none; }
+  </style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <div class="header-card">
+    <div class="header-eyebrow">YSA Youth STEM Summit 2026</div>
+    <h1>Community STEM Field Workshop</h1>
+    <p>Saturday, July 11, Lozova. Open to the public, free to attend.<br>
+      <a href="agenda.html#d11" target="_blank">See the full agenda &rarr;</a>
+    </p>
+  </div>
+
+  <form id="workshop-form">
+    <div class="form-card">
+      <div class="field">
+        <label class="field-label" for="inp-name">Full name<span class="required-star">*</span></label>
+        <input type="text" id="inp-name" required>
+      </div>
+      <div class="field">
+        <label class="field-label" for="inp-contact">Best contact (email or phone)<span class="required-star">*</span></label>
+        <input type="text" id="inp-contact" required placeholder="you@example.com or phone number">
+      </div>
+      <div class="field">
+        <label class="field-label" for="inp-guests">Additional guests</label>
+        <div class="guest-row">
+          <input type="number" id="inp-guests" min="0" max="20" value="0">
+          <span style="font-size:13px;color:#888;">not including yourself</span>
+        </div>
+        <div id="guest-names-field">
+          <label class="field-label" for="inp-guest-names" style="margin-top:14px;">Guest name(s)</label>
+          <input type="text" id="inp-guest-names" placeholder="e.g. Jane Doe, John Doe">
+        </div>
+      </div>
+      <button type="button" class="submit-btn" id="submit-btn">Sign up for the workshop</button>
+      <div class="error-msg" id="error-msg"></div>
+    </div>
+  </form>
+
+  <div id="success-screen">
+    <div class="success-icon">🎉</div>
+    <h2>You're signed up!</h2>
+    <div class="success-conf">
+      <p>Confirmation number</p>
+      <span id="conf-num-display">&mdash;</span>
+    </div>
+    <p class="sub">Show this confirmation number at check-in Saturday morning. We can't wait to see you there!</p>
+  </div>
+
+  <a href="index.html" class="back-link">&larr; Back to Summit Site</a>
+</div>
+
+<script>
+  // Same Apps Script Web App used by the main RSVP form, needs a doPost handler
+  // added for formType "saturday_workshop" (see Code.gs notes from Mads/Claude).
+  const SCRIPT_URL = 'https://script.google.com/a/macros/youngscientistacademy.org/s/AKfycbyCjGK8F4Blwqw7L0MqJo76eC712rfEgtsnFrVtJusfE7gvDp2kPlffqexjKT75BR0TnQ/exec';
+
+  document.getElementById('inp-guests').addEventListener('input', function () {
+    document.getElementById('guest-names-field').style.display = parseInt(this.value) > 0 ? 'block' : 'none';
+  });
+
+  document.getElementById('submit-btn').addEventListener('click', function () {
+    const name = document.getElementById('inp-name').value.trim();
+    const contact = document.getElementById('inp-contact').value.trim();
+    const guests = parseInt(document.getElementById('inp-guests').value) || 0;
+    const guestNames = document.getElementById('inp-guest-names').value.trim();
+    const errorEl = document.getElementById('error-msg');
+    errorEl.style.display = 'none';
+
+    if (!name || !contact) {
+      errorEl.textContent = 'Please fill in your name and best contact.';
+      errorEl.style.display = 'block';
+      return;
+    }
+
+    const btn = this;
+    btn.disabled = true;
+    btn.textContent = 'Signing up...';
+
+    const payload = new URLSearchParams({
+      formType: 'saturday_workshop',
+      name: name,
+      contact: contact,
+      guestCount: guests,
+      guestNames: guestNames
+    });
+
+    fetch(SCRIPT_URL, { method: 'POST', body: payload })
+      .then(res => res.json())
+      .then(res => {
+        if (res && res.success) {
+          document.getElementById('workshop-form').style.display = 'none';
+          document.getElementById('success-screen').style.display = 'block';
+          document.getElementById('conf-num-display').textContent = res.confirmNum || 'YSA-SAT';
+        } else {
+          throw new Error(res && res.error ? res.error : 'Something went wrong.');
+        }
+      })
+      .catch(err => {
+        errorEl.textContent = 'Could not submit right now. Please try again in a moment.';
+        errorEl.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Sign up for the workshop';
+      });
+  });
+</script>
+</body>
+</html>

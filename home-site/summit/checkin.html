@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YSA Summit Check-In</title>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #f0fbfa; min-height: 100vh; }
+
+  /* PASSPHRASE GATE */
+  #passGate { position: fixed; inset: 0; z-index: 900; background: #0a1a17; display: flex; align-items: center; justify-content: center; }
+  #passGate.hidden { display: none; }
+  .passgate-box { background: white; border-radius: 16px; padding: 32px 28px; text-align: center; max-width: 340px; width: 90%; }
+  .passgate-box h2 { color: #1a3c3a; font-size: 18px; margin-bottom: 8px; }
+  .passgate-box p { color: #777; font-size: 13px; margin-bottom: 18px; line-height: 1.5; }
+  .passgate-input { width: 100%; padding: 11px 14px; border-radius: 10px; border: 2px solid #e0f5f3; font-size: 15px; text-align: center; margin-bottom: 12px; outline: none; }
+  .passgate-input:focus { border-color: #2ec4b6; }
+  .passgate-btn { width: 100%; padding: 11px; border-radius: 10px; border: none; background: #2ec4b6; color: white; font-weight: 800; font-size: 14px; cursor: pointer; }
+  .passgate-error { display: none; color: #ef4444; font-size: 12px; margin-top: 10px; background: #fef2f2; border-radius: 8px; padding: 8px 10px; }
+
+  .top-bar { background: linear-gradient(135deg, #2ec4b6 0%, #1a9e92 100%); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .top-bar h1 { color: white; font-size: 18px; font-weight: 800; white-space: nowrap; }
+  .top-bar-right { display: flex; align-items: center; gap: 10px; }
+  .refresh-text { color: rgba(255,255,255,0.8); font-size: 11px; white-space: nowrap; }
+  .btn-register, .btn-scan { background: white; color: #1a9e92; border: none; border-radius: 8px; padding: 9px 16px; font-size: 13px; font-weight: 800; cursor: pointer; white-space: nowrap; }
+  .btn-register:hover, .btn-scan:hover { background: #f0fbfa; }
+
+  .stats-bar { display: flex; background: white; border-bottom: 1px solid #e0f5f3; flex-wrap: wrap; }
+  .stat { flex: 1; min-width: 90px; text-align: center; padding: 14px 8px; border-right: 1px solid #e0f5f3; }
+  .stat:last-child { border-right: none; }
+  .stat-num { font-size: 26px; font-weight: 900; color: #1a9e92; line-height: 1; }
+  .stat-label { font-size: 10px; color: #999; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+
+  .search-area { padding: 14px 24px; background: white; border-bottom: 1px solid #e8f8f6; }
+  .search-row { display: flex; gap: 8px; }
+  .search-input { flex: 1; padding: 11px 16px; border: 2px solid #c0ede9; border-radius: 10px; font-size: 15px; outline: none; transition: border 0.2s; }
+  .search-input:focus { border-color: #2ec4b6; }
+
+  .btn { padding: 11px 18px; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: opacity 0.15s; }
+  .btn:hover { opacity: 0.85; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-teal  { background: #2ec4b6; color: white; }
+  .btn-ghost { background: #e8f8f6; color: #1a9e92; }
+  .btn-green { background: #22c55e; color: white; }
+  .btn-amber { background: #f59e0b; color: white; }
+  .btn-red   { background: #ef4444; color: white; }
+  .btn-sm    { padding: 7px 13px; font-size: 12px; border-radius: 8px; }
+
+  .tabs { display: flex; background: white; border-bottom: 2px solid #e0f5f3; padding: 0 24px; overflow-x: auto; }
+  .tab { padding: 13px 16px; font-size: 13px; font-weight: 700; color: #aaa; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.15s; white-space: nowrap; }
+  .tab.active { color: #1a9e92; border-bottom-color: #1a9e92; }
+  .tab:hover:not(.active) { color: #555; }
+
+  .content { padding: 16px 24px; max-width: 900px; margin: 0 auto; }
+
+  .filter-row { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .filter-btn { padding: 6px 16px; border: 1.5px solid #c0ede9; border-radius: 20px; font-size: 12px; font-weight: 700; color: #1a9e92; background: white; cursor: pointer; transition: all 0.15s; }
+  .filter-btn.active { background: #1a9e92; color: white; border-color: #1a9e92; }
+
+  .result-card { background: white; border-radius: 12px; border: 1.5px solid #e0f5f3; padding: 16px 18px; margin-bottom: 10px; }
+  .result-card.checked-all  { border-color: #22c55e; background: #f0fdf4; }
+  .result-card.checked-part { border-color: #f59e0b; background: #fffbeb; }
+  .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; gap: 12px; }
+  .card-name { font-size: 16px; font-weight: 800; color: #1a3c3a; }
+  .card-conf { font-size: 11px; font-family: monospace; color: #999; margin-top: 3px; }
+  .badges { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+  .badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; white-space: nowrap; }
+  .badge-checked   { background: #dcfce7; color: #16a34a; }
+  .badge-pending   { background: #f0fbfa; color: #1a9e92; border: 1px solid #c0ede9; }
+  .badge-walkin    { background: #fef3c7; color: #b45309; }
+  .badge-role      { background: #f0fbfa; color: #1a9e92; border: 1px solid #c0ede9; font-size: 10px; }
+  .badge-maybe     { background: #fef9c3; color: #854d0e; border: 1px solid #fde047; }
+  .card-details { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 12px; }
+  .detail-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #bbb; margin-bottom: 2px; }
+  .detail-value { font-size: 13px; font-weight: 700; color: #333; }
+  .detail-wide { flex-basis: 100%; }
+  .card-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .empty { text-align: center; padding: 48px 16px; }
+  .empty-icon { font-size: 44px; margin-bottom: 12px; }
+  .empty-text { font-size: 15px; font-weight: 600; color: #aaa; }
+  .loading { text-align: center; padding: 32px; color: #1a9e92; font-weight: 700; }
+
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #1a3c3a; color: white; padding: 12px 28px; border-radius: 10px; font-size: 14px; font-weight: 700; opacity: 0; transition: opacity 0.25s; z-index: 1000; pointer-events: none; white-space: nowrap; }
+  .toast.show { opacity: 1; }
+
+  .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; z-index: 500; padding: 20px; }
+  .modal { background: white; border-radius: 16px; padding: 28px; width: 100%; max-width: 420px; max-height: 90vh; overflow-y: auto; }
+  .modal h2 { font-size: 18px; color: #1a3c3a; margin-bottom: 20px; font-weight: 800; }
+  .modal-field { margin-bottom: 16px; }
+  .modal-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #888; margin-bottom: 6px; display: block; }
+  .modal-input, .modal-select { width: 100%; padding: 10px 14px; border: 2px solid #e0f5f3; border-radius: 8px; font-size: 14px; outline: none; transition: border 0.2s; font-family: inherit; }
+  .modal-input:focus, .modal-select:focus { border-color: #2ec4b6; }
+  .modal-section { font-size: 12px; font-weight: 700; color: #1a9e92; text-transform: uppercase; letter-spacing: 0.8px; margin: 20px 0 12px; padding-bottom: 6px; border-bottom: 1px solid #e0f5f3; }
+  .day-checkboxes { display: flex; gap: 12px; }
+  .day-check { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: #333; cursor: pointer; }
+  .day-check input { width: 16px; height: 16px; accent-color: #2ec4b6; }
+  .checkin-now-row { display: flex; align-items: center; gap: 8px; background: #f0fbfa; border-radius: 8px; padding: 10px 14px; font-size: 13px; font-weight: 700; color: #1a3c3a; cursor: pointer; margin-bottom: 8px; }
+  .checkin-now-row input { width: 16px; height: 16px; accent-color: #22c55e; }
+  .modal-btns { display: flex; gap: 10px; margin-top: 24px; }
+  .modal-btns .btn { flex: 1; }
+  .conf-display { background: linear-gradient(135deg, #2ec4b6, #1a9e92); border-radius: 10px; padding: 16px; text-align: center; margin-top: 20px; }
+  .conf-display p { color: rgba(255,255,255,0.8); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .conf-display span { color: white; font-size: 24px; font-weight: 900; font-family: monospace; letter-spacing: 3px; }
+
+  .search-banner { background: #f0fbfa; border: 1px solid #c0ede9; border-radius: 8px; padding: 8px 14px; margin-bottom: 12px; font-size: 13px; color: #1a9e92; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+  .search-clear-x { background: none; border: none; color: #888; cursor: pointer; font-size: 20px; line-height: 1; padding: 0; }
+
+  .trash-note { font-size: 13px; color: #aaa; margin-bottom: 14px; }
+
+  /* SCANNER MODAL */
+  .scan-video-wrap { position: relative; background: #000; border-radius: 12px; overflow: hidden; aspect-ratio: 1/1; margin-bottom: 14px; }
+  #scanVideo { width: 100%; height: 100%; object-fit: cover; }
+  .scan-frame { position: absolute; inset: 12%; border: 3px solid #2ec4b6; border-radius: 12px; pointer-events: none; }
+  .scan-status { text-align: center; font-size: 13px; color: #777; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+
+<!-- PASSPHRASE GATE -->
+<div id="passGate">
+  <div class="passgate-box">
+    <div style="font-size:2rem; margin-bottom:0.6rem;">🔒</div>
+    <h2>Staff Access Only</h2>
+    <p>Enter the staff access code to open the check-in dashboard.</p>
+    <input class="passgate-input" id="passInput" type="text" placeholder="Access code" autocomplete="off"
+      onkeydown="if(event.key==='Enter'){checkPassphrase()}">
+    <button class="passgate-btn" onclick="checkPassphrase()">Unlock &rarr;</button>
+    <div class="passgate-error" id="passError">That code doesn't match. Check with Maddie for the current staff code.</div>
+  </div>
+</div>
+
+<div class="top-bar">
+  <h1>&#127891; YSA Summit Check-In</h1>
+  <div class="top-bar-right">
+    <span class="refresh-text" id="refresh-text">Loading...</span>
+    <button class="btn-scan" onclick="openScanModal()">&#128247; Scan QR</button>
+    <button class="btn-register" onclick="openRegisterModal()">+ Walk-in</button>
+    <button class="btn-register" onclick="confirmResendAll()" style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.4);">&#128231; Resend All</button>
+  </div>
+</div>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-num" id="stat-total">--</div><div class="stat-label">RSVPs</div></div>
+  <div class="stat"><div class="stat-num" id="stat-checked">--</div><div class="stat-label">Checked In</div></div>
+  <div class="stat"><div class="stat-num" id="stat-remaining">--</div><div class="stat-label">Not Yet</div></div>
+</div>
+
+<div class="search-area">
+  <div class="search-row">
+    <input class="search-input" id="search-input" placeholder="Search by name or confirmation number..." oninput="handleSearchInput()">
+    <button class="btn btn-ghost" id="search-clear-btn" style="display:none;" onclick="clearSearch()">Clear</button>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" id="tab-day1" onclick="switchTab('day1')">Day 1 &middot; Jul 13</div>
+  <div class="tab" id="tab-day2" onclick="switchTab('day2')">Day 2 &middot; Jul 14</div>
+  <div class="tab" id="tab-workshop" onclick="switchTab('workshop')">Sat Workshop</div>
+  <div class="tab" id="tab-all" onclick="switchTab('all')">All Attendees</div>
+  <div class="tab" id="tab-trash" onclick="switchTab('trash')">&#128465; Trash</div>
+</div>
+
+<div class="content">
+
+  <div id="search-banner-wrap"></div>
+
+  <!-- Day 1 -->
+  <div id="day1-panel">
+    <div class="filter-row">
+      <button class="filter-btn active" data-day="day1" data-filter="all" onclick="setFilter('day1','all',this)">All</button>
+      <button class="filter-btn" data-day="day1" data-filter="checked" onclick="setFilter('day1','checked',this)">Checked In</button>
+      <button class="filter-btn" data-day="day1" data-filter="pending" onclick="setFilter('day1','pending',this)">Not Yet</button>
+    </div>
+    <div id="day1-list"><div class="loading">Loading...</div></div>
+  </div>
+
+  <!-- Day 2 -->
+  <div id="day2-panel" style="display:none;">
+    <div class="filter-row">
+      <button class="filter-btn active" data-day="day2" data-filter="all" onclick="setFilter('day2','all',this)">All</button>
+      <button class="filter-btn" data-day="day2" data-filter="checked" onclick="setFilter('day2','checked',this)">Checked In</button>
+      <button class="filter-btn" data-day="day2" data-filter="pending" onclick="setFilter('day2','pending',this)">Not Yet</button>
+    </div>
+    <div id="day2-list"><div class="loading">Loading...</div></div>
+  </div>
+
+  <!-- Workshop -->
+  <div id="workshop-panel" style="display:none;">
+    <div class="filter-row">
+      <button class="filter-btn active" data-day="workshop" data-filter="all" onclick="setFilter('workshop','all',this)">All</button>
+      <button class="filter-btn" data-day="workshop" data-filter="checked" onclick="setFilter('workshop','checked',this)">Checked In</button>
+      <button class="filter-btn" data-day="workshop" data-filter="pending" onclick="setFilter('workshop','pending',this)">Not Yet</button>
+    </div>
+    <div id="workshop-list"><div class="loading">Loading...</div></div>
+  </div>
+
+  <!-- All -->
+  <div id="all-panel" style="display:none;">
+    <div id="all-list"><div class="loading">Loading...</div></div>
+  </div>
+
+  <!-- Trash -->
+  <div id="trash-panel" style="display:none;">
+    <p class="trash-note">Deleted attendees, restore to add them back.</p>
+    <div id="trash-list"><div class="loading">Loading...</div></div>
+  </div>
+
+</div>
+
+<!-- SCAN MODAL -->
+<div class="overlay" id="scan-modal" style="display:none;">
+  <div class="modal">
+    <h2>Scan Summit Pass QR</h2>
+    <div class="scan-video-wrap">
+      <video id="scanVideo" playsinline autoplay muted></video>
+      <div class="scan-frame"></div>
+    </div>
+    <canvas id="scanCanvas" style="display:none;"></canvas>
+    <p class="scan-status" id="scan-status">Point the camera at the QR code in the guest's Summit Pass email.</p>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" onclick="closeScanModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- WALK-IN MODAL -->
+<div class="overlay" id="register-modal" style="display:none;">
+  <div class="modal">
+    <h2>Register Walk-in</h2>
+    <div class="modal-field">
+      <label class="modal-label">Full name</label>
+      <input class="modal-input" id="reg-name">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Role</label>
+      <select class="modal-select" id="reg-role">
+        <option value="">Select role...</option>
+        <option>STEM Explorer</option>
+        <option>Global STEM Ambassador</option>
+        <option>Teacher</option>
+        <option>Chaperone</option>
+        <option>Parent / Guardian</option>
+        <option>Dignitary / Official</option>
+        <option>Community Member / Partner</option>
+        <option>Staff / Volunteer</option>
+        <option>Guest</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Best contact</label>
+      <input class="modal-input" id="reg-contact" placeholder="email or phone">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Email <span style="font-weight:400;text-transform:none;">(optional — sends summit pass)</span></label>
+      <input class="modal-input" id="reg-email" type="email" placeholder="email@example.com">
+    </div>
+    <div class="modal-section">Days attending</div>
+    <div class="day-checkboxes">
+      <label class="day-check"><input type="checkbox" id="reg-workshop"> Sat Workshop, Jul 11</label>
+      <label class="day-check"><input type="checkbox" id="reg-day1"> Day 1, Jul 13</label>
+      <label class="day-check"><input type="checkbox" id="reg-day2"> Day 2, Jul 14</label>
+    </div>
+    <div class="modal-field" style="margin-top:16px;">
+      <label class="modal-label">Additional guests</label>
+      <input class="modal-input" id="reg-guests" type="number" min="0" value="0">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Guest name(s)</label>
+      <input class="modal-input" id="reg-guest-names">
+    </div>
+    <div class="modal-section">Check in now</div>
+    <label class="checkin-now-row"><input type="checkbox" id="reg-checkin-workshop"> Check in for Workshop</label>
+    <label class="checkin-now-row"><input type="checkbox" id="reg-checkin-day1"> Check in for Day 1</label>
+    <label class="checkin-now-row"><input type="checkbox" id="reg-checkin-day2"> Check in for Day 2</label>
+    <div class="modal-btns" id="register-modal-btns">
+      <button class="btn btn-ghost" onclick="closeRegisterModal()">Cancel</button>
+      <button class="btn btn-teal" onclick="submitRegistration()">Register</button>
+    </div>
+    <div id="reg-confirm-display" style="display:none;">
+      <div class="conf-display"><p>Confirmation Number</p><span id="reg-confirm-num"></span></div>
+      <div class="modal-btns"><button class="btn btn-teal" style="flex:1;" onclick="closeRegisterModal()">Done</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // Shared staff access code. Change before the summit.
+  const STAFF_PASSPHRASE = "32KMPAYLOAD";
+  (function () {
+    const gate = document.getElementById('passGate');
+    if (sessionStorage.getItem('ysa_staff_ok') === 'true' || localStorage.getItem('ysa_staff_ok') === 'true') gate.classList.add('hidden');
+    window.checkPassphrase = function () {
+      const val = (document.getElementById('passInput').value || '').trim().toUpperCase();
+      if (val === STAFF_PASSPHRASE.toUpperCase()) {
+        localStorage.setItem('ysa_staff_ok', 'true');
+        sessionStorage.setItem('ysa_staff_ok', 'true');
+        gate.classList.add('hidden');
+      } else {
+        document.getElementById('passError').style.display = 'block';
+      }
+    };
+  })();
+
+  let currentTab = 'day1';
+  let currentFilters = { day1: 'all', day2: 'all', workshop: 'all' };
+  let allData = { day1: [], day2: [], workshop: [], all: [] };
+  let searchMode = false;
+  let searchResults = [];
+
+  function switchTab(tab) {
+    currentTab = tab;
+    ['day1','day2','workshop','all','trash'].forEach(t => {
+      document.getElementById('tab-' + t).classList.toggle('active', t === tab);
+      document.getElementById(t + '-panel').style.display = t === tab ? 'block' : 'none';
+    });
+    if (tab === 'trash') loadTrash();
+    else renderCurrentTab();
+  }
+
+  function setFilter(day, filter, btn) {
+    currentFilters[day] = filter;
+    btn.parentElement.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderCurrentTab();
+  }
+
+  function loadAll(cb) {
+    google.script.run.withSuccessHandler(function (items) {
+      allData.all = items;
+      allData.day1 = items.filter(a => a.attendsDay1);
+      allData.day2 = items.filter(a => a.attendsDay2);
+      allData.workshop = items.filter(a => a.attendsWorkshop);
+      updateStats();
+      document.getElementById('refresh-text').textContent = 'Updated ' + new Date().toLocaleTimeString();
+      if (cb) cb();
+    }).withFailureHandler(handleError).getAllAttendees();
+  }
+
+  function updateStats() {
+    const list = currentTab === 'all' ? allData.all : (allData[currentTab] || allData.all);
+    const ciField = currentTab === 'day1' ? 'day1CheckedIn' : currentTab === 'day2' ? 'day2CheckedIn' : 'workshopCheckedIn';
+    const total = list.length;
+    const checked = currentTab === 'all' ? list.filter(a => a.day1CheckedIn === 'Yes' || a.day2CheckedIn === 'Yes' || a.workshopCheckedIn === 'Yes').length
+                                          : list.filter(a => a[ciField] === 'Yes').length;
+    document.getElementById('stat-total').textContent = total;
+    document.getElementById('stat-checked').textContent = checked;
+    document.getElementById('stat-remaining').textContent = total - checked;
+  }
+
+  function renderCurrentTab() {
+    updateStats();
+    if (searchMode) { renderSearchResults(); return; }
+    if (currentTab === 'all') { renderList('all-list', allData.all, 'all'); return; }
+    if (currentTab === 'trash') return;
+    const filter = currentFilters[currentTab];
+    const ciField = currentTab === 'day1' ? 'day1CheckedIn' : currentTab === 'day2' ? 'day2CheckedIn' : 'workshopCheckedIn';
+    let list = allData[currentTab] || [];
+    if (filter === 'checked') list = list.filter(a => a[ciField] === 'Yes');
+    if (filter === 'pending') list = list.filter(a => a[ciField] !== 'Yes');
+    renderList(currentTab + '-list', list, currentTab);
+  }
+
+  function cardHtml(a, dayContext) {
+    const day1Badge = a.attendsDay1 ? `<span class="badge ${a.day1CheckedIn === 'Yes' ? 'badge-checked' : 'badge-pending'}">Day 1: ${a.day1CheckedIn === 'Yes' ? 'Checked In' : 'Not Yet'}</span>` : '';
+    const day2Badge = a.attendsDay2 ? `<span class="badge ${a.day2CheckedIn === 'Yes' ? 'badge-checked' : 'badge-pending'}">Day 2: ${a.day2CheckedIn === 'Yes' ? 'Checked In' : 'Not Yet'}</span>` : '';
+    const workshopBadge = a.attendsWorkshop ? `<span class="badge ${a.workshopCheckedIn === 'Yes' ? 'badge-checked' : 'badge-pending'}">Workshop: ${a.workshopCheckedIn === 'Yes' ? 'Checked In' : 'Not Yet'}</span>` : '';
+    const walkinBadge = (a.confirmNum || '').startsWith('YSA-W') ? '<span class="badge badge-walkin">Walk-in</span>' : '';
+    const maybeBadge = (a.attendingStatus || '').includes('maybe') ? '<span class="badge badge-maybe">Maybe RSVP</span>' : '';
+
+    let cardClass = 'result-card';
+    const relevantCi = dayContext === 'day1' ? a.day1CheckedIn : dayContext === 'day2' ? a.day2CheckedIn : dayContext === 'workshop' ? a.workshopCheckedIn : null;
+    if (relevantCi === 'Yes') cardClass += ' checked-all';
+
+    let actions = '';
+    if (dayContext === 'day1' || (dayContext === 'all' && a.attendsDay1)) {
+      actions += a.day1CheckedIn === 'Yes'
+        ? `<button class="btn btn-amber btn-sm" onclick="doUncheckIn(${a.rowIndex},'day1',this)">Undo Day 1</button>`
+        : `<button class="btn btn-green btn-sm" onclick="doCheckIn(${a.rowIndex},'day1',this)">Check In Day 1</button>`;
+    }
+    if (dayContext === 'day2' || (dayContext === 'all' && a.attendsDay2)) {
+      actions += a.day2CheckedIn === 'Yes'
+        ? `<button class="btn btn-amber btn-sm" onclick="doUncheckIn(${a.rowIndex},'day2',this)">Undo Day 2</button>`
+        : `<button class="btn btn-green btn-sm" onclick="doCheckIn(${a.rowIndex},'day2',this)">Check In Day 2</button>`;
+    }
+    if (dayContext === 'workshop' || (dayContext === 'all' && a.attendsWorkshop)) {
+      actions += a.workshopCheckedIn === 'Yes'
+        ? `<button class="btn btn-amber btn-sm" onclick="doUncheckIn(${a.rowIndex},'workshop',this)">Undo Workshop</button>`
+        : `<button class="btn btn-green btn-sm" onclick="doCheckIn(${a.rowIndex},'workshop',this)">Check In Workshop</button>`;
+    }
+    if (a.email) actions += `<button class="btn btn-ghost btn-sm" onclick="doResend(${a.rowIndex},this)">&#128231; Resend Pass</button>`;
+    actions += `<button class="btn btn-red btn-sm" onclick="doDelete(${a.rowIndex},'${(a.name||'').replace(/'/g,"\\'")}',this)">Delete</button>`;
+
+    return `
+      <div class="result-card ${cardClass.replace('result-card','').trim()}" id="card-${a.rowIndex}">
+        <div class="card-top">
+          <div>
+            <div class="card-name">${a.name}</div>
+            ${a.confirmNum ? `<div class="card-conf">${a.confirmNum}</div>` : ''}
+          </div>
+          <div class="badges">${maybeBadge}${day1Badge}${day2Badge}${workshopBadge}${walkinBadge}<span class="badge badge-role">${a.role || 'Attendee'}</span></div>
+        </div>
+        <div class="card-details">
+          ${a.email   ? `<div class="detail-wide"><div class="detail-label">Email</div><div class="detail-value">${a.email}</div></div>` : ''}
+          ${a.contact ? `<div><div class="detail-label">Contact</div><div class="detail-value">${a.contact}</div></div>` : ''}
+          ${a.guests > 0 ? `<div><div class="detail-label">Guests</div><div class="detail-value">${a.guests} (${a.guestNames || 'unnamed'})</div></div>` : ''}
+          ${a.comments ? `<div class="detail-wide"><div class="detail-label">Comments</div><div class="detail-value">${a.comments}</div></div>` : ''}
+          <div class="detail-wide"><div class="detail-label">Days</div><div class="detail-value">${a.days || '—'}</div></div>
+        </div>
+        <div class="card-actions">${actions}</div>
+      </div>`;
+  }
+
+  function renderList(elId, list, dayContext) {
+    const el = document.getElementById(elId);
+    if (!list || list.length === 0) {
+      el.innerHTML = '<div class="empty"><div class="empty-icon">&#10003;</div><div class="empty-text">Nothing here</div></div>';
+      return;
+    }
+    el.innerHTML = list.map(a => cardHtml(a, dayContext)).join('');
+  }
+
+  // ---- SEARCH ----
+  let searchDebounce;
+  function handleSearchInput() {
+    const q = document.getElementById('search-input').value.trim();
+    document.getElementById('search-clear-btn').style.display = q ? 'inline-block' : 'none';
+    clearTimeout(searchDebounce);
+    if (!q) { searchMode = false; document.getElementById('search-banner-wrap').innerHTML = ''; renderCurrentTab(); return; }
+    searchDebounce = setTimeout(() => runSearch(q), 250);
+  }
+
+  function runSearch(q) {
+    searchMode = true;
+    google.script.run.withSuccessHandler(function (results) {
+      searchResults = results;
+      document.getElementById('search-banner-wrap').innerHTML =
+        `<div class="search-banner"><span>${results.length} result${results.length !== 1 ? 's' : ''} for "${q}"</span>
+          <button class="search-clear-x" onclick="clearSearch()">&times;</button></div>`;
+      renderSearchResults();
+    }).withFailureHandler(handleError).searchAttendee(q);
+  }
+
+  function renderSearchResults() {
+    renderList(currentTab === 'trash' ? 'all-list' : (currentTab + '-list'), searchResults, currentTab === 'all' ? 'all' : currentTab);
+  }
+
+  function clearSearch() {
+    document.getElementById('search-input').value = '';
+    document.getElementById('search-clear-btn').style.display = 'none';
+    document.getElementById('search-banner-wrap').innerHTML = '';
+    searchMode = false;
+    renderCurrentTab();
+  }
+
+  // ---- QR SCANNER ----
+  let scanStream = null;
+  let scanRAF = null;
+
+  function openScanModal() {
+    document.getElementById('scan-modal').style.display = 'flex';
+    const video = document.getElementById('scanVideo');
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+      .then(stream => {
+        scanStream = stream;
+        video.srcObject = stream;
+        video.play();
+        scanRAF = requestAnimationFrame(tickScan);
+      })
+      .catch(() => {
+        document.getElementById('scan-status').textContent = 'Could not access the camera. Check permissions and try again, or search by name instead.';
+      });
+  }
+
+  function closeScanModal() {
+    document.getElementById('scan-modal').style.display = 'none';
+    if (scanRAF) cancelAnimationFrame(scanRAF);
+    if (scanStream) { scanStream.getTracks().forEach(t => t.stop()); scanStream = null; }
+  }
+
+  function tickScan() {
+    const video = document.getElementById('scanVideo');
+    const canvas = document.getElementById('scanCanvas');
+    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(imageData.data, imageData.width, imageData.height);
+      if (code && code.data) {
+        onScanSuccess(code.data);
+        return;
+      }
+    }
+    scanRAF = requestAnimationFrame(tickScan);
+  }
+
+  function onScanSuccess(text) {
+    closeScanModal();
+    const confNum = text.trim();
+    // Determine day from active tab; default to day1
+    const day = currentTab === 'day2' ? 'day2' : currentTab === 'workshop' ? 'workshop' : 'day1';
+    showToast('Scanning ' + confNum + '...');
+    google.script.run
+      .withSuccessHandler(function(res) {
+        if (!res.success) {
+          showToast('Not found: ' + confNum);
+          // Fall back to search so staff can see and handle manually
+          document.getElementById('search-input').value = confNum;
+          handleSearchInput();
+        } else if (res.alreadyCheckedIn) {
+          showToast('Already checked in: ' + res.name);
+          loadAll(renderCurrentTab);
+        } else {
+          showToast('Checked in: ' + res.name);
+          loadAll(renderCurrentTab);
+        }
+      })
+      .withFailureHandler(function(err) {
+        showToast('Scan error — searching instead');
+        document.getElementById('search-input').value = confNum;
+        handleSearchInput();
+      })
+      .quickCheckIn(confNum, day);
+  }
+
+  // ---- CHECK-IN ACTIONS ----
+  function doCheckIn(rowIndex, day, btn) {
+    btn.disabled = true; btn.textContent = 'Checking in...';
+    google.script.run.withSuccessHandler(function () {
+      showToast('Checked in');
+      loadAll(renderCurrentTab);
+    }).withFailureHandler(handleError).checkInAttendee(rowIndex, day);
+  }
+
+  function doUncheckIn(rowIndex, day, btn) {
+    btn.disabled = true; btn.textContent = 'Undoing...';
+    google.script.run.withSuccessHandler(function () {
+      showToast('Check-in undone');
+      loadAll(renderCurrentTab);
+    }).withFailureHandler(handleError).uncheckInAttendee(rowIndex, day);
+  }
+
+  function doDelete(rowIndex, name, btn) {
+    if (!confirm('Delete ' + name + '? This moves them to Trash, you can restore later.')) return;
+    btn.disabled = true;
+    google.script.run.withSuccessHandler(function () {
+      showToast('Deleted ' + name);
+      loadAll(renderCurrentTab);
+    }).withFailureHandler(handleError).deleteAttendee(rowIndex);
+  }
+
+  function loadTrash() {
+    document.getElementById('trash-list').innerHTML = '<div class="loading">Loading...</div>';
+    google.script.run.withSuccessHandler(function (items) {
+      if (!items || items.length === 0) {
+        document.getElementById('trash-list').innerHTML = '<div class="empty"><div class="empty-icon">&#10003;</div><div class="empty-text">Trash is empty</div></div>';
+        return;
+      }
+      document.getElementById('trash-list').innerHTML = items.map(a => `
+        <div class="result-card" id="trash-card-${a.rowIndex}" style="opacity:0.75;">
+          <div class="card-top">
+            <div>
+              <div class="card-name">${a.name}</div>
+              ${a.confirmNum ? `<div class="card-conf">${a.confirmNum}</div>` : ''}
+            </div>
+            <span class="badge badge-role">${a.role || 'Attendee'}</span>
+          </div>
+          <div class="card-actions">
+            <button class="btn btn-teal btn-sm" onclick="doRestore(${a.rowIndex},'${(a.name||'').replace(/'/g,"\\'")}',this)">Restore</button>
+          </div>
+        </div>`).join('');
+    }).withFailureHandler(handleError).getDeletedAttendees();
+  }
+
+  function doRestore(rowIndex, name, btn) {
+    btn.disabled = true; btn.textContent = 'Restoring...';
+    google.script.run.withSuccessHandler(function () {
+      const el = document.getElementById('trash-card-' + rowIndex);
+      if (el) el.remove();
+      showToast('Restored ' + name);
+      loadAll(renderCurrentTab);
+    }).withFailureHandler(handleError).restoreAttendee(rowIndex);
+  }
+
+  // ---- WALK-IN REGISTRATION ----
+  function openRegisterModal() {
+    document.getElementById('register-modal').style.display = 'flex';
+    document.getElementById('register-modal-btns').style.display = 'flex';
+    document.getElementById('reg-confirm-display').style.display = 'none';
+    ['reg-name','reg-contact','reg-email','reg-guest-names'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('reg-guests').value = 0;
+    ['reg-day1','reg-day2','reg-workshop','reg-checkin-day1','reg-checkin-day2','reg-checkin-workshop'].forEach(id => document.getElementById(id).checked = false);
+  }
+
+  function closeRegisterModal() { document.getElementById('register-modal').style.display = 'none'; }
+
+  function submitRegistration() {
+    const name = document.getElementById('reg-name').value.trim();
+    if (!name) { showToast('Name is required'); return; }
+    const workshopSel = document.getElementById('reg-workshop').checked;
+    const day1sel     = document.getElementById('reg-day1').checked;
+    const day2sel     = document.getElementById('reg-day2').checked;
+    if (!day1sel && !day2sel && !workshopSel) { showToast('Select at least one day'); return; }
+
+    const dayParts = [];
+    if (workshopSel) dayParts.push('Saturday, July 11 (Community STEM Field Workshop)');
+    if (day1sel) dayParts.push('Day 1 - July 13, 2026 (Lozova)');
+    if (day2sel) dayParts.push('Day 2 - July 14, 2026 (Scoreni)');
+
+    const regBtn = document.querySelector('#register-modal-btns .btn-teal');
+    regBtn.disabled = true; regBtn.textContent = 'Registering...';
+
+    const data = {
+      name: name,
+      role: document.getElementById('reg-role').value,
+      days: dayParts.join(', '),
+      guestCount: parseInt(document.getElementById('reg-guests').value) || 0,
+      guestNames: document.getElementById('reg-guest-names').value.trim(),
+      contact: document.getElementById('reg-contact').value.trim(),
+      email: document.getElementById('reg-email').value.trim(),
+      checkInWorkshop: document.getElementById('reg-checkin-workshop').checked,
+      checkInDay1: document.getElementById('reg-checkin-day1').checked,
+      checkInDay2: document.getElementById('reg-checkin-day2').checked,
+    };
+
+    google.script.run
+      .withSuccessHandler(function (res) {
+        document.getElementById('register-modal-btns').style.display = 'none';
+        document.getElementById('reg-confirm-display').style.display = 'block';
+        document.getElementById('reg-confirm-num').textContent = res.confirmNum;
+        showToast('Registered: ' + name);
+        loadAll(renderCurrentTab);
+      })
+      .withFailureHandler(function (err) {
+        regBtn.disabled = false; regBtn.textContent = 'Register';
+        handleError(err);
+      })
+      .registerWalkin(data);
+  }
+
+  function confirmResendAll() {
+    const withEmail = allData.all.filter(a => a.email).length;
+    const total = allData.all.length;
+    if (!confirm(`Resend summit passes to all ${withEmail} attendees with email addresses?\n(${total - withEmail} will be skipped — no email on file)\n\nThis uses ${withEmail} of your daily Gmail quota.`)) return;
+    showToast('Sending ' + withEmail + ' passes...');
+    google.script.run
+      .withSuccessHandler(function(res) { showToast('Sent ' + res.sent + ' passes, skipped ' + res.skipped); })
+      .withFailureHandler(handleError)
+      .resendAllConfirmationEmails();
+  }
+
+  function doResend(rowIndex, btn) {
+    btn.disabled = true; btn.textContent = 'Sending...';
+    google.script.run
+      .withSuccessHandler(function() { btn.disabled = false; btn.textContent = '📧 Resend Pass'; showToast('Pass email sent!'); })
+      .withFailureHandler(function(err) { btn.disabled = false; btn.textContent = '📧 Resend Pass'; handleError(err); })
+      .resendConfirmationEmail(rowIndex);
+  }
+
+  // ---- UTILS ----
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+  function handleError(err) { showToast('Error: ' + (err.message || String(err))); }
+
+  setInterval(() => { loadAll(renderCurrentTab); }, 30000);
+  loadAll(renderCurrentTab);
+</script>
+</body>
+</html>

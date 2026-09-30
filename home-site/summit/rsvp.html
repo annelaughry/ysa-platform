@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YSA Summit RSVP 2026</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(160deg, #e8faf8 0%, #f4f6f9 60%);
+      min-height: 100vh;
+      padding: 24px 16px 60px;
+      color: #1a3c3a;
+    }
+    .page-wrap { max-width: 560px; margin: 0 auto; }
+
+    /* ── Language toggle (standalone only, hidden when embedded) ── */
+    .lang-bar {
+      display: flex; justify-content: flex-end; gap: 4px;
+      margin-bottom: 20px;
+    }
+    .lang-btn {
+      border: 1.5px solid #c0ede9; border-radius: 20px;
+      background: white; color: #1a9e92;
+      font-size: 12px; font-weight: 700; padding: 5px 14px;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .lang-btn.active { background: #1a9e92; color: white; border-color: #1a9e92; }
+
+    /* ── Header card ── */
+    .header-card {
+      background: linear-gradient(135deg, #2ec4b6 0%, #1a9e92 100%);
+      border-radius: 20px; padding: 36px 32px 30px;
+      text-align: center; margin-bottom: 20px;
+    }
+    .header-card img { height: 52px; width: auto; margin-bottom: 18px; }
+    .header-eyebrow {
+      color: rgba(255,255,255,0.8); font-size: 11px;
+      font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .header-card h1 { color: white; font-size: 24px; font-weight: 800; line-height: 1.25; margin-bottom: 6px; }
+    .header-card p { color: rgba(255,255,255,0.88); font-size: 14px; }
+
+    /* ── Form card ── */
+    .form-card {
+      background: white; border-radius: 16px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+      padding: 28px 28px 32px;
+      margin-bottom: 16px;
+    }
+    .section-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: #2ec4b6;
+      margin-bottom: 20px; padding-bottom: 8px;
+      border-bottom: 1.5px solid #e8f8f6;
+    }
+    .field { margin-bottom: 18px; }
+    .field:last-child { margin-bottom: 0; }
+    label.field-label {
+      display: block; font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.8px;
+      color: #888; margin-bottom: 7px;
+    }
+    .required-star { color: #ef4444; margin-left: 2px; }
+    input[type="text"],
+    input[type="email"],
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%; padding: 11px 14px;
+      border: 2px solid #e0f5f3; border-radius: 10px;
+      font-size: 14px; font-family: inherit; color: #1a3c3a;
+      outline: none; transition: border 0.2s;
+      background: #fafeff;
+    }
+    input:focus, select:focus, textarea:focus { border-color: #2ec4b6; background: white; }
+    textarea { resize: vertical; min-height: 80px; }
+    .field-note { font-size: 11px; color: #aaa; margin-top: 5px; }
+
+    /* ── Radio / checkbox groups ── */
+    .radio-group, .check-group { display: flex; flex-direction: column; gap: 10px; }
+    .radio-opt, .check-opt {
+      display: flex; align-items: center; gap: 10px;
+      background: #f8fffe; border: 1.5px solid #e0f5f3;
+      border-radius: 10px; padding: 12px 14px;
+      cursor: pointer; transition: all 0.15s;
+      font-size: 14px; font-weight: 600; color: #333;
+    }
+    .radio-opt:hover, .check-opt:hover { border-color: #2ec4b6; background: #f0fbfa; }
+    .radio-opt input, .check-opt input { width: 17px; height: 17px; accent-color: #2ec4b6; flex-shrink: 0; }
+    .radio-opt.selected, .check-opt.selected { border-color: #2ec4b6; background: #e8faf8; }
+
+    /* ── Sorry message ── */
+    #maybe-msg {
+      display: none; background: #fffbea;
+      border-left: 3px solid #f0b429;
+      border-radius: 8px; padding: 10px 14px;
+      margin-top: 12px; font-size: 13px; color: #7a5c00;
+    }
+    #sorry-msg {
+      display: none; background: #f0fbfa;
+      border: 1.5px solid #c0ede9; border-radius: 12px;
+      padding: 20px 22px; text-align: center; color: #1a9e92;
+      font-weight: 600; font-size: 14px; margin-top: 8px;
+    }
+
+    /* ── Guest count row ── */
+    .guest-row { display: flex; align-items: center; gap: 12px; }
+    .guest-row input { max-width: 100px; }
+    #guest-names-field { display: none; margin-top: 14px; }
+
+    /* ── Submit ── */
+    .submit-btn {
+      width: 100%; padding: 15px;
+      background: linear-gradient(135deg, #2ec4b6 0%, #1a9e92 100%);
+      color: white; border: none; border-radius: 12px;
+      font-size: 16px; font-weight: 800; cursor: pointer;
+      transition: opacity 0.2s; margin-top: 8px;
+      letter-spacing: 0.3px;
+    }
+    .submit-btn:hover { opacity: 0.9; }
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .error-msg {
+      color: #ef4444; font-size: 13px; font-weight: 600;
+      margin-top: 10px; display: none; text-align: center;
+    }
+
+    /* ── Success state ── */
+    #success-screen {
+      display: none; text-align: center;
+      background: white; border-radius: 20px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+      padding: 52px 32px;
+    }
+    .success-icon { font-size: 56px; margin-bottom: 20px; }
+    .success-conf {
+      display: inline-block;
+      background: linear-gradient(135deg, #2ec4b6, #1a9e92);
+      border-radius: 10px; padding: 12px 28px; margin: 20px 0;
+    }
+    .success-conf p { color: rgba(255,255,255,0.8); font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 4px; }
+    .success-conf span { color: white; font-size: 22px; font-weight: 900; font-family: monospace; letter-spacing: 3px; }
+    #success-screen h2 { font-size: 26px; font-weight: 800; color: #1a3c3a; margin-bottom: 10px; }
+    #success-screen p.sub { font-size: 14px; color: #666; line-height: 1.6; max-width: 360px; margin: 0 auto; }
+  </style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <!-- Language bar -->
+
+  <!-- Header -->
+  <div class="header-card">
+    <img src="https://www.youngscientistacademy.org/uploads/4/4/0/9/44094069/published/ysa-primarybrandmark-transparent.png" alt="YSA Logo">
+    <div class="header-eyebrow">Young Scientist Academy</div>
+    <h1 id="hdr-title">5th Annual Youth STEM Summit 2026</h1>
+    <p id="hdr-sub">RSVP Registration</p>
+  </div>
+
+  <!-- Main form -->
+  <form id="rsvp-form">
+
+    <!-- Will you attend? -->
+    <div class="form-card">
+      <div class="section-label" id="lbl-attending-section">Attendance</div>
+      <div class="field">
+        <label class="field-label" id="lbl-attend">Will you be attending the summit? <span class="required-star">*</span></label>
+        <div class="radio-group" id="attend-group">
+          <label class="radio-opt" id="opt-yes-label">
+            <input type="radio" name="attend" value="yes" onchange="handleAttendChange()"> <span id="lbl-yes">Yes, I'll be there!</span>
+          </label>
+          <label class="radio-opt" id="opt-maybe-label">
+            <input type="radio" name="attend" value="maybe" onchange="handleAttendChange()"> <span id="lbl-maybe">Maybe — I'm not sure yet</span>
+          </label>
+          <label class="radio-opt" id="opt-no-label">
+            <input type="radio" name="attend" value="no" onchange="handleAttendChange()"> <span id="lbl-no">No, I won't be able to make it</span>
+          </label>
+        </div>
+        <div id="maybe-msg"><span id="lbl-maybe-note">No worries! Fill in your details and we'll keep your info ready just in case.</span></div>
+        <div id="sorry-msg"><span id="lbl-sorry">We're sorry to hear that! We hope to see you at a future event.</span></div>
+      </div>
+    </div>
+
+    <!-- Personal info -->
+    <div class="form-card" id="personal-section" style="display:none;">
+      <div class="section-label" id="lbl-personal-section">Your Information</div>
+
+      <div class="field">
+        <label class="field-label" for="inp-name"><span id="lbl-name">Full Name</span> <span class="required-star">*</span></label>
+        <input type="text" id="inp-name" name="name" autocomplete="name" placeholder="Your full name" required>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="inp-email"><span id="lbl-email">Email Address</span> <span class="required-star">*</span></label>
+        <input type="email" id="inp-email" name="email" autocomplete="email" placeholder="email@example.com" required>
+        <div class="field-note" id="lbl-email-note">Your summit pass will be sent here</div>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="inp-role"><span id="lbl-role">Your Role</span></label>
+        <select id="inp-role" name="role">
+          <option value="" id="lbl-role-ph">Select your role...</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="inp-contact"><span id="lbl-contact">How can we reach you?</span></label>
+        <input type="text" id="inp-contact" name="contact" placeholder="e.g. Email: jane@example.com">
+        <div class="field-note" id="lbl-contact-note">Please include both the method and the info, like email, phone, or WhatsApp.</div>
+      </div>
+    </div>
+
+    <!-- Days -->
+    <div class="form-card" id="days-section" style="display:none;">
+      <div class="section-label" id="lbl-days-section">Summit Days</div>
+      <div class="field">
+        <label class="field-label"><span id="lbl-days">Which day(s) will you attend?</span> <span class="required-star">*</span></label>
+        <div class="check-group">
+          <label class="check-opt">
+            <input type="checkbox" id="chk-day1" name="day1" value="July 13">
+            <span>
+              <span id="lbl-day1">Day 1 — July 13, Lozova</span><br>
+              <span style="font-size:11px;font-weight:400;color:#888;">Muzeul Codrii &bull; Liceul Mitropolit Nestor Vornicescu</span>
+            </span>
+          </label>
+          <label class="check-opt">
+            <input type="checkbox" id="chk-day2" name="day2" value="July 14">
+            <span>
+              <span id="lbl-day2">Day 2 — July 14, Scoreni</span><br>
+              <span style="font-size:11px;font-weight:400;color:#888;">Liceul Teoretic Universul &bull; World's Biggest Wine Barrel</span>
+            </span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Guests -->
+    <div class="form-card" id="guests-section" style="display:none;">
+      <div class="section-label" id="lbl-guests-section">Guests</div>
+      <div class="field">
+        <label class="field-label" for="inp-guests"><span id="lbl-guests">Additional Guests</span></label>
+        <div class="guest-row">
+          <input type="number" id="inp-guests" name="guestCount" min="0" max="20" value="0" oninput="handleGuestCount()">
+          <span style="font-size:13px;color:#888;" id="lbl-guests-sub">not including yourself</span>
+        </div>
+        <div id="guest-names-field">
+          <label class="field-label" for="inp-guest-names" style="margin-top:14px;"><span id="lbl-guest-names">Guest Name(s)</span></label>
+          <input type="text" id="inp-guest-names" name="guestNames" placeholder="e.g. Jane Doe, John Doe">
+        </div>
+      </div>
+    </div>
+
+    <!-- Saturday workshop -->
+    <div class="form-card" id="saturday-section" style="display:none;">
+      <div class="section-label" id="lbl-sat-section">Community STEM Field Workshop — July 18</div>
+      <div class="field">
+        <label class="field-label">
+          <span id="lbl-sat">Will you attend the Community STEM Field Workshop?</span>
+          <a href="agenda.html" target="_blank" style="display:inline-block;margin-left:8px;font-size:11px;font-weight:600;color:#3cbbb1;text-decoration:none;border-bottom:1px solid rgba(60,187,177,0.4);white-space:nowrap;">See full agenda →</a>
+        </label>
+        <div class="radio-group">
+          <label class="radio-opt">
+            <input type="radio" name="saturday_ans" value="Yes, I'll be there!"> <span id="lbl-sat-yes">Yes, I'll be there!</span>
+          </label>
+          <label class="radio-opt">
+            <input type="radio" name="saturday_ans" value="No, I won't be able to make it"> <span id="lbl-sat-no">No, I won't be able to make it</span>
+          </label>
+          <label class="radio-opt">
+            <input type="radio" name="saturday_ans" value="Maybe — I'll try my best"> <span id="lbl-sat-maybe">Maybe — I'll try my best</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comments -->
+    <div class="form-card" id="comments-section" style="display:none;">
+      <div class="section-label" id="lbl-comments-section">Additional Info</div>
+      <div class="field">
+        <label class="field-label" for="inp-comments"><span id="lbl-comments">Comments, Questions, or Concerns</span></label>
+        <textarea id="inp-comments" name="comments" placeholder="Anything you'd like us to know..."></textarea>
+      </div>
+
+      <!-- Submit -->
+      <button type="button" class="submit-btn" id="submit-btn" onclick="submitRSVP()">
+        <span id="lbl-submit">Submit RSVP</span>
+      </button>
+      <div class="error-msg" id="error-msg"></div>
+    </div>
+
+  </form>
+
+  <!-- Success screen -->
+  <div id="success-screen">
+    <div class="success-icon">🎉</div>
+    <h2 id="lbl-success-title">You're registered!</h2>
+    <div class="success-conf">
+      <p id="lbl-conf-label">CONFIRMATION NUMBER</p>
+      <span id="conf-num-display">—</span>
+    </div>
+    <p class="sub" id="lbl-success-msg">Your summit pass will be sent to your email. We can't wait to see you!</p>
+  </div>
+
+</div><!-- end .page-wrap -->
+
+<script>
+// ─────────────────────────────────────────────
+// CONFIG — replace with your Apps Script exec URL
+// ─────────────────────────────────────────────
+const SCRIPT_URL = 'https://script.google.com/a/macros/youngscientistacademy.org/s/AKfycbyCjGK8F4Blwqw7L0MqJo76eC712rfEgtsnFrVtJusfE7gvDp2kPlffqexjKT75BR0TnQ/exec';
+
+// ─────────────────────────────────────────────
+// Translations
+// ─────────────────────────────────────────────
+const ROLES_EN = ["STEM Explorer","Global STEM Ambassador","Teacher","Chaperone","Parent / Guardian","Dignitary / Official","Community Member / Partner","Staff / Volunteer","Guest"];
+
+const T = {
+  en: {
+    pageTitle:       "YSA Summit RSVP 2026",
+    hdrTitle:        "5th Annual Youth STEM Summit 2026",
+    hdrSub:          "RSVP Registration",
+    sectionAttend:   "Attendance",
+    attend:          "Will you be attending the summit?",
+    yes:             "Yes, I'll be there!",
+    maybe:           "Maybe — I'm not sure yet",
+    no:              "No, I won't be able to make it",
+    maybeNote:       "No worries! Fill in your details and we'll keep your info ready just in case.",
+    sorry:           "We're sorry to hear that! We hope to see you at a future event.",
+    sectionPersonal: "Your Information",
+    name:            "Full Name",
+    namePh:          "Your full name",
+    email:           "Email Address",
+    emailNote:       "Your summit pass will be sent here",
+    emailPh:         "email@example.com",
+    role:            "Your Role",
+    rolePh:          "Select your role...",
+    roles:           ["STEM Explorer","Global STEM Ambassador","Teacher","Chaperone","Parent / Guardian","Dignitary / Official","Community Member / Partner","Staff / Volunteer","Guest"],
+    contact:         "How can we reach you?",
+    contactPh:       "e.g. Email: jane@example.com",
+    contactNote:     "Please include both the method and the info, like email, phone, or WhatsApp.",
+    sectionDays:     "Summit Days",
+    days:            "Which day(s) will you attend?",
+    day1:            "Day 1 — July 13, Lozova",
+    day2:            "Day 2 — July 14, Scoreni",
+    sectionGuests:   "Guests",
+    guests:          "Additional Guests",
+    guestsSub:       "not including yourself",
+    guestNames:      "Guest Name(s)",
+    guestNamesPh:    "e.g. Jane Doe, John Doe",
+    sectionSat:      "Community STEM Field Workshop — July 18",
+    sat:             "Will you attend the Community STEM Field Workshop?",
+    satYes:          "Yes, I'll be there!",
+    satNo:           "No, I won't be able to make it",
+    satMaybe:        "Maybe — I'll try my best",
+    sectionComments: "Additional Info",
+    comments:        "Comments, Questions, or Concerns",
+    commentsPh:      "Anything you'd like us to know...",
+    submit:          "Submit RSVP",
+    submitting:      "Submitting...",
+    confLabel:       "CONFIRMATION NUMBER",
+    successTitle:    "You're registered!",
+    successMsg:      "Your summit pass will be sent to your email. We can't wait to see you!",
+    errRequired:     "Please fill in your name and email.",
+    errDay:          "Please select at least one day.",
+    errAttend:       "Please indicate if you'll attend.",
+  },
+  ro: {
+    pageTitle:       "YSA Summit RSVP 2026",
+    hdrTitle:        "Al 5-lea Summit Anual al Tinerilor în STEM 2026",
+    hdrSub:          "Înregistrare RSVP",
+    sectionAttend:   "Participare",
+    attend:          "Veți participa la summit?",
+    yes:             "Da, voi fi acolo!",
+    maybe:           "Poate — nu sunt sigur/ă încă",
+    no:              "Nu, nu voi putea participa",
+    maybeNote:       "Nicio problemă! Completați detaliile și vom păstra informațiile dvs. la îndemână.",
+    sorry:           "Ne pare rău să auzim asta! Sperăm să vă vedem la un eveniment viitor.",
+    sectionPersonal: "Informațiile dvs.",
+    name:            "Nume complet",
+    namePh:          "Numele dvs. complet",
+    email:           "Adresă de e-mail",
+    emailNote:       "Permisul dvs. de acces va fi trimis aici",
+    emailPh:         "email@exemplu.com",
+    role:            "Rolul dvs.",
+    rolePh:          "Selectați rolul...",
+    roles:           ["STEM Explorer","Ambasador Global STEM","Profesor","Însoțitor","Părinte / Tutore","Oficial / Demnitar","Membru al comunității / Partener","Personal / Voluntar","Invitat"],
+    contact:         "Cum vă putem contacta?",
+    contactPh:       "ex. Email: jane@exemplu.com",
+    contactNote:     "Vă rugăm să includeți atât metoda, cât și informația, de exemplu e-mail, telefon sau WhatsApp.",
+    sectionDays:     "Zilele Summit-ului",
+    days:            "În ce zi(le) veți participa?",
+    day1:            "Ziua 1 — 13 iulie, Lozova",
+    day2:            "Ziua 2 — 14 iulie, Scoreni",
+    sectionGuests:   "Invitați",
+    guests:          "Invitați suplimentari",
+    guestsSub:       "pe lângă dvs.",
+    guestNames:      "Numele invitaților",
+    guestNamesPh:    "ex. Ion Popescu, Maria Ionescu",
+    sectionSat:      "Atelier de teren STEM — 18 iulie",
+    sat:             "Veți participa la Atelierul de teren STEM comunitar?",
+    satYes:          "Da, voi fi acolo!",
+    satNo:           "Nu, nu voi putea participa",
+    satMaybe:        "Poate — voi încerca",
+    sectionComments: "Informații suplimentare",
+    comments:        "Comentarii, întrebări sau nelămuriri",
+    commentsPh:      "Orice doriți să știm...",
+    submit:          "Trimite RSVP",
+    submitting:      "Se trimite...",
+    confLabel:       "NUMĂR DE CONFIRMARE",
+    successTitle:    "Sunteți înregistrat!",
+    successMsg:      "Permisul dvs. de acces va fi trimis la adresa de e-mail indicată. Abia așteptăm să vă vedem!",
+    errRequired:     "Vă rugăm să completați numele și adresa de e-mail.",
+    errDay:          "Vă rugăm să selectați cel puțin o zi.",
+    errAttend:       "Vă rugăm să indicați dacă veți participa.",
+  },
+  ru: {
+    pageTitle:       "YSA Саммит RSVP 2026",
+    hdrTitle:        "5-й Ежегодный Молодёжный STEM-Саммит 2026",
+    hdrSub:          "Регистрация RSVP",
+    sectionAttend:   "Участие",
+    attend:          "Будете ли вы участвовать в саммите?",
+    yes:             "Да, я буду там!",
+    maybe:           "Возможно — ещё не уверен/а",
+    no:              "Нет, я не смогу прийти",
+    maybeNote:       "Не переживайте! Заполните данные, и мы сохраним вашу информацию на всякий случай.",
+    sorry:           "Жаль это слышать! Надеемся увидеть вас на следующем мероприятии.",
+    sectionPersonal: "Ваши данные",
+    name:            "Полное имя",
+    namePh:          "Ваше полное имя",
+    email:           "Адрес электронной почты",
+    emailNote:       "Ваш пропуск на саммит будет отправлен сюда",
+    emailPh:         "email@example.com",
+    role:            "Ваша роль",
+    rolePh:          "Выберите роль...",
+    roles:           ["STEM Эксплорер","Глобальный STEM Амбассадор","Учитель","Сопровождающий","Родитель / Опекун","Официальное лицо / Дипломат","Член сообщества / Партнёр","Персонал / Волонтёр","Гость"],
+    contact:         "Как с вами связаться?",
+    contactPh:       "напр. Email: jane@example.com",
+    contactNote:     "Пожалуйста, укажите способ и саму информацию: email, телефон или WhatsApp.",
+    sectionDays:     "Дни саммита",
+    days:            "В какой день(дни) вы придёте?",
+    day1:            "День 1 — 13 июля, Лозова",
+    day2:            "День 2 — 14 июля, Скорень",
+    sectionGuests:   "Гости",
+    guests:          "Дополнительные гости",
+    guestsSub:       "не считая вас",
+    guestNames:      "Имена гостей",
+    guestNamesPh:    "напр. Иван Иванов, Мария Петрова",
+    sectionSat:      "Полевой воркшоп по STEM — 18 июля",
+    sat:             "Будете ли вы участвовать в полевом воркшопе по STEM?",
+    satYes:          "Да, я буду там!",
+    satNo:           "Нет, я не смогу",
+    satMaybe:        "Может быть — постараюсь",
+    sectionComments: "Дополнительная информация",
+    comments:        "Комментарии, вопросы или пожелания",
+    commentsPh:      "Всё, что вы хотите, чтобы мы знали...",
+    submit:          "Отправить RSVP",
+    submitting:      "Отправка...",
+    confLabel:       "НОМЕР ПОДТВЕРЖДЕНИЯ",
+    successTitle:    "Вы зарегистрированы!",
+    successMsg:      "Ваш пропуск будет отправлен на указанный email. Мы с нетерпением ждём встречи с вами!",
+    errRequired:     "Пожалуйста, укажите ваше имя и email.",
+    errDay:          "Пожалуйста, выберите хотя бы один день.",
+    errAttend:       "Пожалуйста, укажите, будете ли вы участвовать.",
+  }
+};
+
+let currentLang = 'en';
+
+function setLang(lang) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent === lang.toUpperCase()));
+  applyTranslations();
+}
+
+function applyTranslations() {
+  const t = T[currentLang];
+  document.title = t.pageTitle;
+
+  // Header
+  document.getElementById('hdr-title').textContent = t.hdrTitle;
+  document.getElementById('hdr-sub').textContent   = t.hdrSub;
+
+  // Section labels
+  document.getElementById('lbl-attending-section').textContent = t.sectionAttend;
+  document.getElementById('lbl-personal-section').textContent  = t.sectionPersonal;
+  document.getElementById('lbl-days-section').textContent      = t.sectionDays;
+  document.getElementById('lbl-guests-section').textContent    = t.sectionGuests;
+  document.getElementById('lbl-sat-section').textContent       = t.sectionSat;
+  document.getElementById('lbl-comments-section').textContent  = t.sectionComments;
+
+  // Field labels
+  document.getElementById('lbl-attend').childNodes[0].textContent  = t.attend + ' ';
+  document.getElementById('lbl-yes').textContent       = t.yes;
+  document.getElementById('lbl-maybe').textContent     = t.maybe;
+  document.getElementById('lbl-no').textContent        = t.no;
+  document.getElementById('lbl-maybe-note').textContent = t.maybeNote;
+  document.getElementById('lbl-sorry').textContent     = t.sorry;
+  document.getElementById('lbl-name').textContent   = t.name;
+  document.getElementById('lbl-email').textContent  = t.email;
+  document.getElementById('lbl-email-note').textContent = t.emailNote;
+  document.getElementById('lbl-role').textContent   = t.role;
+  document.getElementById('lbl-contact').textContent = t.contact;
+  document.getElementById('lbl-contact-note').textContent = t.contactNote;
+  document.getElementById('lbl-days').textContent   = t.days;
+  document.getElementById('lbl-day1').textContent   = t.day1;
+  document.getElementById('lbl-day2').textContent   = t.day2;
+  document.getElementById('lbl-guests').textContent = t.guests;
+  document.getElementById('lbl-guests-sub').textContent = t.guestsSub;
+  document.getElementById('lbl-guest-names').textContent = t.guestNames;
+  document.getElementById('lbl-sat').textContent    = t.sat;
+  document.getElementById('lbl-sat-yes').textContent   = t.satYes;
+  document.getElementById('lbl-sat-no').textContent    = t.satNo;
+  document.getElementById('lbl-sat-maybe').textContent = t.satMaybe;
+  document.getElementById('lbl-comments').textContent  = t.comments;
+  document.getElementById('lbl-submit').textContent    = t.submit;
+  document.getElementById('lbl-success-title').textContent = t.successTitle;
+  document.getElementById('lbl-success-msg').textContent  = t.successMsg;
+  document.getElementById('lbl-conf-label').textContent   = t.confLabel;
+
+  // Placeholders
+  document.getElementById('inp-name').placeholder    = t.namePh;
+  document.getElementById('inp-email').placeholder   = t.emailPh;
+  document.getElementById('inp-contact').placeholder = t.contactPh;
+  document.getElementById('inp-comments').placeholder = t.commentsPh;
+  document.getElementById('inp-guest-names').placeholder = t.guestNamesPh;
+
+  // Role dropdown
+  const sel = document.getElementById('inp-role');
+  const curVal = sel.value;
+  // find matching English index
+  const engIdx = ROLES_EN.indexOf(curVal);
+  sel.innerHTML = `<option value="">${t.rolePh}</option>`;
+  t.roles.forEach((r, i) => {
+    const opt = document.createElement('option');
+    opt.value = ROLES_EN[i]; // always store English value
+    opt.textContent = r;
+    if (i === engIdx) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+// ─────────────────────────────────────────────
+// Attendance toggle
+// ─────────────────────────────────────────────
+function handleAttendChange() {
+  const val = document.querySelector('input[name="attend"]:checked')?.value;
+  const sections = ['personal-section','days-section','guests-section','saturday-section','comments-section'];
+  const sorryMsg = document.getElementById('sorry-msg');
+  const maybeMsg = document.getElementById('maybe-msg');
+
+  // Update radio opt styling
+  document.querySelectorAll('.radio-opt').forEach(el => {
+    const inp = el.querySelector('input[name="attend"]');
+    if (inp) el.classList.toggle('selected', inp.checked);
+  });
+
+  sorryMsg.style.display = 'none';
+  maybeMsg.style.display = 'none';
+
+  if (val === 'yes') {
+    sections.forEach(id => document.getElementById(id).style.display = 'block');
+  } else if (val === 'maybe') {
+    maybeMsg.style.display = 'block';
+    sections.forEach(id => document.getElementById(id).style.display = 'block');
+  } else if (val === 'no') {
+    sorryMsg.style.display = 'block';
+    sections.forEach(id => document.getElementById(id).style.display = 'none');
+  }
+}
+
+// ─────────────────────────────────────────────
+// Guest count
+// ─────────────────────────────────────────────
+function handleGuestCount() {
+  const count = parseInt(document.getElementById('inp-guests').value) || 0;
+  document.getElementById('guest-names-field').style.display = count > 0 ? 'block' : 'none';
+}
+
+// Day checkbox styling
+document.querySelectorAll('.check-opt input[type="checkbox"]').forEach(inp => {
+  inp.addEventListener('change', () => {
+    inp.closest('.check-opt').classList.toggle('selected', inp.checked);
+  });
+});
+
+// Radio styling for saturday
+document.querySelectorAll('input[name="saturday_ans"]').forEach(inp => {
+  inp.addEventListener('change', () => {
+    document.querySelectorAll('input[name="saturday_ans"]').forEach(r => {
+      r.closest('.radio-opt').classList.toggle('selected', r.checked);
+    });
+  });
+});
+
+// ─────────────────────────────────────────────
+// Submit
+// ─────────────────────────────────────────────
+async function submitRSVP() {
+  const t      = T[currentLang];
+  const errEl  = document.getElementById('error-msg');
+  const btn    = document.getElementById('submit-btn');
+  errEl.style.display = 'none';
+
+  const attendVal = document.querySelector('input[name="attend"]:checked')?.value;
+  if (!attendVal) { showError(t.errAttend); return; }
+  if (attendVal === 'no') return;
+
+  const name  = document.getElementById('inp-name').value.trim();
+  const email = document.getElementById('inp-email').value.trim();
+  if (!name || !email) { showError(t.errRequired); return; }
+
+  const day1 = document.getElementById('chk-day1').checked;
+  const day2 = document.getElementById('chk-day2').checked;
+  if (!day1 && !day2) { showError(t.errDay); return; }
+
+  // Build days string (English — backend expects "July 13" / "July 14")
+  const dayParts = [];
+  if (day1) dayParts.push('July 13, 2026 (Lozova)');
+  if (day2) dayParts.push('July 14, 2026 (Scoreni)');
+  const daysStr = dayParts.join('; ');
+
+  const guestCount  = parseInt(document.getElementById('inp-guests').value) || 0;
+  const guestNames  = document.getElementById('inp-guest-names').value.trim();
+  const role        = document.getElementById('inp-role').value;
+  const contact     = document.getElementById('inp-contact').value.trim();
+  const saturday    = document.querySelector('input[name="saturday_ans"]:checked')?.value || '';
+  const comments    = document.getElementById('inp-comments').value.trim();
+
+  // Disable submit
+  btn.disabled = true;
+  document.getElementById('lbl-submit').textContent = t.submitting;
+
+  const formData = new FormData();
+  formData.append('name',       name);
+  formData.append('email',      email);
+  formData.append('role',       role);
+  formData.append('contact',    contact);
+  formData.append('days',       daysStr);
+  formData.append('guestCount', guestCount);
+  formData.append('guestNames', guestNames);
+  formData.append('saturday',   saturday);
+  formData.append('comments',   comments);
+  formData.append('source',     'rsvp-form');
+
+  let confirmNum = '';
+  try {
+    // Try with cors first to get confirmation number back
+    const res = await fetch(SCRIPT_URL, { method: 'POST', body: formData });
+    if (res.ok) {
+      const data = await res.json().catch(() => ({}));
+      confirmNum = data.confirmNum || '';
+    }
+  } catch(_) {
+    // CORS blocked — fall back to fire-and-forget
+    try { await fetch(SCRIPT_URL, { method: 'POST', body: formData, mode: 'no-cors' }); } catch(__) {}
+  }
+
+  showSuccess(confirmNum);
+}
+
+function showError(msg) {
+  const errEl = document.getElementById('error-msg');
+  errEl.textContent = msg;
+  errEl.style.display = 'block';
+  errEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function showSuccess(confirmNum) {
+  document.getElementById('rsvp-form').style.display = 'none';
+  document.getElementById('success-screen').style.display = 'block';
+  if (confirmNum) {
+    document.getElementById('conf-num-display').textContent = confirmNum;
+  } else {
+    document.querySelector('.success-conf').style.display = 'none';
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ─────────────────────────────────────────────
+// Init — apply URL param lang if present (e.g. rsvp.html?lang=ru for standalone)
+// ─────────────────────────────────────────────
+const _urlLang = new URLSearchParams(location.search).get('lang');
+if (_urlLang && T[_urlLang]) currentLang = _urlLang;
+applyTranslations();
+
+// Also accept postMessage from parent page
+window.addEventListener('message', e => {
+  if (e.data?.type === 'setLang' && T[e.data.lang]) {
+    setLang(e.data.lang);
+  }
+});
+</script>
+</body>
+</html>

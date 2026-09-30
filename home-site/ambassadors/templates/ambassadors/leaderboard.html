@@ -1,0 +1,307 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@1,700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --teal:     #3cbbb1;
+    --lavender: #bbbdf6;
+    --pink:     #ee4266;
+    --dark:     #0a0f0d;
+    --gold:     #f1b643;
+    --amber:    #c4903a;
+    --off-white:#f5f5f0;
+    --card-bg:  #111a15;
+    --border:   color-mix(in srgb, var(--off-white) 8%, transparent);
+  }
+
+  .lb-wrap {
+    min-height: 100vh;
+    background: var(--dark);
+    color: var(--off-white);
+    font-family: 'Inter', sans-serif;
+    padding: 2rem 1.5rem 5rem;
+  }
+
+  .lb-header {
+    max-width: 720px;
+    margin: 0 auto 2rem;
+  }
+
+  .lb-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    color: var(--teal);
+    margin-bottom: 0.4rem;
+  }
+
+  .lb-header p {
+    color: color-mix(in srgb, var(--off-white) 45%, transparent);
+    font-size: 0.95rem;
+  }
+
+  /* Toggle */
+  .toggle-bar {
+    max-width: 720px;
+    margin: 0 auto 2rem;
+    display: flex;
+    gap: 0.5rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0;
+  }
+
+  .toggle-btn {
+    background: none;
+    border: none;
+    color: color-mix(in srgb, var(--off-white) 45%, transparent);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0.6rem 1.1rem;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    text-decoration: none;
+    display: inline-block;
+    transition: color 0.15s, border-color 0.15s;
+  }
+
+  .toggle-btn.active {
+    color: var(--teal);
+    border-bottom-color: var(--teal);
+  }
+
+  .toggle-btn:hover:not(.active) {
+    color: var(--off-white);
+  }
+
+  /* Individual list */
+  .lb-list {
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .lb-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+    transition: border-color 0.15s;
+  }
+
+  .lb-row:hover { border-color: color-mix(in srgb, var(--off-white) 15%, transparent); }
+
+  .lb-rank {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: color-mix(in srgb, var(--off-white) 25%, transparent);
+    min-width: 2rem;
+    text-align: center;
+  }
+
+  .lb-rank.top1 { color: var(--gold); }
+  .lb-rank.top2 { color: color-mix(in srgb, var(--off-white) 60%, transparent); }
+  .lb-rank.top3 { color: var(--amber); }
+
+  .lb-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .lb-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .lb-team {
+    font-size: 0.78rem;
+    color: color-mix(in srgb, var(--off-white) 40%, transparent);
+    margin-top: 0.1rem;
+  }
+
+  .lb-status {
+    display: inline-block;
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--dark);
+    white-space: nowrap;
+  }
+
+  .lb-bar-wrap {
+    flex: 1;
+    max-width: 140px;
+  }
+
+  .lb-bar-track {
+    height: 6px;
+    background: color-mix(in srgb, var(--off-white) 7%, transparent);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .lb-bar-fill {
+    height: 100%;
+    background: var(--teal);
+    border-radius: 999px;
+  }
+
+  .lb-pts {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--teal);
+    min-width: 4rem;
+    text-align: right;
+  }
+
+  /* Team cards */
+  .team-lb-grid {
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .team-lb-card {
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--tc);
+    border-radius: 12px;
+    padding: 1.1rem 1.3rem;
+  }
+
+  .tlb-rank {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: color-mix(in srgb, var(--off-white) 25%, transparent);
+    min-width: 2rem;
+    text-align: center;
+  }
+
+  .tlb-rank.top1 { color: var(--gold); }
+  .tlb-rank.top2 { color: color-mix(in srgb, var(--off-white) 60%, transparent); }
+  .tlb-rank.top3 { color: var(--amber); }
+
+  .tlb-info { flex: 1; }
+
+  .tlb-name {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--tc);
+  }
+
+  .tlb-meta {
+    font-size: 0.78rem;
+    color: color-mix(in srgb, var(--off-white) 40%, transparent);
+    margin-top: 0.15rem;
+  }
+
+  .tlb-pts {
+    text-align: right;
+  }
+
+  .tlb-total {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--teal);
+  }
+
+  .tlb-avg {
+    font-size: 0.75rem;
+    color: color-mix(in srgb, var(--off-white) 35%, transparent);
+    margin-top: 0.1rem;
+  }
+
+  .empty-note {
+    color: color-mix(in srgb, var(--off-white) 30%, transparent);
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 3rem 0;
+  }
+</style>
+
+<div class="lb-wrap">
+  <div class="lb-header">
+    <h1>Leaderboard</h1>
+    <p>Points earned through summit participation, research contributions, and workshops.</p>
+  </div>
+
+  <div class="toggle-bar">
+    <a href="?view=individual" class="toggle-btn {% if view == 'individual' %}active{% endif %}">Individual</a>
+    <a href="?view=team" class="toggle-btn {% if view == 'team' %}active{% endif %}">By Team</a>
+  </div>
+
+  {% if view == 'individual' %}
+    <div class="lb-list">
+      {% if individuals %}
+        {% for amb in individuals %}
+          {% with rank=forloop.counter %}
+          <div class="lb-row">
+            <div class="lb-rank {% if rank == 1 %}top1{% elif rank == 2 %}top2{% elif rank == 3 %}top3{% endif %}">
+              {% if rank == 1 %}🥇{% elif rank == 2 %}🥈{% elif rank == 3 %}🥉{% else %}{{ rank }}{% endif %}
+            </div>
+            <div class="lb-info">
+              <div class="lb-name">{{ amb.user.get_full_name|default:amb.user.username }}</div>
+              <div class="lb-team">
+                {% if amb.team %}{{ amb.team.flag_emoji }} {{ amb.team.name }}{% else %}No team{% endif %}
+              </div>
+            </div>
+            <span class="lb-status" style="background-color: {{ amb.status_color }};">{{ amb.status_level }}</span>
+            <div class="lb-bar-wrap">
+              <div class="lb-bar-track">
+                <div class="lb-bar-fill" style="width: {{ amb.progress_to_next }}%;"></div>
+              </div>
+            </div>
+            <div class="lb-pts">{{ amb.points }}</div>
+          </div>
+          {% endwith %}
+        {% endfor %}
+      {% else %}
+        <p class="empty-note">No ambassadors on the leaderboard yet.</p>
+      {% endif %}
+    </div>
+
+  {% else %}
+    <div class="team-lb-grid">
+      {% if team_rows %}
+        {% for team in team_rows %}
+          {% with rank=forloop.counter %}
+          <div class="team-lb-card" style="--tc: {{ team.color }};">
+            <div class="tlb-rank {% if rank == 1 %}top1{% elif rank == 2 %}top2{% elif rank == 3 %}top3{% endif %}">
+              {% if rank == 1 %}🥇{% elif rank == 2 %}🥈{% elif rank == 3 %}🥉{% else %}{{ rank }}{% endif %}
+            </div>
+            <div class="tlb-info">
+              <div class="tlb-name">{{ team.flag_emoji }} {{ team.name }}</div>
+              <div class="tlb-meta">{{ team.member_count }} member{{ team.member_count|pluralize }} &middot; {{ team.country }}</div>
+            </div>
+            <div class="tlb-pts">
+              <div class="tlb-total">{{ team.total_points|default:0 }}</div>
+              <div class="tlb-avg">avg {{ team.avg_points|floatformat:0 }} pts/member</div>
+            </div>
+          </div>
+          {% endwith %}
+        {% endfor %}
+      {% else %}
+        <p class="empty-note">No team data yet.</p>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

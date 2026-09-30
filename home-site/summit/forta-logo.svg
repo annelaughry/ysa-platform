@@ -1,0 +1,61 @@
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" font-family="Arial Black, Arial, sans-serif">
+  <!-- Background -->
+  <rect width="500" height="500" fill="#ee4266" rx="32"/>
+
+  <!-- Subtle texture circles -->
+  <circle cx="420" cy="80" r="120" fill="rgba(255,255,255,0.04)"/>
+  <circle cx="80" cy="420" r="100" fill="rgba(255,255,255,0.04)"/>
+
+  <!-- FOOD SCIENCE ICON: Stylized leaf growing from a beaker -->
+  <!-- Beaker body -->
+  <path d="M210 290 L195 360 Q193 372 205 376 L295 376 Q307 372 305 360 L290 290 Z"
+        fill="rgba(255,255,255,0.25)" stroke="white" stroke-width="6" stroke-linejoin="round"/>
+  <!-- Beaker neck -->
+  <rect x="207" y="248" width="86" height="46" rx="6"
+        fill="rgba(255,255,255,0.15)" stroke="white" stroke-width="6"/>
+  <!-- Beaker mouth rim -->
+  <rect x="198" y="238" width="104" height="16" rx="8"
+        fill="white" opacity="0.9"/>
+
+  <!-- Liquid inside beaker -->
+  <path d="M201 346 L209 304 L291 304 L299 346 Q297 368 250 368 Q203 368 201 346 Z"
+        fill="rgba(241,182,67,0.55)"/>
+
+  <!-- Bubbles in liquid -->
+  <circle cx="235" cy="340" r="7" fill="rgba(255,255,255,0.5)"/>
+  <circle cx="262" cy="325" r="5" fill="rgba(255,255,255,0.4)"/>
+  <circle cx="275" cy="348" r="4" fill="rgba(255,255,255,0.45)"/>
+
+  <!-- Leaf / plant growing from beaker -->
+  <path d="M250 248 C250 248 250 190 250 170"
+        stroke="rgba(255,255,255,0.9)" stroke-width="6" stroke-linecap="round"/>
+  <!-- Left leaf -->
+  <path d="M250 210 C250 210 215 195 200 165 C200 165 235 162 250 185 Z"
+        fill="rgba(255,255,255,0.85)"/>
+  <!-- Right leaf -->
+  <path d="M250 190 C250 190 285 172 302 142 C302 142 267 142 250 165 Z"
+        fill="white"/>
+  <!-- Stem tip dot -->
+  <circle cx="250" cy="168" r="5" fill="white"/>
+
+  <!-- FORȚA text -->
+  <text x="250" y="445"
+        text-anchor="middle"
+        font-family="Arial Black, Impact, sans-serif"
+        font-weight="900"
+        font-size="72"
+        letter-spacing="6"
+        fill="white">FOR&#538;A</text>
+
+  <!-- Underline accent -->
+  <rect x="130" y="455" width="240" height="5" rx="3" fill="rgba(255,255,255,0.35)"/>
+
+  <!-- Small tag -->
+  <text x="250" y="478"
+        text-anchor="middle"
+        font-family="Arial, sans-serif"
+        font-weight="600"
+        font-size="18"
+        letter-spacing="4"
+        fill="rgba(255,255,255,0.55)">FOOD SCIENCE</text>
+</svg>

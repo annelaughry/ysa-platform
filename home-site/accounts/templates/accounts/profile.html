@@ -1,0 +1,416 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
+
+  .profile-wrap {
+    min-height: 100vh;
+    background: var(--dark);
+    font-family: 'Inter', sans-serif;
+    color: var(--off-white);
+    padding: 3rem 1rem 4rem;
+  }
+
+  .profile-inner {
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  /* --- Page header --- */
+  .page-header {
+    margin-bottom: 2.25rem;
+  }
+
+  .page-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 2rem;
+    color: var(--off-white);
+    margin: 0 0 0.25rem;
+  }
+
+  .page-header p {
+    font-size: 0.88rem;
+    color: color-mix(in srgb, var(--off-white) 40%, transparent);
+    margin: 0;
+  }
+
+  /* --- Avatar + identity block --- */
+  .identity-card {
+    background: var(--card-bg);
+    border: 1px solid color-mix(in srgb, var(--off-white) 8%, transparent);
+    border-radius: 16px;
+    padding: 1.75rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .avatar-circle {
+    flex-shrink: 0;
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    background: var(--dark);
+    border: 2px solid #3cbbb1;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .avatar-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .identity-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .identity-info .username {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--off-white);
+    margin: 0 0 0.3rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .identity-info .email {
+    font-size: 0.83rem;
+    color: color-mix(in srgb, var(--off-white) 40%, transparent);
+    margin: 0 0 0.5rem;
+  }
+
+  .role-badge {
+    display: inline-block;
+    padding: 0.2rem 0.65rem;
+    border-radius: 99px;
+    font-size: 0.73rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    background: rgba(60, 187, 177, 0.15);
+    color: #3cbbb1;
+    border: 1px solid rgba(60, 187, 177, 0.3);
+  }
+
+  .role-badge.role-admin    { background: rgba(241,182,67,.15); color:#f1b643; border-color:rgba(241,182,67,.3); }
+  .role-badge.role-staff    { background: rgba(187,189,246,.15); color:#bbbdf6; border-color:rgba(187,189,246,.3); }
+  .role-badge.role-teacher  { background: rgba(238,66,102,.12); color:#ee4266; border-color:rgba(238,66,102,.3); }
+
+  .meta-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.55rem;
+  }
+
+  .meta-pill {
+    font-size: 0.78rem;
+    color: color-mix(in srgb, var(--off-white) 50%, transparent);
+    background: color-mix(in srgb, var(--off-white) 5%, transparent);
+    border: 1px solid color-mix(in srgb, var(--off-white) 8%, transparent);
+    border-radius: 6px;
+    padding: 0.2rem 0.55rem;
+  }
+
+  .meta-pill strong {
+    color: color-mix(in srgb, var(--off-white) 75%, transparent);
+    font-weight: 500;
+  }
+
+  /* --- Edit card --- */
+  .edit-card {
+    background: var(--card-bg);
+    border: 1px solid color-mix(in srgb, var(--off-white) 8%, transparent);
+    border-radius: 16px;
+    padding: 1.75rem;
+  }
+
+  .edit-card h2 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: color-mix(in srgb, var(--off-white) 45%, transparent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin: 0 0 1.25rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.1rem;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: color-mix(in srgb, var(--off-white) 50%, transparent);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.4rem;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    box-sizing: border-box;
+    background: color-mix(in srgb, var(--off-white) 5%, transparent);
+    border: 1px solid color-mix(in srgb, var(--off-white) 12%, transparent);
+    border-radius: 8px;
+    padding: 0.65rem 0.9rem;
+    font-size: 0.93rem;
+    font-family: 'Inter', sans-serif;
+    color: var(--off-white);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    resize: vertical;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: #3cbbb1;
+    box-shadow: 0 0 0 3px rgba(60, 187, 177, 0.15);
+  }
+
+  .form-group select option {
+    background: var(--card-bg);
+    color: var(--off-white);
+  }
+
+  .form-group input::placeholder,
+  .form-group textarea::placeholder {
+    color: color-mix(in srgb, var(--off-white) 20%, transparent);
+  }
+
+  .field-errors {
+    margin-top: 0.3rem;
+  }
+
+  .field-errors span {
+    display: block;
+    font-size: 0.8rem;
+    color: #ee4266;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  @media (max-width: 520px) {
+    .form-row { grid-template-columns: 1fr; }
+    .identity-card { flex-direction: column; text-align: center; }
+    .meta-pills { justify-content: center; }
+  }
+
+  .save-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.25rem;
+  }
+
+  .btn-primary {
+    padding: 0.7rem 1.75rem;
+    background: #3cbbb1;
+    color: var(--dark);
+    border: none;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.93rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+
+  .btn-primary:hover { background: #4ecdc4; }
+  .btn-primary:active { transform: scale(0.98); }
+
+  .save-confirm {
+    font-size: 0.85rem;
+    color: #3cbbb1;
+    display: {% if saved %}flex{% else %}none{% endif %};
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .save-confirm::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #3cbbb1;
+    animation: pulse 1.4s ease infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+  }
+
+  /* --- Avatar note --- */
+  .avatar-note {
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid color-mix(in srgb, var(--off-white) 6%, transparent);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .avatar-note img {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 1px solid rgba(60, 187, 177, 0.4);
+    background: var(--dark);
+  }
+
+  .avatar-note p {
+    font-size: 0.8rem;
+    color: color-mix(in srgb, var(--off-white) 35%, transparent);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .avatar-note p a {
+    color: #3cbbb1;
+    text-decoration: none;
+  }
+</style>
+
+<div class="profile-wrap">
+  <div class="profile-inner">
+
+    <div class="page-header">
+      <h1>Your Profile</h1>
+      <p>YSA Platform &mdash; Ambassador account</p>
+    </div>
+
+    <!-- Identity card -->
+    <div class="identity-card">
+      <div class="avatar-circle">
+        <img src="{{ avatar_url }}" alt="Avatar for {{ user.username }}" loading="lazy">
+      </div>
+      <div class="identity-info">
+        <div class="username">{{ user.username }}</div>
+        {% if user.email %}
+          <div class="email">{{ user.email }}</div>
+        {% endif %}
+        <span class="role-badge role-{{ profile.role }}">{{ profile.get_role_display }}</span>
+        <div class="meta-pills">
+          {% if profile.team %}
+            <span class="meta-pill"><strong>Team:</strong> {{ profile.team }}</span>
+          {% endif %}
+          {% if profile.country %}
+            <span class="meta-pill"><strong>Country:</strong> {{ profile.country }}</span>
+          {% endif %}
+          {% if not profile.team and not profile.country %}
+            <span class="meta-pill">No team or country set yet</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit form -->
+    <div class="edit-card">
+      <h2>Edit profile</h2>
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="{{ form.team.id_for_label }}">Team</label>
+            <input
+              type="text"
+              name="{{ form.team.html_name }}"
+              id="{{ form.team.id_for_label }}"
+              value="{{ form.team.value|default:'' }}"
+              placeholder="e.g. Code Green"
+            >
+            {% if form.team.errors %}
+              <div class="field-errors">{% for e in form.team.errors %}<span>{{ e }}</span>{% endfor %}</div>
+            {% endif %}
+          </div>
+
+          <div class="form-group">
+            <label for="{{ form.country.id_for_label }}">Country</label>
+            <input
+              type="text"
+              name="{{ form.country.html_name }}"
+              id="{{ form.country.id_for_label }}"
+              value="{{ form.country.value|default:'' }}"
+              placeholder="e.g. United States"
+            >
+            {% if form.country.errors %}
+              <div class="field-errors">{% for e in form.country.errors %}<span>{{ e }}</span>{% endfor %}</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.role.id_for_label }}">Role</label>
+          <select name="{{ form.role.html_name }}" id="{{ form.role.id_for_label }}">
+            {% for value, label in form.role.field.choices %}
+              <option value="{{ value }}" {% if form.role.value == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+          {% if form.role.errors %}
+            <div class="field-errors">{% for e in form.role.errors %}<span>{{ e }}</span>{% endfor %}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.bio.id_for_label }}">Bio</label>
+          <textarea
+            name="{{ form.bio.html_name }}"
+            id="{{ form.bio.id_for_label }}"
+            rows="4"
+            placeholder="Tell us about your research, interests, or what you're excited about at the summit..."
+          >{{ form.bio.value|default:'' }}</textarea>
+          {% if form.bio.errors %}
+            <div class="field-errors">{% for e in form.bio.errors %}<span>{{ e }}</span>{% endfor %}</div>
+          {% endif %}
+        </div>
+
+        <div class="save-row">
+          <button type="submit" class="btn-primary">Save changes</button>
+          <span class="save-confirm" id="save-confirm">Saved</span>
+        </div>
+
+        <!-- DiceBear avatar note -->
+        <div class="avatar-note">
+          <img src="{{ avatar_url }}" alt="Your avatar" loading="lazy">
+          <p>
+            Your avatar is auto-generated by
+            <a href="https://www.dicebear.com/" target="_blank" rel="noopener">DiceBear</a>
+            from your username. It updates automatically if you change your username.
+          </p>
+        </div>
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Show the saved confirmation on page load if the view flagged it
+  {% if saved %}
+  const confirm = document.getElementById('save-confirm');
+  confirm.style.display = 'flex';
+  setTimeout(() => { confirm.style.display = 'none'; }, 3500);
+  {% endif %}
+</script>
+{% endblock %}

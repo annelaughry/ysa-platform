@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en" id="htmlRoot">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Project Amoeba — YSA Design Competition</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet"/>
+  <style>
+    /* ============================================================
+       DESIGN SYSTEM — mirrors index.html exactly.
+       Light mode by default, dark mode via html.dark class.
+       All colors are CSS variables so theme swaps automatically.
+       ============================================================ */
+    :root {
+      --teal: #3cbbb1; --lavender: #bbbdf6; --pink: #ee4266;
+      --dark: #f7faf8; --off-white: #0d1a15; --card-bg: #ffffff;
+      --border: rgba(10,20,15,0.1); --gold: #f1b643; --amber: #c4903a;
+    }
+    html.dark {
+      --dark: #0a0f0d; --off-white: #f5f5f0;
+      --card-bg: #111a15; --border: rgba(245,245,240,0.08);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: Inter, sans-serif; background: var(--dark);
+      color: var(--off-white); min-height: 100vh;
+      padding-bottom: 72px; /* leave room for fixed bottom bar */
+      transition: background .3s, color .3s;
+    }
+
+    /* ============================================================
+       NAV — same sticky top bar as every other page.
+       ============================================================ */
+    nav.nav-ysa {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; height: 64px;
+      background: rgba(247,250,248,0.92); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      transition: background .3s, border-color .3s;
+    }
+    html.dark nav.nav-ysa { background: rgba(10,15,13,0.92); }
+    .nav-logo { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: var(--off-white); text-decoration: none; }
+    .nav-logo span { color: var(--teal); }
+    .nav-right { display: flex; align-items: center; gap: .75rem; }
+    .nav-back { font-size: .82rem; font-weight: 600; color: color-mix(in srgb, var(--off-white) 65%, transparent); text-decoration: none; padding: .35rem .75rem; border-radius: 8px; border: 1px solid var(--border); transition: all .15s; }
+    .nav-back:hover { color: var(--off-white); border-color: var(--teal); }
+    /* Gear icon — links to settings panel on index.html */
+    .nav-gear { background: none; border: none; cursor: pointer; color: color-mix(in srgb, var(--off-white) 55%, transparent); display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; transition: color .15s, background .15s; text-decoration: none; }
+    .nav-gear:hover { color: var(--off-white); background: color-mix(in srgb, var(--off-white) 8%, transparent); }
+
+    /* ============================================================
+       HERO — pink-tinted gradient banner for Amoeba
+       ============================================================ */
+    .amoeba-hero {
+      padding: 5rem 2rem 4rem; text-align: center; position: relative;
+      background: linear-gradient(160deg, color-mix(in srgb, var(--pink) 6%, var(--dark)), var(--dark) 60%);
+      overflow: clip;
+    }
+    .amoeba-hero::before {
+      content: ''; position: absolute; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 20% 40%, rgba(238,66,102,0.1) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 80% 60%, rgba(60,187,177,0.07) 0%, transparent 70%);
+    }
+    .amoeba-hero > * { position: relative; z-index: 1; }
+    .amoeba-badge {
+      display: inline-block; background: var(--pink); color: #fff;
+      font-size: .62rem; font-weight: 800; letter-spacing: .12em;
+      text-transform: uppercase; padding: .3rem .8rem; border-radius: 4px;
+      margin-bottom: 1.25rem;
+    }
+    .amoeba-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 700; line-height: 1.1; margin-bottom: 1rem;
+      color: var(--off-white);
+    }
+    .amoeba-title em { font-style: italic; color: var(--pink); }
+    .amoeba-sub {
+      max-width: 600px; margin: 0 auto 2rem;
+      font-size: 1.05rem; color: color-mix(in srgb, var(--off-white) 65%, transparent);
+      line-height: 1.75;
+    }
+    .amoeba-deadline {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: color-mix(in srgb, var(--pink) 10%, transparent);
+      border: 1px solid color-mix(in srgb, var(--pink) 25%, transparent);
+      border-radius: 100px; padding: .45rem 1.1rem;
+      font-size: .82rem; font-weight: 700; color: var(--pink);
+    }
+
+    /* ============================================================
+       CONTENT WRAPPER — centers everything, caps at 1100px
+       ============================================================ */
+    .content-wrap { max-width: 1100px; margin: 0 auto; padding: 0 2rem; }
+    .section-pad { padding: 4rem 0; }
+
+    /* ============================================================
+       SECTION LABELS — tiny teal all-caps tag above headings
+       ============================================================ */
+    .section-tag {
+      font-size: .65rem; font-weight: 800; letter-spacing: .15em;
+      text-transform: uppercase; color: var(--teal); margin-bottom: .75rem; display: block;
+    }
+    .section-h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.75rem, 3vw, 2.5rem);
+      font-weight: 700; color: var(--off-white); margin-bottom: 1rem;
+    }
+
+    /* ============================================================
+       RULES GRID — three rule cards side by side
+       ============================================================ */
+    .rules-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;
+      margin-top: 2rem;
+    }
+    @media (max-width: 700px) { .rules-grid { grid-template-columns: 1fr; } }
+    .rule-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 16px; padding: 1.5rem;
+      border-top: 3px solid var(--pink);
+    }
+    .rule-icon { font-size: 1.75rem; margin-bottom: .75rem; }
+    .rule-title { font-size: .9rem; font-weight: 700; color: var(--off-white); margin-bottom: .4rem; }
+    .rule-desc { font-size: .83rem; color: color-mix(in srgb, var(--off-white) 62%, transparent); line-height: 1.65; }
+
+    /* ============================================================
+       CONCEPT SECTION — the "what is an amoeba" explanation
+       ============================================================ */
+    .concept-box {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--pink);
+      border-radius: 0 16px 16px 0;
+      padding: 2rem 2rem 2rem 2.25rem;
+      margin-top: 2rem;
+    }
+    .concept-box h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: .75rem; color: var(--off-white); }
+    .concept-box p { font-size: .9rem; color: color-mix(in srgb, var(--off-white) 68%, transparent); line-height: 1.75; margin-bottom: .65rem; }
+    .concept-box p:last-child { margin-bottom: 0; }
+    .vibe-tags { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1rem; }
+    .vibe-tag {
+      background: color-mix(in srgb, var(--pink) 8%, transparent);
+      border: 1px solid color-mix(in srgb, var(--pink) 20%, transparent);
+      color: var(--pink); font-size: .73rem; font-weight: 700;
+      padding: .25rem .7rem; border-radius: 100px;
+    }
+
+    /* ============================================================
+       PRIZES SECTION
+       ============================================================ */
+    .prizes-row { display: flex; gap: 1rem; margin-top: 2rem; flex-wrap: wrap; }
+    .prize-card {
+      flex: 1; min-width: 200px;
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.5rem; text-align: center;
+    }
+    .prize-place { font-size: 1.5rem; margin-bottom: .4rem; }
+    .prize-label { font-size: .72rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: color-mix(in srgb, var(--off-white) 45%, transparent); margin-bottom: .5rem; }
+    .prize-reward { font-size: .9rem; font-weight: 600; color: var(--off-white); }
+
+    /* ============================================================
+       FORM EMBED — the Google Form iframe, or a fallback button
+       ============================================================ */
+    .form-section { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; margin-top: 2rem; }
+    .form-header { background: var(--pink); color: #fff; padding: 1.5rem 2rem; }
+    .form-header h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; margin-bottom: .25rem; }
+    .form-header p { font-size: .84rem; opacity: .85; }
+    /* The iframe embeds the Google Form. Replace the src URL once you
+       create the form in Google Forms and copy the embed link.
+       (Form > Send > Embed icon > Copy) */
+    .form-iframe-wrap { position: relative; }
+    .form-iframe-wrap iframe {
+      width: 100%; min-height: 900px; border: none; display: block;
+    }
+    /* Shown when Google Form URL isn't set yet */
+    .form-placeholder {
+      padding: 4rem 2rem; text-align: center;
+      color: color-mix(in srgb, var(--off-white) 50%, transparent);
+    }
+    .form-placeholder h4 { font-size: 1rem; font-weight: 700; color: var(--off-white); margin-bottom: .5rem; }
+    .form-placeholder p { font-size: .85rem; line-height: 1.65; max-width: 420px; margin: 0 auto 1.25rem; }
+    .btn-pink {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: var(--pink); color: #fff; padding: .65rem 1.35rem;
+      border-radius: 10px; font-size: .88rem; font-weight: 700;
+      text-decoration: none; transition: opacity .15s;
+    }
+    .btn-pink:hover { opacity: .88; }
+
+    /* ============================================================
+       NATIVE SUBMISSION FORM STYLES
+       ============================================================ */
+    .submit-form-wrap {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 20px; overflow: hidden; margin-top: 2rem;
+    }
+    .submit-form-header {
+      background: var(--pink); color: #fff; padding: 1.5rem 2rem;
+    }
+    .submit-form-header h3 { font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:700; margin-bottom:.25rem; }
+    .submit-form-header p  { font-size:.84rem; opacity:.85; }
+    .submit-form-body { padding: 2rem; display: flex; flex-direction: column; gap: 1.25rem; }
+
+    /* Field group: label + input stacked */
+    .field-group { display: flex; flex-direction: column; gap: .45rem; }
+    .field-group label { font-size: .8rem; font-weight: 700; color: var(--off-white); letter-spacing: .02em; }
+    .field-group .field-hint { font-size: .74rem; color: color-mix(in srgb, var(--off-white) 50%, transparent); margin-top: -.2rem; }
+    .field-group input,
+    .field-group select,
+    .field-group textarea {
+      background: var(--dark); border: 1px solid var(--border);
+      border-radius: 10px; padding: .65rem .9rem;
+      font-size: .88rem; color: var(--off-white); font-family: Inter, sans-serif;
+      transition: border-color .15s, box-shadow .15s; outline: none; width: 100%;
+    }
+    .field-group input:focus,
+    .field-group select:focus,
+    .field-group textarea:focus {
+      border-color: var(--pink);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--pink) 12%, transparent);
+    }
+    .field-group textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
+    .field-group select { cursor: pointer; }
+
+    /* Two-col row for short adjacent fields */
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 560px) { .field-row { grid-template-columns: 1fr; } }
+
+    /* Checkbox confirmations */
+    .confirm-list { display: flex; flex-direction: column; gap: .65rem; }
+    .confirm-item { display: flex; align-items: flex-start; gap: .65rem; cursor: pointer; }
+    .confirm-item input[type="checkbox"] { margin-top: .15rem; flex-shrink: 0; accent-color: var(--pink); width: 16px; height: 16px; cursor: pointer; }
+    .confirm-item span { font-size: .84rem; color: color-mix(in srgb, var(--off-white) 75%, transparent); line-height: 1.55; }
+
+    /* Submit button */
+    .submit-btn {
+      background: var(--pink); color: #fff; border: none; border-radius: 10px;
+      padding: .75rem 1.75rem; font-size: .92rem; font-weight: 700;
+      cursor: pointer; transition: opacity .15s; align-self: flex-start;
+      display: flex; align-items: center; gap: .5rem;
+    }
+    .submit-btn:hover { opacity: .88; }
+    .submit-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    /* Success / error state shown after submit */
+    .form-success { display:none; padding:2.5rem 2rem; text-align:center; }
+    .form-success .success-icon { font-size:3rem; margin-bottom:.75rem; }
+    .form-success h4 { font-size:1.2rem; font-weight:700; margin-bottom:.5rem; color:var(--off-white); }
+    .form-success p  { font-size:.88rem; color:color-mix(in srgb, var(--off-white) 60%, transparent); line-height:1.7; }
+    .form-error-msg { display:none; font-size:.82rem; color:var(--pink); margin-top:.25rem; }
+
+    .divider-label {
+      font-size: .65rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+      color: color-mix(in srgb, var(--off-white) 38%, transparent);
+      border-bottom: 1px solid var(--border); padding-bottom: .5rem; margin-top: .5rem;
+    }
+
+    /* ============================================================
+       BOTTOM BAR — fixed app switcher, same as other pages
+       ============================================================ */
+    .bottom-bar {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+      background: rgba(10,15,13,0.97); border-top: 1px solid rgba(245,245,240,0.08);
+      display: flex; align-items: center; justify-content: space-around;
+      height: 56px; padding: 0 1rem;
+    }
+    .bottom-bar a {
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      text-decoration: none; color: rgba(245,245,240,0.5);
+      font-size: .58rem; font-weight: 600; letter-spacing: .04em;
+      text-transform: uppercase; transition: color .15s;
+    }
+    .bottom-bar a:hover, .bottom-bar a.active { color: var(--teal); }
+    .bottom-bar a span.icon { font-size: 1rem; }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================
+     THEME INIT — reads localStorage and applies dark/light class
+     before the page renders to avoid a flash of the wrong theme.
+     ============================================================ -->
+<script>
+(function(){
+  var t = localStorage.getItem('ysa-theme');
+  var r = document.getElementById('htmlRoot');
+  if (t === 'dark') r.classList.add('dark');
+  var accent = localStorage.getItem('ysa-accent-hex');
+  if (accent) r.style.setProperty('--teal', accent);
+})();
+</script>
+
+<!-- NAV -->
+<nav class="nav-ysa">
+  <a href="index.html" class="nav-logo">YSA<span>.</span></a>
+  <div class="nav-right">
+    <a href="index.html" class="nav-back">&#8592; Home</a>
+    <!-- Gear icon links to settings panel on index.html -->
+    <a href="index.html?settings=1" class="nav-gear" aria-label="Settings">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </a>
+  </div>
+</nav>
+
+<!-- HERO BANNER -->
+<div class="amoeba-hero">
+  <span class="amoeba-badge">&#129440; Design Competition</span>
+  <h1 class="amoeba-title">Project <em>Amoeba</em></h1>
+  <p class="amoeba-sub">Design the next YSA mascot. The amoeba adapts to every environment — just like our scientists adapt to new challenges. We want something bold, collaborative, and unmistakably YSA.</p>
+  <span class="amoeba-deadline">&#128197;&nbsp; Submissions open — deadline TBD</span>
+</div>
+
+<!-- RULES SECTION -->
+<div class="content-wrap section-pad">
+  <span class="section-tag">The Rules</span>
+  <h2 class="section-h2">What makes a winning design?</h2>
+  <p style="color:color-mix(in srgb, var(--off-white) 62%, transparent);font-size:.95rem;line-height:1.75;max-width:680px;">
+    We want something you made yourself — no shortcuts. Here's what we're judging on:
+  </p>
+
+  <div class="rules-grid">
+    <div class="rule-card">
+      <div class="rule-icon">&#127995;</div>
+      <div class="rule-title">No AI Generation</div>
+      <div class="rule-desc">Hand-drawn or digital — both are welcome. The design must come from your own hands and imagination, not a generator. We'll ask you to confirm this on submission.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-icon">&#128200;</div>
+      <div class="rule-title">Scalable</div>
+      <div class="rule-desc">Your design must work at any size — from a phone screen to a banner. Vector-friendly or clean enough to be vectorized. Test it small and large before you submit.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-icon">&#129536;</div>
+      <div class="rule-title">Core Amoeba Shape</div>
+      <div class="rule-desc">The design needs a recognizable dome/core that builds outward. The amoeba adapts to its environment — show us how it takes shape while staying true to itself.</div>
+    </div>
+  </div>
+
+  <!-- CONCEPT BOX — explains the amoeba idea and vibe -->
+  <div class="concept-box">
+    <h3>What is the amoeba concept?</h3>
+    <p>An amoeba has no fixed form — it moves, adapts, and takes shape around whatever it encounters. That's exactly what YSA scientists do. The mascot should feel like it's always in motion, always curious, always growing.</p>
+    <p>The vibe we're going for: somewhere between a trendy golf clubhouse and a science lab. Collaborative, innovative, a place you want to hang out. Not a lone wolf — something that thrives in community.</p>
+    <div class="vibe-tags">
+      <span class="vibe-tag">Collaborative</span>
+      <span class="vibe-tag">Innovative</span>
+      <span class="vibe-tag">Fun hangout energy</span>
+      <span class="vibe-tag">Adaptable</span>
+      <span class="vibe-tag">Bold</span>
+      <span class="vibe-tag">Community-first</span>
+    </div>
+  </div>
+</div>
+
+<!-- PRIZES SECTION -->
+<div style="background:color-mix(in srgb, var(--pink) 4%, var(--dark));border-top:1px solid color-mix(in srgb, var(--pink) 12%, transparent);border-bottom:1px solid color-mix(in srgb, var(--pink) 12%, transparent);padding:3.5rem 0;">
+  <div class="content-wrap">
+    <span class="section-tag">Prizes</span>
+    <h2 class="section-h2">What you could win</h2>
+    <div class="prizes-row">
+      <div class="prize-card" style="border-top:3px solid #f1b643;">
+        <div class="prize-place">&#129351;</div>
+        <div class="prize-label">1st Place</div>
+        <div class="prize-reward">Your design becomes the official YSA mascot + featured across all platforms</div>
+      </div>
+      <div class="prize-card" style="border-top:3px solid #b0b0b0;">
+        <div class="prize-place">&#129352;</div>
+        <div class="prize-label">2nd Place</div>
+        <div class="prize-reward">Design featured in YSA materials + recognition at next summit</div>
+      </div>
+      <div class="prize-card" style="border-top:3px solid #c4903a;">
+        <div class="prize-place">&#129353;</div>
+        <div class="prize-label">3rd Place</div>
+        <div class="prize-reward">Featured on YSA social media + personal shoutout</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SUBMISSION FORM SECTION -->
+<div class="content-wrap section-pad">
+  <span class="section-tag">Submit Your Design</span>
+  <h2 class="section-h2">Ready to enter?</h2>
+  <p style="color:color-mix(in srgb, var(--off-white) 62%, transparent);font-size:.9rem;line-height:1.75;margin-bottom:1.5rem;max-width:560px;">
+    Fill out the form below. Upload your design file (PNG, JPG, SVG, or PDF). Be specific in your description — judges want to understand your thought process, not just see the final result.
+  </p>
+
+  <!-- NATIVE SUBMISSION FORM — posts JSON to Apps Script web app
+       which writes each response to a Google Sheet.
+       To activate the backend:
+         1. Open amoeba_backend.gs in script.google.com
+         2. Deploy → New deployment → Web app
+         3. Execute as: Me | Who has access: Anyone
+         4. Copy the deployment URL
+         5. Paste it into APPS_SCRIPT_URL below
+  -->
+  <div class="submit-form-wrap">
+    <div class="submit-form-header">
+      <h3>Submit Your Design</h3>
+      <p>All starred fields are required. Upload your design to Google Drive, share it, and paste the link below.</p>
+    </div>
+
+    <!-- Success message — shown after a successful submission -->
+    <div class="form-success" id="formSuccess">
+      <div class="success-icon">&#127775;</div>
+      <h4>Submission received!</h4>
+      <p>Thank you for entering Project Amoeba. We'll review all entries and announce the winner. Keep creating!</p>
+    </div>
+
+    <form class="submit-form-body" id="amoebaForm" onsubmit="submitAmoeba(event)">
+
+      <div class="divider-label">About You</div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label for="f-name">Full Name *</label>
+          <input type="text" id="f-name" name="name" placeholder="First Last" required/>
+        </div>
+        <div class="field-group">
+          <label for="f-email">Email Address *</label>
+          <input type="email" id="f-email" name="email" placeholder="you@email.com" required/>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label for="f-grade">Age / Grade</label>
+          <input type="text" id="f-grade" name="grade" placeholder="e.g. 10th grade, 16"/>
+        </div>
+        <div class="field-group">
+          <label for="f-membership">YSA Membership *</label>
+          <select id="f-membership" name="membership" required>
+            <option value="" disabled selected>Select one...</option>
+            <option value="Global STEM Ambassador">Yes — Global STEM Ambassador</option>
+            <option value="STEM Explorer">Yes — STEM Explorer</option>
+            <option value="Interested">Not yet, but interested</option>
+            <option value="Community">Community member</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label for="f-team">Your YSA Team (if applicable)</label>
+        <input type="text" id="f-team" name="team" placeholder="e.g. Code Green, HydroTerra..."/>
+      </div>
+
+      <div class="divider-label">Your Design</div>
+
+      <div class="field-group">
+        <label for="f-title">Design Title *</label>
+        <input type="text" id="f-title" name="title" placeholder="Give your mascot a name..." required/>
+      </div>
+
+      <div class="field-group">
+        <label for="f-desc">Design Description *</label>
+        <span class="field-hint">At least 3 sentences. What does it represent? How does it capture the amoeba concept — adaptable, growing, community-first? What makes it unmistakably YSA?</span>
+        <textarea id="f-desc" name="description" rows="5" placeholder="Describe your design and what it means..." required minlength="100"></textarea>
+      </div>
+
+      <div class="field-group">
+        <label for="f-link">Design File Link *</label>
+        <span class="field-hint">Upload your design (PNG, JPG, SVG, or PDF) to Google Drive → right-click → Share → "Anyone with the link" → paste the URL here.</span>
+        <input type="url" id="f-link" name="fileLink" placeholder="https://drive.google.com/file/d/..." required/>
+      </div>
+
+      <div class="field-group">
+        <label for="f-process">Process Notes</label>
+        <span class="field-hint">Optional. How did you make it? What tools? Judges love the story behind the work.</span>
+        <textarea id="f-process" name="process" rows="3" placeholder="Tools used, time spent, anything you want us to know..."></textarea>
+      </div>
+
+      <div class="divider-label">Before You Submit</div>
+
+      <div class="field-group">
+        <label>Confirmations (both required) *</label>
+        <div class="confirm-list">
+          <label class="confirm-item">
+            <input type="checkbox" id="confirm-ai" required/>
+            <span>This design is my own original work and was <strong>NOT</strong> generated by any AI tool.</span>
+          </label>
+          <label class="confirm-item">
+            <input type="checkbox" id="confirm-scale" required/>
+            <span>This design is scalable — it works cleanly at any size, from a phone screen to a banner.</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label for="f-heard">How did you hear about Project Amoeba?</label>
+        <select id="f-heard" name="heard">
+          <option value="">Prefer not to say</option>
+          <option value="YSA website">YSA website</option>
+          <option value="Social media">Social media</option>
+          <option value="Friend or ambassador">A friend or fellow ambassador</option>
+          <option value="YSA event">YSA summit or event</option>
+          <option value="Email">Email from YSA</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div id="submitError" class="form-error-msg">Something went wrong — please try again.</div>
+
+      <button type="submit" class="submit-btn" id="submitBtn">
+        <span>Submit Design</span> <span>&#8594;</span>
+      </button>
+
+    </form>
+  </div>
+</div>
+
+<script>
+// ── AMOEBA FORM SUBMISSION ──────────────────────────────────────────
+// APPS_SCRIPT_URL: paste your deployed Apps Script web app URL here.
+// (From script.google.com: Deploy → New deployment → Web app → Copy URL)
+var APPS_SCRIPT_URL = 'PASTE_YOUR_DEPLOYMENT_URL_HERE';
+
+function submitAmoeba(e) {
+  e.preventDefault(); // stop the browser from reloading the page
+
+  var btn = document.getElementById('submitBtn');
+  var errEl = document.getElementById('submitError');
+  errEl.style.display = 'none';
+
+  // Collect all form values into an object
+  var payload = {
+    timestamp:   new Date().toISOString(),
+    name:        document.getElementById('f-name').value.trim(),
+    email:       document.getElementById('f-email').value.trim(),
+    grade:       document.getElementById('f-grade').value.trim(),
+    membership:  document.getElementById('f-membership').value,
+    team:        document.getElementById('f-team').value.trim(),
+    title:       document.getElementById('f-title').value.trim(),
+    description: document.getElementById('f-desc').value.trim(),
+    fileLink:    document.getElementById('f-link').value.trim(),
+    process:     document.getElementById('f-process').value.trim(),
+    heard:       document.getElementById('f-heard').value,
+    confirmNoAI: document.getElementById('confirm-ai').checked   ? 'Yes' : 'No',
+    confirmScale:document.getElementById('confirm-scale').checked ? 'Yes' : 'No'
+  };
+
+  // Disable button and show loading state
+  btn.disabled = true;
+  btn.innerHTML = '<span>Submitting...</span>';
+
+  // POST JSON to the Apps Script web app.
+  // The script receives it via doPost(e) and appends a row to the Sheet.
+  // 'no-cors' mode means we won't see the response body, but the write succeeds.
+  fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    mode:   'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body:   JSON.stringify(payload)
+  })
+  .then(function() {
+    // Hide the form, show the success card
+    document.getElementById('amoebaForm').style.display  = 'none';
+    document.getElementById('formSuccess').style.display = 'block';
+  })
+  .catch(function() {
+    // Re-enable the button and show an error message
+    btn.disabled = false;
+    btn.innerHTML = '<span>Submit Design</span> <span>&#8594;</span>';
+    errEl.style.display = 'block';
+  });
+}
+</script>
+
+<!-- BOTTOM APP-SWITCHER BAR — fixed, always visible -->
+<div class="bottom-bar">
+  <a href="index.html"><span class="icon">&#127968;</span>Home</a>
+  <a href="ambassadors.html"><span class="icon">&#127758;</span>Ambassadors</a>
+  <a href="research.html"><span class="icon">&#127807;</span>Research</a>
+  <a href="amoeba.html" class="active"><span class="icon">&#129440;</span>Amoeba</a>
+  <a href="auth.html"><span class="icon">&#128100;</span>Sign In</a>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,2376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Summit Chat · YSA Youth STEM Summit 2026</title>
+  <style>
+    :root {
+      --dark: #0a0f0d;
+      --dark-card: #111a16;
+      --teal: #3cbbb1;
+      --lavender: #bbbdf6;
+      --pink: #ee4266;
+      --gold: #f1b643;
+      --off-white: #f5f5f0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--dark); color: var(--off-white); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; height: 100dvh; display: flex; flex-direction: column; }
+
+    /* NAV */
+    nav {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 0.8rem 1.5rem;
+      background: rgba(10,15,13,0.95);
+      border-bottom: 1px solid rgba(245,245,240,0.07);
+      flex-shrink: 0;
+    }
+    .nav-back { color: var(--teal); text-decoration: none; font-size: 0.82rem; font-weight: 700; display: flex; align-items: center; gap: 0.3rem; }
+    .nav-title { font-size: 0.95rem; font-weight: 800; }
+    .nav-title span { color: var(--teal); }
+    .online-count { margin-left: auto; font-size: 0.72rem; color: rgba(245,245,240,0.4); display: flex; align-items: center; gap: 0.4rem; }
+    .online-dot { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+    /* LAYOUT */
+    .chat-layout { display: flex; flex: 1; overflow: hidden; }
+
+    /* SIDEBAR */
+    .channels-sidebar {
+      width: 200px; flex-shrink: 0;
+      background: rgba(255,255,255,0.03);
+      border-right: 1px solid rgba(245,245,240,0.06);
+      display: flex; flex-direction: column;
+      padding: 1rem 0;
+      overflow-y: auto;
+    }
+    .sidebar-section-label {
+      font-size: 0.6rem; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: rgba(245,245,240,0.25);
+      padding: 0.4rem 1rem 0.3rem;
+    }
+    .channel-btn {
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.45rem 1rem;
+      font-size: 0.82rem; font-weight: 500;
+      color: rgba(245,245,240,0.5);
+      background: none; border: none; cursor: pointer;
+      text-align: left; width: 100%;
+      transition: background 0.15s, color 0.15s;
+      border-radius: 0;
+    }
+    .channel-btn:hover { background: rgba(60,187,177,0.07); color: var(--off-white); }
+    .channel-btn.active { background: rgba(60,187,177,0.12); color: var(--teal); font-weight: 700; }
+    .channel-hash { font-size: 0.88rem; opacity: 0.5; }
+
+    /* MAIN CHAT */
+    .chat-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+    .chat-header {
+      padding: 0.9rem 1.4rem;
+      border-bottom: 1px solid rgba(245,245,240,0.06);
+      display: flex; align-items: center; gap: 0.7rem;
+      flex-shrink: 0;
+    }
+    .chat-header-name { font-size: 1rem; font-weight: 800; }
+    .chat-header-desc { font-size: 0.75rem; color: rgba(245,245,240,0.35); margin-left: auto; }
+
+    .messages-area {
+      flex: 1; overflow-y: auto;
+      padding: 1rem 1.4rem;
+      display: flex; flex-direction: column; gap: 0.15rem;
+      scroll-behavior: smooth;
+    }
+    .messages-area::-webkit-scrollbar { width: 4px; }
+    .messages-area::-webkit-scrollbar-thumb { background: rgba(245,245,240,0.1); border-radius: 4px; }
+
+    /* Message grouping */
+    .msg-group { margin-top: 0.8rem; }
+    .msg-header { display: flex; align-items: baseline; gap: 0.6rem; margin-bottom: 0.2rem; }
+    .msg-author { font-size: 0.85rem; font-weight: 700; color: var(--off-white); }
+    .msg-time { font-size: 0.68rem; color: rgba(245,245,240,0.25); }
+    .msg-bubble {
+      font-size: 0.88rem; color: rgba(245,245,240,0.82);
+      line-height: 1.5;
+      padding: 0.1rem 0;
+      word-break: break-word;
+    }
+    .msg-bubble.continuation { padding-left: 0; }
+
+    .msg-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--teal);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; font-weight: 800; color: var(--dark);
+      flex-shrink: 0;
+    }
+    .msg-row { display: flex; gap: 0.8rem; align-items: flex-start; }
+    .msg-content { flex: 1; }
+
+    .system-msg {
+      text-align: center; font-size: 0.72rem;
+      color: rgba(245,245,240,0.2);
+      padding: 0.5rem 0;
+      font-style: italic;
+    }
+
+    /* INPUT */
+    .chat-input-area {
+      padding: 0.8rem 1.4rem 1rem;
+      border-top: 1px solid rgba(245,245,240,0.06);
+      flex-shrink: 0;
+    }
+    .input-row {
+      display: flex; gap: 0.6rem; align-items: flex-end;
+      background: rgba(245,245,240,0.06);
+      border: 1.5px solid rgba(245,245,240,0.1);
+      border-radius: 14px;
+      padding: 0.6rem 0.8rem;
+      transition: border-color 0.2s;
+    }
+    .input-row:focus-within { border-color: rgba(60,187,177,0.4); }
+    #msgInput {
+      flex: 1; background: none; border: none; outline: none;
+      color: var(--off-white); font-size: 0.9rem;
+      resize: none; max-height: 120px;
+      font-family: inherit; line-height: 1.5;
+    }
+    #msgInput::placeholder { color: rgba(245,245,240,0.25); }
+    .send-btn {
+      background: var(--teal); border: none; border-radius: 8px;
+      width: 34px; height: 34px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0;
+      transition: background 0.2s, transform 0.15s;
+      color: var(--dark); font-size: 1rem;
+    }
+    .send-btn:hover { background: #4fd4ca; transform: scale(1.05); }
+    .send-btn:disabled { opacity: 0.3; cursor: default; transform: none; }
+
+    /* DELETE BUTTON (admin only) */
+    .delete-btn {
+      display: none; /* hidden by default, shown via JS for admin */
+      align-items: center; justify-content: center;
+      background: none; border: none; cursor: pointer;
+      font-size: 0.72rem; opacity: 0.25;
+      padding: 0 0.2rem; margin-left: 0.3rem;
+      transition: opacity 0.15s;
+      vertical-align: middle;
+    }
+    .delete-btn:hover { opacity: 0.8; }
+
+    /* REACTIONS — each message line gets its own hover zone via .msg-cont-row */
+    .msg-cont-row { position: relative; }
+    .msg-cont-row:hover > .react-trigger { opacity: 1; }
+    .msg-cont-row > .react-trigger:focus-within { opacity: 1; }
+    .react-trigger {
+      position: absolute; top: 2px; right: 4px;
+      opacity: 0; transition: opacity 0.15s;
+      background: rgba(17,26,22,0.96);
+      border: 1px solid rgba(245,245,240,0.12);
+      border-radius: 50px;
+      padding: 3px 6px;
+      display: flex; gap: 1px; align-items: center;
+      z-index: 10; box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+    .emoji-quick-btn {
+      background: none; border: none; cursor: pointer;
+      font-size: 0.9rem; padding: 2px 4px;
+      border-radius: 4px; transition: transform 0.1s;
+      line-height: 1;
+    }
+    .emoji-quick-btn:hover { transform: scale(1.3); }
+    .reaction-bar {
+      display: flex; flex-wrap: wrap; gap: 4px;
+      padding: 5px 0 3px 40px;
+    }
+    .reaction-bar:empty { display: none; }
+    .reaction-pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: rgba(245,245,240,0.06);
+      border: 1px solid rgba(245,245,240,0.1);
+      border-radius: 50px; padding: 2px 9px;
+      font-size: 0.82rem; cursor: pointer;
+      transition: all 0.15s; color: rgba(245,245,240,0.75);
+      user-select: none; line-height: 1.4;
+    }
+    .reaction-pill:hover { background: rgba(60,187,177,0.1); border-color: rgba(60,187,177,0.3); }
+    .reaction-pill.reacted { background: rgba(60,187,177,0.16); border-color: rgba(60,187,177,0.5); color: var(--teal); }
+    .reaction-count { font-size: 0.72rem; font-weight: 700; }
+
+    /* SIGN-IN WALL */
+    #signInWall {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(10,15,13,0.97);
+      display: none; align-items: center; justify-content: center;
+    }
+    #signInWall.visible { display: flex; }
+    .signin-box {
+      background: var(--dark-card);
+      border: 1px solid rgba(245,245,240,0.1);
+      border-radius: 24px;
+      padding: 2.5rem 2rem;
+      text-align: center;
+      max-width: 360px; width: 90%;
+    }
+    .signin-box h2 { font-size: 1.4rem; font-weight: 900; margin-bottom: 0.4rem; }
+    .signin-box p { font-size: 0.85rem; color: rgba(245,245,240,0.45); margin-bottom: 1.8rem; line-height: 1.5; }
+    #gSignInBtn { display: flex; justify-content: center; margin-bottom: 1.2rem; }
+    .or-divider { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 1.2rem; }
+    .or-divider div { flex:1; height:1px; background:rgba(245,245,240,0.08); }
+    .or-divider span { font-size: 0.65rem; color: rgba(245,245,240,0.25); text-transform: uppercase; letter-spacing: 0.08em; }
+    .guest-form { display: flex; flex-direction: column; gap: 0.7rem; }
+    .guest-input {
+      background: rgba(245,245,240,0.06); border: 1.5px solid rgba(245,245,240,0.1);
+      border-radius: 10px; padding: 0.65rem 0.9rem;
+      color: var(--off-white); font-size: 0.88rem; outline: none;
+      transition: border-color 0.2s;
+    }
+    .guest-input:focus { border-color: rgba(60,187,177,0.4); }
+    .guest-btn {
+      background: var(--teal); border: none; border-radius: 10px;
+      padding: 0.7rem; color: var(--dark); font-weight: 800;
+      font-size: 0.9rem; cursor: pointer; transition: background 0.2s;
+    }
+    .guest-btn:hover { background: #4fd4ca; }
+
+    /* SETUP NOTICE */
+    #setupNotice {
+      background: rgba(241,182,67,0.1);
+      border: 1px solid rgba(241,182,67,0.25);
+      border-radius: 12px;
+      padding: 0.8rem 1rem;
+      font-size: 0.78rem;
+      color: rgba(241,182,67,0.8);
+      margin: 0.5rem 0;
+      line-height: 1.5;
+      display: none;
+    }
+
+    @media (max-width: 600px) {
+      .channels-sidebar { width: 56px; }
+      .channel-btn span:last-child { display: none; }
+      .sidebar-section-label { display: none; }
+      .chat-header-desc { display: none; }
+    }
+
+    /* ── PROFILE SETUP MODAL ── */
+    #profileSetupModal {
+      position: fixed; inset: 0; z-index: 300;
+      background: rgba(10,15,13,0.97);
+      display: none; align-items: center; justify-content: center;
+    }
+    .profile-setup-box {
+      background: var(--dark-card);
+      border: 1px solid rgba(245,245,240,0.1);
+      border-radius: 24px;
+      padding: 2rem 2rem 2.2rem;
+      text-align: center;
+      max-width: 380px; width: 92%;
+    }
+    .profile-setup-box h2 { font-size: 1.3rem; font-weight: 900; margin-bottom: 0.3rem; }
+    .profile-setup-box .sub { font-size: 0.8rem; color: rgba(245,245,240,0.4); margin-bottom: 1.6rem; line-height: 1.5; }
+
+    .avatar-upload-ring {
+      width: 88px; height: 88px; border-radius: 50%;
+      border: 2.5px dashed rgba(60,187,177,0.5);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1.4rem;
+      cursor: pointer; position: relative; overflow: hidden;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      background: rgba(60,187,177,0.07);
+      flex-shrink: 0;
+    }
+    .avatar-upload-ring:hover { border-color: var(--teal); box-shadow: 0 0 0 4px rgba(60,187,177,0.12); }
+    .avatar-upload-ring img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    .avatar-upload-ring .avatar-initials { font-size: 1.6rem; font-weight: 800; color: var(--teal); }
+    .avatar-upload-ring .avatar-hint {
+      position: absolute; inset: 0; border-radius: 50%;
+      background: rgba(10,15,13,0.75);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 0.2s;
+      font-size: 0.6rem; font-weight: 700; color: var(--off-white); gap: 0.2rem;
+    }
+    .avatar-upload-ring:hover .avatar-hint { opacity: 1; }
+    .avatar-upload-ring .avatar-hint span { font-size: 1.2rem; }
+
+    /* ── AVATAR BUILDER ── */
+    .avatar-mode-tabs { display:flex; gap:0.4rem; margin:0 auto 0.75rem; justify-content:center; }
+    .avatar-mode-tab { font-size:0.7rem; font-weight:700; padding:0.28rem 0.8rem; border-radius:50px; border:1.5px solid rgba(245,245,240,0.15); background:none; color:rgba(245,245,240,0.4); cursor:pointer; transition:all 0.15s; font-family:inherit; }
+    .avatar-mode-tab.active { background:rgba(60,187,177,0.15); border-color:rgba(60,187,177,0.5); color:var(--teal); }
+    .avatar-builder-wrap { display:none; margin:0 auto 1.2rem; width:100%; }
+    .avatar-builder-wrap.open { display:block; }
+    .db-preview-wrap { display:flex; justify-content:center; margin:0 0 0.9rem; }
+    .db-preview { width:90px; height:90px; border-radius:50%; background:rgba(60,187,177,0.08); border:2px solid rgba(60,187,177,0.3); }
+    .db-section { margin-bottom:0.65rem; }
+    .db-section-label { font-size:0.58rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:rgba(245,245,240,0.32); margin-bottom:0.38rem; }
+    .db-swatches { display:flex; gap:0.38rem; flex-wrap:wrap; }
+    .db-swatch { width:21px; height:21px; border-radius:50%; border:2.5px solid transparent; cursor:pointer; transition:transform 0.15s, border-color 0.15s; flex-shrink:0; }
+    .db-swatch.sel { border-color:var(--off-white); transform:scale(1.28); }
+    .db-pills { display:flex; gap:0.3rem; flex-wrap:wrap; }
+    .db-pill { font-size:0.68rem; font-weight:700; padding:0.22rem 0.65rem; border-radius:50px; border:1.5px solid rgba(245,245,240,0.14); background:none; color:rgba(245,245,240,0.42); cursor:pointer; transition:all 0.15s; font-family:inherit; }
+    .db-pill:hover { border-color:rgba(60,187,177,0.4); color:var(--teal); }
+    .db-pill.sel { background:rgba(60,187,177,0.15); border-color:rgba(60,187,177,0.5); color:var(--teal); }
+
+    .profile-fields { display: flex; flex-direction: column; gap: 0.7rem; text-align: left; }
+    .profile-field-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(245,245,240,0.35); margin-bottom: 0.2rem; }
+    .profile-input {
+      background: rgba(245,245,240,0.06); border: 1.5px solid rgba(245,245,240,0.1);
+      border-radius: 10px; padding: 0.65rem 0.9rem;
+      color: var(--off-white); font-size: 0.88rem; outline: none;
+      transition: border-color 0.2s; width: 100%; font-family: inherit;
+    }
+    .profile-input:focus { border-color: rgba(60,187,177,0.45); }
+    .profile-save-btn {
+      background: var(--teal); border: none; border-radius: 12px;
+      padding: 0.75rem; color: var(--dark); font-weight: 800;
+      font-size: 0.95rem; cursor: pointer; transition: background 0.2s;
+      width: 100%; margin-top: 0.6rem;
+    }
+    .profile-save-btn:hover { background: #4fd4ca; }
+    .profile-save-btn:disabled { opacity: 0.5; cursor: default; }
+
+    /* ── PROFILE EDIT PANEL ── */
+    #profileEditModal {
+      position: fixed; inset: 0; z-index: 300;
+      display: none; align-items: stretch; justify-content: flex-end;
+    }
+    #profileEditModal.open { display: flex; }
+    .profile-edit-backdrop {
+      position: absolute; inset: 0;
+      background: rgba(10,15,13,0.6);
+    }
+    .profile-edit-panel {
+      position: relative; z-index: 1;
+      width: 340px; max-width: 96vw;
+      background: var(--dark-card);
+      border-left: 1px solid rgba(245,245,240,0.08);
+      display: flex; flex-direction: column;
+      padding: 1.6rem 1.6rem 2rem;
+      overflow-y: auto;
+      transform: translateX(100%);
+      transition: transform 0.28s cubic-bezier(0.16,1,0.3,1);
+      box-shadow: -8px 0 40px rgba(0,0,0,0.5);
+    }
+    #profileEditModal.open .profile-edit-panel { transform: translateX(0); }
+    .profile-edit-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.6rem; }
+    .profile-edit-title { font-size: 1rem; font-weight: 800; }
+    .profile-edit-close { background: none; border: none; cursor: pointer; font-size: 1.2rem; color: rgba(245,245,240,0.4); padding: 0.2rem; transition: color 0.15s; }
+    .profile-edit-close:hover { color: var(--off-white); }
+
+    .profile-edit-preview {
+      background: rgba(245,245,240,0.04);
+      border: 1px solid rgba(245,245,240,0.06);
+      border-radius: 14px;
+      padding: 0.9rem 1rem;
+      margin-bottom: 1.4rem;
+    }
+    .profile-edit-preview-label { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(245,245,240,0.25); margin-bottom: 0.8rem; }
+    .preview-msg-row { display: flex; gap: 0.7rem; align-items: flex-start; }
+    .preview-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; font-weight: 800; color: var(--dark);
+      flex-shrink: 0; background: var(--teal); overflow: hidden;
+    }
+    .preview-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    .preview-author { font-size: 0.85rem; font-weight: 700; color: var(--off-white); }
+    .preview-pronouns { font-size: 0.68rem; color: rgba(245,245,240,0.35); margin-left: 0.4rem; font-weight: 400; }
+    .preview-bubble { font-size: 0.85rem; color: rgba(245,245,240,0.7); margin-top: 0.15rem; }
+
+    .profile-edit-actions { display: flex; gap: 0.6rem; margin-top: 0.6rem; }
+    .profile-edit-save { flex: 1; background: var(--teal); border: none; border-radius: 10px; padding: 0.7rem; color: var(--dark); font-weight: 800; font-size: 0.9rem; cursor: pointer; transition: background 0.2s; }
+    .profile-edit-save:hover { background: #4fd4ca; }
+    .profile-edit-cancel { background: rgba(245,245,240,0.07); border: 1px solid rgba(245,245,240,0.1); border-radius: 10px; padding: 0.7rem 1rem; color: rgba(245,245,240,0.55); font-size: 0.9rem; cursor: pointer; transition: background 0.2s; }
+    .profile-edit-cancel:hover { background: rgba(245,245,240,0.1); }
+
+    /* ── BOTTOM BAR PROFILE STRIP ── */
+    #userBar {
+      display: flex; align-items: center; gap: 0.55rem;
+      font-size: 0.65rem; color: rgba(245,245,240,0.3);
+    }
+    .user-bar-avatar {
+      width: 26px; height: 26px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.6rem; font-weight: 800; color: var(--dark);
+      flex-shrink: 0; cursor: pointer; overflow: hidden;
+      transition: box-shadow 0.2s;
+    }
+    .user-bar-avatar:hover { box-shadow: 0 0 0 2px var(--teal); }
+    .user-bar-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    .user-bar-name { font-weight: 700; color: rgba(245,245,240,0.45); max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .user-bar-pronouns { color: rgba(245,245,240,0.22); font-style: italic; }
+    .user-bar-edit { color: rgba(60,187,177,0.5); text-decoration: none; cursor: pointer; transition: color 0.15s; }
+    .user-bar-edit:hover { color: var(--teal); }
+    .user-bar-dot { opacity: 0.25; }
+
+    /* pronouns in message header */
+    .msg-pronouns { font-size: 0.65rem; color: rgba(245,245,240,0.3); margin-left: 0.2rem; font-weight: 400; font-style: italic; }
+
+    /* Chat images */
+    .chat-img { max-width: 300px; max-height: 280px; border-radius: 10px; display: block; margin-top: 4px; cursor: pointer; object-fit: contain; border: 1px solid rgba(245,245,240,0.08); }
+    .chat-img:hover { opacity: 0.92; }
+
+    /* Image upload button */
+    .img-attach-btn { background: none; border: none; color: rgba(245,245,240,0.3); cursor: pointer; font-size: 1.1rem; padding: 0 0.3rem; flex-shrink: 0; transition: color 0.15s; line-height: 1; }
+    .img-attach-btn:hover { color: var(--teal); }
+
+    /* Ban badge in admin */
+    .ban-btn { background: rgba(238,66,102,0.1); border: 1px solid rgba(238,66,102,0.2); border-radius: 50px; padding: 0.15rem 0.55rem; color: var(--pink); font-size: 0.68rem; cursor: pointer; font-weight: 700; transition: background 0.15s; }
+    .ban-btn:hover { background: rgba(238,66,102,0.22); }
+    .unban-btn { background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.25); border-radius: 8px; padding: 0.2rem 0.7rem; color: #4ade80; font-size: 0.75rem; cursor: pointer; font-weight: 700; transition: background 0.15s; }
+    .unban-btn:hover { background: rgba(74,222,128,0.2); }
+
+    /* Link in chat bubble */
+    .chat-link { color: var(--teal); text-decoration: underline; text-underline-offset: 2px; word-break: break-all; }
+    .chat-link:hover { opacity: 0.8; }
+
+    /* PASSPHRASE GATE */
+    #passGate {
+      position: fixed; inset: 0; z-index: 300;
+      background: var(--dark);
+      display: flex; align-items: center; justify-content: center;
+    }
+    #passGate.hidden { display: none; }
+    .passgate-box {
+      background: var(--dark-card);
+      border: 1px solid rgba(245,245,240,0.1);
+      border-radius: 24px;
+      padding: 2.5rem 2rem;
+      text-align: center;
+      max-width: 360px; width: 90%;
+    }
+    .passgate-box h2 { color: var(--off-white); font-size: 1.3rem; margin-bottom: 0.5rem; }
+    .passgate-box p { color: rgba(245,245,240,0.55); font-size: 0.85rem; margin-bottom: 1.4rem; line-height: 1.5; }
+    .passgate-input {
+      width: 100%; padding: 0.8rem 1rem; border-radius: 12px;
+      border: 1px solid rgba(245,245,240,0.15); background: rgba(245,245,240,0.05);
+      color: var(--off-white); font-size: 1rem; text-align: center;
+      letter-spacing: 0.05em; margin-bottom: 0.8rem; outline: none;
+    }
+    .passgate-input:focus { border-color: var(--teal); }
+    .passgate-btn {
+      width: 100%; padding: 0.8rem; border-radius: 12px; border: none;
+      background: var(--teal); color: var(--dark); font-weight: 800;
+      font-size: 0.95rem; cursor: pointer; transition: background 0.15s;
+    }
+    .passgate-btn:hover { background: var(--lavender); }
+    .passgate-error {
+      display: none; color: var(--pink); font-size: 0.78rem; margin-top: 0.7rem;
+      background: rgba(238,66,102,0.08); border-radius: 8px; padding: 0.5rem 0.8rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- PASSPHRASE GATE (shown before anything else loads) -->
+<div id="passGate">
+  <div class="passgate-box">
+    <div style="font-size:2rem; margin-bottom:0.8rem;">🔒</div>
+    <h2>Summit Access Code</h2>
+    <p>This chat is limited to summit guests. Enter the access code from your Summit Pass email to continue.</p>
+    <input class="passgate-input" id="passInput" type="text" placeholder="Access code" autocomplete="off"
+      onkeydown="if(event.key==='Enter'){checkPassphrase()}">
+    <button class="passgate-btn" onclick="checkPassphrase()">Continue →</button>
+    <div class="passgate-error" id="passError">That code doesn't match. Check your Summit Pass email and try again.</div>
+    <a href="index.html" style="display:block; margin-top:1.2rem; font-size:0.75rem; color:rgba(245,245,240,0.3); text-decoration:none;">← Back to Summit Site</a>
+  </div>
+</div>
+<script>
+  // Shared event passphrase. Change EVENT_PASSPHRASE before the summit and put the same
+  // value in the Summit Pass email template. Not real security, just keeps randoms out.
+  const EVENT_PASSPHRASE = "32KMPAYLOAD";
+  (function () {
+    const gate = document.getElementById('passGate');
+    if (sessionStorage.getItem('ysa_pass_ok') === 'true' || localStorage.getItem('ysa_pass_ok') === 'true') {
+      gate.classList.add('hidden');
+    }
+    window.checkPassphrase = function () {
+      const val = (document.getElementById('passInput').value || '').trim().toUpperCase();
+      if (val === EVENT_PASSPHRASE.toUpperCase()) {
+        localStorage.setItem('ysa_pass_ok', 'true');
+        gate.classList.add('hidden');
+      } else {
+        document.getElementById('passError').style.display = 'block';
+      }
+    };
+  })();
+</script>
+
+<!-- SIGN-IN WALL -->
+<div id="signInWall">
+  <div class="signin-box">
+    <div style="font-size:2rem; margin-bottom:0.8rem;">💬</div>
+    <h2>Summit Chat</h2>
+    <p>Join the live conversation with students, mentors, and guests from the 2026 YSA Youth STEM Summit.</p>
+
+    <!-- Google sign-in -->
+    <div id="gSignInBtn"></div>
+    <div style="margin-top:0.5rem; margin-bottom:0.2rem;">
+      <button onclick="switchGoogleAccount()" style="background:none;border:none;color:rgba(245,245,240,0.35);font-size:0.72rem;cursor:pointer;text-decoration:underline;padding:0;">Use a different account</button>
+    </div>
+
+    <div class="or-divider" style="margin-top:1rem;"><div></div><span>or use email</span><div></div></div>
+
+    <!-- Tab toggle -->
+    <div style="display:flex; gap:0.5rem; margin-bottom:1rem;">
+      <button id="tabSignIn" onclick="switchAuthTab('signin')" style="flex:1; padding:0.5rem; border-radius:10px; border:1px solid rgba(245,245,240,0.15); background:rgba(60,187,177,0.15); color:var(--teal); font-weight:700; font-size:0.82rem; cursor:pointer;">Sign In</button>
+      <button id="tabRegister" onclick="switchAuthTab('register')" style="flex:1; padding:0.5rem; border-radius:10px; border:1px solid rgba(245,245,240,0.08); background:transparent; color:rgba(245,245,240,0.4); font-weight:600; font-size:0.82rem; cursor:pointer;">Create Account</button>
+    </div>
+
+    <!-- Email/password form -->
+    <div class="guest-form" id="emailAuthForm">
+      <input class="guest-input" id="authEmail" type="email" placeholder="Email address" autocomplete="email" />
+      <input class="guest-input" id="authPassword" type="password" placeholder="Password" autocomplete="current-password" />
+      <div id="authError" style="display:none; color:#ee4266; font-size:0.76rem; background:rgba(238,66,102,0.08); border-radius:8px; padding:0.5rem 0.8rem; line-height:1.5; text-align:left;"></div>
+      <button class="guest-btn" id="authSubmitBtn" onclick="submitEmailAuth()">Sign In →</button>
+      <button onclick="resetPassword()" style="background:none;border:none;color:rgba(245,245,240,0.3);font-size:0.72rem;cursor:pointer;text-decoration:underline;padding:0.2rem 0;" id="forgotPasswordBtn">Forgot password?</button>
+    </div>
+
+    <a href="index.html" style="display:block; margin-top:1.2rem; font-size:0.75rem; color:rgba(245,245,240,0.3); text-decoration:none;">← Back to Summit Site</a>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-back">← Summit Site</a>
+  <div class="nav-title">YSA <span>Live Chat</span></div>
+  <div class="online-count"><div class="online-dot"></div><span id="onlineCount">...</span> online</div>
+</nav>
+
+<!-- MAIN LAYOUT -->
+<div class="chat-layout">
+
+  <!-- CHANNELS -->
+  <div class="channels-sidebar">
+    <div class="sidebar-section-label">Channels</div>
+    <button class="channel-btn active" onclick="switchChannel('general', this)">
+      <span class="channel-hash">#</span><span>general</span>
+    </button>
+    <button class="channel-btn" onclick="switchChannel('day1-lozova', this)">
+      <span class="channel-hash">#</span><span>day1-lozova</span>
+    </button>
+    <button class="channel-btn" onclick="switchChannel('day2-scoreni', this)">
+      <span class="channel-hash">#</span><span>day2-scoreni</span>
+    </button>
+    <button class="channel-btn" onclick="switchChannel('science-talk', this)">
+      <span class="channel-hash">#</span><span>science-talk</span>
+    </button>
+    <button class="channel-btn" onclick="switchChannel('random', this)">
+      <span class="channel-hash">#</span><span>random</span>
+    </button>
+    <div class="sidebar-section-label" style="margin-top:1rem;">Ask a Team</div>
+    <button class="channel-btn" onclick="switchChannel('team-codrii-minds', this)">
+      <span>🌲</span><span>Codrii Minds</span>
+    </button>
+    <button class="channel-btn" onclick="switchChannel('team-noroc', this)">
+      <span>🌬️</span><span>Noroc Science</span>
+    </button>
+    <button class="channel-btn" onclick="switchChannel('team-hydroterra', this)">
+      <span>💧</span><span>HydroTerra</span>
+    </button>
+    <button class="channel-btn" onclick="switchChannel('team-codegreen', this)">
+      <span>🌿</span><span>Code Green</span>
+    </button>
+    <button class="channel-btn" onclick="switchChannel('team-divedeep', this)">
+      <span>🪼</span><span>Dive Deep</span>
+    </button>
+    <button class="channel-btn" onclick="switchChannel('team-stealth', this)">
+      <span>🎈</span><span>Stealth</span>
+    </button>
+    <button class="channel-btn" onclick="switchChannel('team-supernovas', this)">
+      <span>🚀</span><span>Supernovas</span>
+    </button>
+    <button class="channel-btn" onclick="switchChannel('team-labrats', this)">
+      <span>🧪</span><span>Lab Rats</span>
+    </button>
+    <button class="channel-btn" onclick="switchChannel('team-forta', this)">
+      <span>💊</span><span>Forța</span>
+    </button>
+    <button class="channel-btn" onclick="switchChannel('team-20dm3', this)">
+      <span>🌸</span><span>20dm³</span>
+    </button>
+  </div>
+
+  <!-- CHAT MAIN -->
+  <div class="chat-main">
+    <div class="chat-header">
+      <span style="font-size:1.1rem;">#</span>
+      <div class="chat-header-name" id="channelName">general</div>
+      <div class="chat-header-desc" id="channelDesc">Open chat for all summit participants</div>
+    </div>
+
+    <div id="setupNotice">
+      ⚙️ <strong>Firebase setup required</strong> — add your Firebase config below to enable real-time chat.
+      See the comment in the script section of this file.
+    </div>
+
+    <div id="teamCallout" style="margin:0.5rem 1.4rem; background:rgba(60,187,177,0.07); border:1px solid rgba(60,187,177,0.18); border-radius:12px; padding:0.7rem 1rem; font-size:0.78rem; color:rgba(245,245,240,0.6); line-height:1.5; display:none;">
+      💬 <strong style="color:var(--teal);">Have a question for a team?</strong> Select any team in the sidebar under <em>Ask a Team</em> to chat with them directly about their research!
+    </div>
+    <div class="messages-area" id="messagesArea">
+      <div class="system-msg">Welcome to #general — say hello! 👋</div>
+    </div>
+
+    <div class="chat-input-area">
+      <div style="font-size:0.72rem; color:rgba(245,245,240,0.3); margin-bottom:0.4rem;" id="typingIndicator"></div>
+      <div class="input-row">
+        <button class="img-attach-btn" onclick="document.getElementById('imageUploadInput').click()" title="Send image">🖼</button>
+        <input type="file" id="imageUploadInput" accept="image/*" style="display:none" />
+        <textarea id="msgInput" rows="1" placeholder="Message #general…" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">↑</button>
+      </div>
+      <div style="margin-top:0.4rem; display:flex; align-items:center; justify-content:space-between;">
+        <div id="userBar">
+          <div class="user-bar-avatar" id="userBarAvatar" onclick="openProfileEdit()" title="Edit profile">
+            <span id="userBarInitials">?</span>
+          </div>
+          <span class="user-bar-name" id="currentUserLabel"></span>
+          <span class="user-bar-pronouns" id="userBarPronouns"></span>
+          <span class="user-bar-dot">·</span>
+          <span class="user-bar-edit" onclick="openProfileEdit()">Edit Profile</span>
+          <span id="adminBtnWrap" style="display:none;">
+            <span class="user-bar-dot">·</span>
+            <span class="user-bar-edit" onclick="openAdminPanel()" title="Admin: view registrations">🛡 Admin</span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="adminPanel" style="display:none; position:fixed; inset:0; z-index:400; background:rgba(10,15,13,0.97); align-items:flex-start; justify-content:center; overflow-y:auto; padding:2rem 1rem;">
+  <div style="background:var(--dark-card); border:1px solid rgba(245,245,240,0.1); border-radius:24px; padding:2rem; max-width:860px; width:100%; margin:0 auto;">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.4rem;">
+      <div style="font-size:1.2rem; font-weight:900;">🛡 Admin — Registrations</div>
+      <button onclick="closeAdminPanel()" style="background:none;border:1px solid rgba(245,245,240,0.15);color:rgba(245,245,240,0.5);border-radius:10px;padding:0.35rem 0.8rem;cursor:pointer;font-size:0.85rem;">✕ Close</button>
+    </div>
+
+    <!-- Online Now section -->
+    <div style="margin-bottom:1.4rem; background:rgba(60,187,177,0.06); border:1px solid rgba(60,187,177,0.18); border-radius:14px; padding:1rem 1.2rem;">
+      <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.8rem;">
+        <div style="width:8px; height:8px; border-radius:50%; background:#3cbbb1; box-shadow:0 0 6px #3cbbb1;"></div>
+        <span style="font-size:0.75rem; font-weight:800; letter-spacing:0.07em; text-transform:uppercase; color:var(--teal);">Online Now</span>
+        <span id="adminOnlineCount" style="font-size:0.72rem; color:rgba(245,245,240,0.35);"></span>
+      </div>
+      <div id="adminOnlineList" style="display:flex; flex-wrap:wrap; gap:0.5rem; font-size:0.78rem; color:rgba(245,245,240,0.6);">
+        <span style="color:rgba(245,245,240,0.25); font-style:italic;">Loading…</span>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:0.8rem; margin-bottom:1.2rem; flex-wrap:wrap;">
+      <input id="adminSearch" type="text" placeholder="Search by name, email, team…" oninput="filterAdminTable()" style="flex:1; min-width:200px; padding:0.5rem 0.8rem; border-radius:10px; border:1px solid rgba(245,245,240,0.12); background:rgba(245,245,240,0.05); color:var(--text); font-size:0.82rem;" />
+      <button onclick="exportAdminCSV()" style="padding:0.5rem 1rem; border-radius:10px; border:1px solid rgba(60,187,177,0.3); background:rgba(60,187,177,0.1); color:var(--teal); font-size:0.82rem; cursor:pointer; font-weight:700;">⬇ Export CSV</button>
+      <button onclick="loadAdminData()" style="padding:0.5rem 1rem; border-radius:10px; border:1px solid rgba(245,245,240,0.12); background:transparent; color:rgba(245,245,240,0.4); font-size:0.82rem; cursor:pointer;">↺ Refresh</button>
+    </div>
+    <div id="adminTableWrap" style="overflow-x:auto; overflow-y:auto; max-height:340px;">
+      <div id="adminLoadMsg" style="text-align:center; padding:2rem; color:rgba(245,245,240,0.3); font-size:0.85rem;">Loading registrations…</div>
+      <table id="adminTable" style="display:none; width:100%; border-collapse:collapse; font-size:0.8rem;">
+        <thead>
+          <tr style="color:rgba(245,245,240,0.35); font-size:0.7rem; letter-spacing:0.05em; text-transform:uppercase; border-bottom:1px solid rgba(245,245,240,0.08);">
+            <th style="text-align:left; padding:0.5rem 0.6rem;">#</th>
+            <th style="text-align:left; padding:0.5rem 0.6rem;">Name</th>
+            <th style="text-align:left; padding:0.5rem 0.6rem;">Email</th>
+            <th style="text-align:left; padding:0.5rem 0.6rem;">Phone</th>
+            <th style="text-align:left; padding:0.5rem 0.6rem;">Team</th>
+            <th style="text-align:left; padding:0.5rem 0.6rem;">Role</th>
+            <th style="text-align:left; padding:0.5rem 0.6rem;">Country</th>
+            <th style="text-align:left; padding:0.5rem 0.6rem;">Registered</th>
+            <th style="padding:0.5rem 0.6rem;"></th>
+          </tr>
+        </thead>
+        <tbody id="adminTableBody"></tbody>
+      </table>
+    </div>
+    <div id="adminCount" style="margin-top:0.8rem; font-size:0.75rem; color:rgba(245,245,240,0.3); text-align:right;"></div>
+
+    <!-- Banned Users -->
+    <div style="margin-top:1.6rem; background:rgba(238,66,102,0.05); border:1px solid rgba(238,66,102,0.15); border-radius:14px; padding:1rem 1.2rem;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.8rem;">
+        <span style="font-size:0.75rem; font-weight:800; letter-spacing:0.07em; text-transform:uppercase; color:var(--pink);">🚫 Banned Users</span>
+        <div style="display:flex;gap:0.6rem;align-items:center;">
+          <button onclick="loadBannedUsers()" style="background:none;border:none;color:rgba(245,245,240,0.3);font-size:0.75rem;cursor:pointer;">↺ Refresh</button>
+          <button onclick="clearAllBanned()" style="background:none;border:1px solid rgba(238,66,102,0.3);border-radius:6px;color:var(--pink);font-size:0.72rem;padding:0.2rem 0.55rem;cursor:pointer;">Clear All</button>
+        </div>
+      </div>
+      <div id="bannedUsersList" style="font-size:0.82rem; color:rgba(245,245,240,0.6); max-height:200px; overflow-y:auto;">
+        <span style="color:rgba(245,245,240,0.25); font-style:italic;">Loading…</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE SETUP MODAL -->
+<div id="profileSetupModal">
+  <div class="profile-setup-box">
+    <div style="font-size:1.1rem; font-weight:900; margin-bottom:0.2rem;">👤 Set Up Your Profile</div>
+    <div class="sub">Customize how others see you in chat.</div>
+
+    <div class="avatar-mode-tabs">
+      <button class="avatar-mode-tab active" id="setupTabUpload" onclick="switchAvatarTab('setup','upload')">📷 Photo</button>
+      <button class="avatar-mode-tab" id="setupTabBuild" onclick="switchAvatarTab('setup','build')">🎨 Build</button>
+    </div>
+    <div class="avatar-upload-ring" id="setupAvatarRing" onclick="onAvatarRingClick('setup')">
+      <div class="avatar-initials" id="setupAvatarInitials">?</div>
+      <div class="avatar-hint" id="setupAvatarHint"><span>📷</span>Upload photo</div>
+    </div>
+    <input type="file" id="setupAvatarInput" accept="image/*" style="display:none" />
+    <div class="avatar-builder-wrap" id="setupAvatarBuilder">
+      <div class="db-preview-wrap">
+        <img id="setupDbPreview" class="db-preview" src="" alt="avatar preview" />
+      </div>
+      <div class="db-section">
+        <div class="db-section-label">Skin Tone</div>
+        <div class="db-swatches" id="setup-skin"></div>
+      </div>
+      <div class="db-section">
+        <div class="db-section-label">Hair Style</div>
+        <div class="db-pills" id="setup-hair"></div>
+      </div>
+      <div class="db-section">
+        <div class="db-section-label">Hair Color</div>
+        <div class="db-swatches" id="setup-haircolor"></div>
+      </div>
+      <div class="db-section">
+        <div class="db-section-label">Outfit</div>
+        <div class="db-pills" id="setup-outfit"></div>
+      </div>
+    </div>
+
+    <div class="profile-fields">
+      <div>
+        <div class="profile-field-label">Display Name</div>
+        <input class="profile-input" id="setupName" placeholder="Your name" maxlength="40" />
+      </div>
+      <div>
+        <div class="profile-field-label">Pronouns <span style="opacity:0.5;font-weight:400;text-transform:none;">(optional)</span></div>
+        <select class="profile-input" id="setupPronounsSelect" onchange="togglePronounsOther('setup')">
+          <option value="">Prefer not to say</option>
+          <option value="she/her">she/her</option>
+          <option value="he/him">he/him</option>
+          <option value="they/them">they/them</option>
+          <option value="other">Other…</option>
+        </select>
+        <input class="profile-input" id="setupPronounsOther" placeholder="Type your pronouns…" maxlength="30" style="display:none; margin-top:0.4rem;" />
+      </div>
+      <div>
+        <div class="profile-field-label">Country <span style="opacity:0.5;font-weight:400;text-transform:none;">(optional)</span></div>
+        <input class="profile-input" id="setupCountry" placeholder="e.g. United States, Moldova…" maxlength="50" />
+      </div>
+      <div>
+        <div class="profile-field-label">Phone Number <span style="opacity:0.5;font-weight:400;text-transform:none;">(optional — for event updates)</span></div>
+        <input class="profile-input" id="setupPhone" type="tel" placeholder="+1 (555) 000-0000" maxlength="30" />
+      </div>
+      <div>
+        <div class="profile-field-label">Team / Affiliation</div>
+        <select class="profile-input" id="setupTeam">
+          <option value="">Select your team…</option>
+          <option value="YSA Staff">YSA Staff</option>
+          <option value="YSA Parent / Chaperone">YSA Parent / Chaperone</option>
+          <option value="Guest">Guest / Attendee</option>
+          <optgroup label="Moldova Teams">
+            <option>Codrii Minds</option><option>Noroc Science</option>
+            <option>20dm³</option><option>HydroTerra</option>
+          </optgroup>
+          <optgroup label="North Carolina Teams">
+            <option>Code Green</option><option>Lab Rats</option>
+            <option>Forța</option><option>Dive Deep</option>
+            <option>Stealth</option><option>Supernovas</option>
+          </optgroup>
+        </select>
+      </div>
+      <div>
+        <div class="profile-field-label">Role</div>
+        <select class="profile-input" id="setupRole">
+          <option value="">Select your role…</option>
+          <option>Student</option>
+          <option>Mentor / Advisor</option>
+          <option>Parent</option>
+          <option>Teacher / Educator</option>
+          <option>Guest</option>
+          <option>Staff</option>
+        </select>
+      </div>
+      <div id="setupErrorMsg" style="display:none; color:#ee4266; font-size:0.78rem; background:rgba(238,66,102,0.08); border-radius:8px; padding:0.5rem 0.8rem; line-height:1.5;"></div>
+      <button class="profile-save-btn" id="setupSaveBtn" onclick="saveProfileSetup()">Enter Chat →</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE EDIT PANEL -->
+<div id="profileEditModal">
+  <div class="profile-edit-backdrop" onclick="closeProfileEdit()"></div>
+  <div class="profile-edit-panel">
+    <div class="profile-edit-header">
+      <div class="profile-edit-title">Edit Profile</div>
+      <button class="profile-edit-close" onclick="closeProfileEdit()">✕</button>
+    </div>
+
+    <!-- Avatar -->
+    <div style="margin-bottom:1.4rem;">
+      <div class="avatar-mode-tabs">
+        <button class="avatar-mode-tab active" id="editTabUpload" onclick="switchAvatarTab('edit','upload')">📷 Photo</button>
+        <button class="avatar-mode-tab" id="editTabBuild" onclick="switchAvatarTab('edit','build')">🎨 Build</button>
+      </div>
+      <div style="display:flex; justify-content:center;">
+        <div class="avatar-upload-ring" id="editAvatarRing" style="width:88px;height:88px;" onclick="onAvatarRingClick('edit')">
+          <div class="avatar-initials" id="editAvatarInitials">?</div>
+          <div class="avatar-hint" id="editAvatarHint"><span>📷</span>Change</div>
+        </div>
+        <input type="file" id="editAvatarInput" accept="image/*" style="display:none" />
+      </div>
+      <div class="avatar-builder-wrap" id="editAvatarBuilder">
+        <div class="db-preview-wrap">
+          <img id="editDbPreview" class="db-preview" src="" alt="avatar preview" />
+        </div>
+        <div class="db-section">
+          <div class="db-section-label">Skin Tone</div>
+          <div class="db-swatches" id="edit-skin"></div>
+        </div>
+        <div class="db-section">
+          <div class="db-section-label">Hair Style</div>
+          <div class="db-pills" id="edit-hair"></div>
+        </div>
+        <div class="db-section">
+          <div class="db-section-label">Hair Color</div>
+          <div class="db-swatches" id="edit-haircolor"></div>
+        </div>
+        <div class="db-section">
+          <div class="db-section-label">Outfit</div>
+          <div class="db-pills" id="edit-outfit"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview -->
+    <div class="profile-edit-preview">
+      <div class="profile-edit-preview-label">Preview</div>
+      <div class="preview-msg-row">
+        <div class="preview-avatar" id="previewAvatar">?</div>
+        <div>
+          <div>
+            <span class="preview-author" id="previewName">You</span>
+            <span class="preview-pronouns" id="previewPronouns"></span>
+          </div>
+          <div class="preview-bubble">This is what your messages look like.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fields -->
+    <div class="profile-fields">
+      <div>
+        <div class="profile-field-label">Display Name</div>
+        <input class="profile-input" id="editName" placeholder="Your name" maxlength="40" oninput="updateEditPreview()" />
+      </div>
+      <div>
+        <div class="profile-field-label">Pronouns <span style="opacity:0.5;font-weight:400;text-transform:none;">(optional)</span></div>
+        <select class="profile-input" id="editPronounsSelect" onchange="togglePronounsOther('edit'); updateEditPreview()">
+          <option value="">Prefer not to say</option>
+          <option value="she/her">she/her</option>
+          <option value="he/him">he/him</option>
+          <option value="they/them">they/them</option>
+          <option value="other">Other…</option>
+        </select>
+        <input class="profile-input" id="editPronounsOther" placeholder="Type your pronouns…" maxlength="30" style="display:none; margin-top:0.4rem;" oninput="updateEditPreview()" />
+      </div>
+      <div>
+        <div class="profile-field-label">Country <span style="opacity:0.5;font-weight:400;text-transform:none;">(optional)</span></div>
+        <input class="profile-input" id="editCountry" placeholder="e.g. United States, Moldova…" maxlength="50" />
+      </div>
+      <div>
+        <div class="profile-field-label">Team / Affiliation</div>
+        <select class="profile-input" id="editTeam">
+          <option value="">Select your team…</option>
+          <option value="YSA Staff">YSA Staff</option>
+          <option value="YSA Parent / Chaperone">YSA Parent / Chaperone</option>
+          <option value="Guest">Guest / Attendee</option>
+          <optgroup label="Moldova Teams">
+            <option>Codrii Minds</option><option>Noroc Science</option>
+            <option>20dm³</option><option>HydroTerra</option>
+          </optgroup>
+          <optgroup label="North Carolina Teams">
+            <option>Code Green</option><option>Lab Rats</option>
+            <option>Forța</option><option>Dive Deep</option>
+            <option>Stealth</option><option>Supernovas</option>
+          </optgroup>
+        </select>
+      </div>
+      <div>
+        <div class="profile-field-label">Role</div>
+        <select class="profile-input" id="editRole">
+          <option value="">Select your role…</option>
+          <option>Student</option>
+          <option>Mentor / Advisor</option>
+          <option>Parent</option>
+          <option>Teacher / Educator</option>
+          <option>Guest</option>
+          <option>Staff</option>
+        </select>
+      </div>
+    </div>
+    <div class="profile-edit-actions">
+      <button class="profile-edit-save" onclick="saveProfileEdit()">Save Changes</button>
+      <button class="profile-edit-cancel" onclick="closeProfileEdit()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+  // ─────────────────────────────────────────────────────
+  // FIREBASE SETUP — replace this config with yours:
+  // 1. Go to console.firebase.google.com
+  // 2. Create project → Add web app → copy the firebaseConfig object
+  // 3. In Firebase console: Build → Realtime Database → Create database
+  //    (choose "Start in test mode" for now)
+  // 4. Paste your config values below
+  // ─────────────────────────────────────────────────────
+  const firebaseConfig = {
+    apiKey:            "AIzaSyDCqFuFjIyIKnY2RU1arzYwINvfGet23FA",
+    authDomain:        "ysalive.firebaseapp.com",
+    databaseURL:       "https://ysalive-default-rtdb.firebaseio.com",
+    projectId:         "ysalive",
+    storageBucket:     "ysalive.firebasestorage.app",
+    messagingSenderId: "1028950845986",
+    appId:             "1:1028950845986:web:7ab38a447d07bb0155337b",
+    measurementId:     "G-EW0KY35R21"
+  };
+
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { getDatabase, ref, push, onChildAdded, onChildRemoved, serverTimestamp, onValue, set, remove, update, get, onDisconnect }
+    from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+  import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithCredential, onAuthStateChanged, signOut as fbSignOut,
+           createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail }
+    from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+
+  const isConfigured = !firebaseConfig.apiKey.startsWith('PASTE');
+
+  const ADMIN_EMAIL = 'gsachair@youngscientistacademy.org';
+  let app, db, auth, currentUser = null, currentChannel = 'general', unsubscribe = null, removeSub = null;
+  let chatInitialized = false;
+
+  // Stable color from any seed string (uid preferred — so same-name users get different colors)
+  const COLORS = ['#3cbbb1','#bbbdf6','#ee4266','#f1b643','#4ade80','#f472b6'];
+  function seedColor(seed) {
+    let h = 0;
+    for (let i = 0; i < (seed || '').length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
+    return COLORS[h % COLORS.length];
+  }
+  const msgRefs = {}; // key → firebase ref for delete
+  const reactionUnsubs = {}; // key → onValue unsubscribe for reactions
+  const QUICK_EMOJIS = ['👍','❤️','😂','😮','🙌','🔥'];
+
+  // Image-based reactions: stored as "img:id" in Firebase
+  const IMG_REACTIONS = [
+    { id: 'brain',      src: 'ysa-brain-transparent.png',  label: 'YSA Brain' },
+    { id: 'codegreen',  src: 'CodeGreen Logo (1).png',     label: 'Code Green' },
+    { id: 'labrats',    src: 'Lab_Rats.png',               label: 'Lab Rats' },
+    { id: 'divedeep',   src: 'divedeep.png',               label: 'Dive Deep' },
+    { id: 'supernovas', src: 'supernova.png',              label: 'Supernovas' },
+    { id: 'stealth',    src: 'image.png',                  label: 'Stealth' },
+    { id: 'fuerza',     src: 'Fuerza.png',                 label: 'Fuerza' },
+  ];
+
+  if (isConfigured) {
+    app  = initializeApp(firebaseConfig);
+    db   = getDatabase(app);
+    auth = getAuth(app);
+
+    onAuthStateChanged(auth, async user => {
+      if (user) {
+        // Check if this user is banned
+        try {
+          const bannedSnap = await get(ref(db, `banned/${user.uid}`));
+          if (bannedSnap.exists()) {
+            await fbSignOut(auth);
+            showSignInWall();
+            showAuthError('Your account has been suspended. Contact gsachair@youngscientistacademy.org for help.');
+            return;
+          }
+        } catch(_) {} // non-blocking — if check fails, let them in
+        currentUser = { uid: user.uid, name: user.displayName || user.email.split('@')[0], photo: user.photoURL, email: user.email, team: 'YSA', pronouns: '' };
+        // Log every sign-in to signups/ so admin can see all accounts, not just profile-completers
+        try {
+          const signupRef = ref(db, `signups/${user.uid}`);
+          const existing = await get(signupRef);
+          if (!existing.exists()) {
+            await set(signupRef, {
+              email: user.email || null,
+              displayName: user.displayName || user.email?.split('@')[0] || null,
+              provider: user.providerData?.[0]?.providerId || 'unknown',
+              firstSeen: Date.now()
+            });
+          }
+        } catch(_) {}
+        checkAndShowProfileSetup();
+      } else {
+        // Firebase confirmed: no session — show the sign-in wall
+        showSignInWall();
+      }
+    });
+
+    // Primary Google sign-in (popup with account picker)
+    window.signInWithGoogle = async () => {
+      try {
+        const provider = new GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
+        await signInWithPopup(auth, provider);
+        // onAuthStateChanged handles the rest
+      } catch(e) {
+        if (e.code !== 'auth/popup-closed-by-user') console.error('Sign-in error:', e);
+      }
+    };
+
+    // Force-switch account: sign out first, then sign in with account picker
+    window.switchGoogleAccount = async () => {
+      try {
+        await fbSignOut(auth);
+        chatInitialized = false;
+        await window.signInWithGoogle();
+      } catch(e) { console.error(e); }
+    };
+
+    window.signOut = async () => {
+      await fbSignOut(auth);
+      currentUser = null;
+      chatInitialized = false;
+      // onAuthStateChanged will fire with null and call showSignInWall
+    };
+  } else {
+    document.getElementById('setupNotice').style.display = 'block';
+    showSignInWall();
+    window.signInWithGoogle = () => alert('Firebase not configured yet.');
+    window.switchGoogleAccount = window.signInWithGoogle;
+    window.submitEmailAuth = () => alert('Firebase not configured yet.');
+    window.signOut = () => { currentUser = null; chatInitialized = false; showSignInWall(); };
+  }
+
+  let authMode = 'signin'; // 'signin' | 'register'
+
+  window.switchAuthTab = (mode) => {
+    authMode = mode;
+    const isReg = mode === 'register';
+    document.getElementById('tabSignIn').style.background    = isReg ? 'transparent' : 'rgba(60,187,177,0.15)';
+    document.getElementById('tabSignIn').style.color         = isReg ? 'rgba(245,245,240,0.4)' : 'var(--teal)';
+    document.getElementById('tabSignIn').style.border        = isReg ? '1px solid rgba(245,245,240,0.08)' : '1px solid rgba(245,245,240,0.15)';
+    document.getElementById('tabRegister').style.background  = isReg ? 'rgba(60,187,177,0.15)' : 'transparent';
+    document.getElementById('tabRegister').style.color       = isReg ? 'var(--teal)' : 'rgba(245,245,240,0.4)';
+    document.getElementById('tabRegister').style.border      = isReg ? '1px solid rgba(245,245,240,0.15)' : '1px solid rgba(245,245,240,0.08)';
+    document.getElementById('authSubmitBtn').textContent     = isReg ? 'Create Account →' : 'Sign In →';
+    document.getElementById('authPassword').autocomplete     = isReg ? 'new-password' : 'current-password';
+    document.getElementById('forgotPasswordBtn').style.display = isReg ? 'none' : 'block';
+    document.getElementById('authError').style.display = 'none';
+  };
+
+  window.submitEmailAuth = async () => {
+    const email    = document.getElementById('authEmail').value.trim();
+    const password = document.getElementById('authPassword').value;
+    const errEl    = document.getElementById('authError');
+    const btn      = document.getElementById('authSubmitBtn');
+    errEl.style.display = 'none';
+    if (!email || !password) { showAuthError('Please enter your email and password.'); return; }
+    btn.disabled = true;
+    btn.textContent = authMode === 'register' ? 'Creating account…' : 'Signing in…';
+    try {
+      if (authMode === 'register') {
+        await createUserWithEmailAndPassword(auth, email, password);
+      } else {
+        await signInWithEmailAndPassword(auth, email, password);
+      }
+      // onAuthStateChanged fires and handles the rest
+    } catch(e) {
+      btn.disabled = false;
+      btn.textContent = authMode === 'register' ? 'Create Account →' : 'Sign In →';
+      showAuthError(friendlyAuthError(e.code));
+    }
+  };
+
+  window.resetPassword = async () => {
+    const email = document.getElementById('authEmail').value.trim();
+    if (!email) { showAuthError('Enter your email address first.'); return; }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      showAuthError('Password reset email sent! Check your inbox and spam folder — it may take a moment.', true);
+    } catch(e) {
+      showAuthError(friendlyAuthError(e.code));
+    }
+  };
+
+  function showAuthError(msg, isSuccess = false) {
+    const el = document.getElementById('authError');
+    el.textContent = msg;
+    el.style.display = 'block';
+    el.style.color      = isSuccess ? '#4ade80' : '#ee4266';
+    el.style.background = isSuccess ? 'rgba(74,222,128,0.08)' : 'rgba(238,66,102,0.08)';
+  }
+
+  function friendlyAuthError(code) {
+    const map = {
+      'auth/email-already-in-use':    'An account with this email already exists. Try signing in.',
+      'auth/invalid-email':           'That email doesn\'t look right.',
+      'auth/weak-password':           'Password should be at least 6 characters.',
+      'auth/user-not-found':          'No account found with that email.',
+      'auth/wrong-password':          'Incorrect password. Try again or reset it.',
+      'auth/invalid-credential':      'Incorrect email or password.',
+      'auth/too-many-requests':       'Too many attempts. Try again in a moment.',
+      'auth/network-request-failed':  'Network error. Check your connection.',
+    };
+    return map[code] || 'Something went wrong. Please try again.';
+  }
+
+  // Allow Enter key to submit email auth
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && document.getElementById('signInWall')?.classList.contains('visible')) {
+      const active = document.activeElement;
+      if (active && (active.id === 'authEmail' || active.id === 'authPassword')) {
+        window.submitEmailAuth();
+      }
+    }
+  });
+
+  function showSignInWall() {
+    const wall = document.getElementById('signInWall');
+    wall.classList.add('visible');
+    // Reset button so it's clickable again after sign-out
+    const btn = document.getElementById('authSubmitBtn');
+    if (btn) { btn.disabled = false; btn.textContent = 'Sign In →'; }
+    const errEl = document.getElementById('authError');
+    if (errEl) errEl.style.display = 'none';
+  }
+  function hideSignInWall() {
+    const wall = document.getElementById('signInWall');
+    wall.classList.remove('visible');
+  }
+
+  // Google GSI button render
+  window.addEventListener('load', () => {
+    if (window.google) {
+      google.accounts.id.initialize({
+        client_id: '925304429450-mngcqp5aa64g8amr4kklc3702keas0tn.apps.googleusercontent.com',
+        callback: async (resp) => {
+          if (!auth) return;
+          try {
+            // Proper Firebase auth via credential — sets auth.currentUser correctly
+            // so Firebase rules (auth != null) pass, and reactions/profile writes work
+            const cred = GoogleAuthProvider.credential(resp.credential);
+            await signInWithCredential(auth, cred);
+            // onAuthStateChanged fires from here and handles the rest
+          } catch(e) {
+            console.error('GSI credential auth failed:', e);
+          }
+        }
+      });
+      google.accounts.id.renderButton(document.getElementById('gSignInBtn'), {
+        theme: 'filled_black', size: 'large', width: 280, shape: 'pill'
+      });
+    }
+  });
+
+  // Guest login removed in task #21 — email/password and Google only
+
+  function enterChat() {
+    if (chatInitialized) { refreshUserBar(); return; } // guard against double-load
+    chatInitialized = true;
+    hideSignInWall();
+    document.getElementById('currentUserLabel').textContent = currentUser.name;
+    refreshUserBar();
+    loadChannel('general');
+    trackOnline();
+    watchForBan();
+  }
+
+  // Real-time ban watcher — kicks user out the moment they're banned
+  function watchForBan() {
+    if (!db || !currentUser) return;
+    onValue(ref(db, `banned/${currentUser.uid}`), async snap => {
+      if (snap.exists()) {
+        await fbSignOut(auth);
+        currentUser = null;
+        chatInitialized = false;
+        showSignInWall();
+        showAuthError('Your account has been suspended. Contact gsachair@youngscientistacademy.org for help.');
+      }
+    });
+  }
+
+  // Online presence
+  function trackOnline() {
+    if (!db || !currentUser) return;
+    const presenceRef = ref(db, `presence/${currentUser.uid}`);
+    set(presenceRef, {
+      name: currentUser.name,
+      team: currentUser.team || '',
+      pronouns: currentUser.pronouns || '',
+      ts: serverTimestamp()
+    });
+    // Auto-remove when browser closes / disconnects
+    onDisconnect(presenceRef).remove();
+    const onlineRef = ref(db, 'presence');
+    onValue(onlineRef, snap => {
+      const count = snap.exists() ? Object.keys(snap.val()).length : 1;
+      document.getElementById('onlineCount').textContent = count;
+      // Live-update admin online list if panel is open
+      if (document.getElementById('adminPanel').style.display === 'flex') {
+        renderAdminOnline(snap);
+      }
+    });
+  }
+
+  function renderAdminOnline(snap) {
+    const list = document.getElementById('adminOnlineList');
+    const countEl = document.getElementById('adminOnlineCount');
+    if (!list) return;
+    if (!snap || !snap.exists()) {
+      list.innerHTML = '<span style="color:rgba(245,245,240,0.25); font-style:italic;">Nobody online right now</span>';
+      if (countEl) countEl.textContent = '';
+      return;
+    }
+    const entries = Object.entries(snap.val());
+    if (countEl) countEl.textContent = `(${entries.length})`;
+    list.innerHTML = entries.map(([uid, u]) => {
+      const name = u.name || 'Unknown';
+      const isMe = currentUser && uid === currentUser.uid;
+      const parts = [u.pronouns, u.team].filter(Boolean);
+      const tip = parts.length ? parts.join(' · ') : '';
+      const safeName = name.replace(/'/g, "\\'");
+      return `<div style="display:flex;align-items:center;gap:0.4rem;flex-wrap:nowrap;">
+        <span title="${tip}" style="background:rgba(60,187,177,0.1);border:1px solid rgba(60,187,177,0.2);border-radius:50px;padding:0.2rem 0.65rem;white-space:nowrap;font-size:0.78rem;">${esc(name)}</span>
+        ${!isMe
+          ? `<button class="ban-btn" onclick="banUser('${uid}','${safeName}')" title="Ban ${esc(name)}">Ban</button>
+             <button onclick="removeUser('${uid}','${safeName}')" title="Remove account data" style="background:none;border:1px solid rgba(245,245,240,0.12);border-radius:50px;color:rgba(245,245,240,0.3);font-size:0.65rem;padding:0.15rem 0.5rem;cursor:pointer;" onmouseover="this.style.color='#4ade80';this.style.borderColor='rgba(74,222,128,0.4)'" onmouseout="this.style.color='rgba(245,245,240,0.3)';this.style.borderColor='rgba(245,245,240,0.12)'">Remove</button>`
+          : '<span style="font-size:0.65rem;color:rgba(245,245,240,0.2);">(you)</span>'}
+      </div>`;
+    }).join('');
+  }
+
+  // Channel switching
+  const channelDescs = {
+    'general':             'Open chat for all summit participants',
+    'day1-lozova':         'Day 1 · July 13 · Codrii Reserve & LT Nestor Vornicescu',
+    'day2-scoreni':        'Day 2 · July 14 · LT Universul & World\'s Biggest Wine Barrel',
+    'science-talk':        'Research discussions, science questions, nerding out 🔬',
+    'random':              'Anything goes — photos, memes, memories',
+    'team-codrii-minds':   'Ask Codrii Minds anything about their research — wildlife, forest tech, mental health',
+    'team-noroc':          'Ask Noroc Science about their CO₂ air quality mapping across Chișinău',
+    'team-hydroterra':     'Ask HydroTerra about their water quality dashboard across Moldova',
+    'team-codegreen':      'Ask Code Green about the Greenspace app and urban sustainability',
+    'team-divedeep':       'Ask Dive Deep about marine science and their research',
+    'team-stealth':        'Ask Stealth about their weather balloon payload engineering',
+    'team-supernovas':     'Ask Supernovas about their research',
+    'team-labrats':        'Ask Lab Rats about climate & mental health and extreme environment botany',
+    'team-forta':          'Ask Forța about healthcare access across the US and Moldova',
+    'team-20dm3':          'Ask 20dm³ about their pollen mapping and allergen research',
+  };
+
+  function loadChannel(channel) {
+    currentChannel = channel;
+    const area = document.getElementById('messagesArea');
+    area.innerHTML = `<div class="system-msg">Welcome to #${channel} 👋</div>`;
+    document.getElementById('channelName').textContent = channel;
+    document.getElementById('channelDesc').textContent = channelDescs[channel] || `Ask this team about their research`;
+    document.getElementById('teamCallout').style.display = channel === 'general' ? 'block' : 'none';
+    document.getElementById('msgInput').placeholder = `Message #${channel}…`;
+
+    if (unsubscribe) { unsubscribe(); unsubscribe = null; }
+    if (removeSub) { removeSub(); removeSub = null; }
+    Object.values(reactionUnsubs).forEach(fn => fn());
+    Object.keys(reactionUnsubs).forEach(k => delete reactionUnsubs[k]);
+    lastAuthor  = null;
+    lastUid     = null;
+    lastDateStr = null;
+
+    if (db) {
+      const msgsRef = ref(db, `channels/${channel}/messages`);
+      unsubscribe = onChildAdded(msgsRef, snap => {
+        msgRefs[snap.key] = ref(db, `channels/${channel}/messages/${snap.key}`);
+        renderMessage(snap.val(), snap.key, area);
+      });
+      // onChildRemoved handles DOM cleanup when a message is deleted from Firebase
+      removeSub = onChildRemoved(msgsRef, snap => {
+        const contRow = document.querySelector(`.msg-cont-row[data-key="${snap.key}"]`);
+        if (contRow) {
+          const group = contRow.closest('.msg-group');
+          contRow.remove();
+          // If that was the last message in the group, remove the whole group
+          if (group && group.querySelectorAll('.msg-cont-row').length === 0) group.remove();
+        }
+        // Re-sync grouping state after deletion
+        const lastGroup = area.querySelector('.msg-group:last-child');
+        lastAuthor = lastGroup ? (lastGroup.querySelector('.msg-author')?.textContent.trim() || null) : null;
+        lastUid    = null; // can't reliably recover uid from DOM; force new group on next message
+      });
+    }
+  }
+
+  window.switchChannel = (ch, btn) => {
+    document.querySelectorAll('.channel-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    loadChannel(ch);
+  };
+
+  // Rendering
+  let lastAuthor  = null;
+  let lastUid     = null;
+  let lastDateStr = null;
+
+  // Build a self-contained row for any individual message bubble.
+  // Every message (first in group OR continuation) gets the same structure:
+  //   .msg-cont-row > .react-trigger + .msg-bubble [+delete] + .reaction-bar
+  // This means the hover trigger is always scoped to exactly one row — no group-level trigger.
+  function makeContRow(msg, key, isContinuation) {
+    const isAdmin = currentUser && currentUser.email === ADMIN_EMAIL;
+    const isOwn   = currentUser && msg.uid && msg.uid === currentUser.uid;
+
+    const contRow = document.createElement('div');
+    contRow.className = 'msg-cont-row';
+    if (key) contRow.dataset.key = key;
+
+    // React trigger scoped to this row's key
+    if (key) {
+      const quickBtns = QUICK_EMOJIS.map(e =>
+        `<button class="emoji-quick-btn" title="${e}" onclick="toggleReaction('${key}','${e}')">${e}</button>`
+      ).join('') + IMG_REACTIONS.map(r =>
+        `<button class="emoji-quick-btn" title="${r.label}" onclick="toggleReaction('${key}','img:${r.id}')"><img src="${r.src}" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;border-radius:3px;"></button>`
+      ).join('');
+      const trigger = document.createElement('div');
+      trigger.className = 'react-trigger';
+      trigger.innerHTML = quickBtns;
+      contRow.appendChild(trigger);
+    }
+
+    const bubble = document.createElement('div');
+    bubble.className = isContinuation ? 'msg-bubble continuation' : 'msg-bubble';
+    if (msg.imageData) {
+      const img = document.createElement('img');
+      img.src = msg.imageData;
+      img.className = 'chat-img';
+      img.title = 'Click to open full size';
+      img.onclick = () => window.open(msg.imageData, '_blank');
+      bubble.appendChild(img);
+    }
+    if (msg.text) {
+      const span = document.createElement('span');
+      span.innerHTML = linkify(escHtml(msg.text));
+      bubble.appendChild(span);
+    }
+
+    if (key && (isAdmin || isOwn)) {
+      const delBtn = document.createElement('button');
+      delBtn.className = 'delete-btn';
+      delBtn.style.display = 'inline-flex';
+      delBtn.title = 'Delete message';
+      delBtn.textContent = '🗑';
+      delBtn.dataset.key = key;
+      delBtn.onclick = () => deleteMessage(key);
+      bubble.appendChild(delBtn);
+    }
+
+    contRow.appendChild(bubble);
+
+    if (key) {
+      const bar = document.createElement('div');
+      bar.className = 'reaction-bar';
+      bar.id = `reactions-${key}`;
+      contRow.appendChild(bar);
+    }
+
+    return contRow;
+  }
+
+  function renderMessage(msg, key, area) {
+    const isNew = msg.author !== lastAuthor || msg.uid !== lastUid;
+    lastAuthor = msg.author;
+    lastUid    = msg.uid || null;
+
+    const msgDate = msg.ts ? new Date(msg.ts) : new Date();
+    const now = new Date();
+    const dateStr = msgDate.toDateString();
+    const timeStr = msgDate.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    let friendlyDate;
+    if (dateStr === now.toDateString()) friendlyDate = 'Today';
+    else if (dateStr === new Date(now - 86400000).toDateString()) friendlyDate = 'Yesterday';
+    else friendlyDate = msgDate.toLocaleDateString([], {weekday:'long', month:'short', day:'numeric'});
+    const fullTime = `${friendlyDate} at ${timeStr}`;
+
+    if (dateStr !== lastDateStr) {
+      lastDateStr = dateStr;
+      lastAuthor  = null;
+      lastUid     = null;
+      const divider = document.createElement('div');
+      divider.style.cssText = 'display:flex;align-items:center;gap:0.8rem;margin:1rem 0 0.5rem;';
+      divider.innerHTML = `<div style="flex:1;height:1px;background:rgba(245,245,240,0.07);"></div><span style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;color:rgba(245,245,240,0.25);text-transform:uppercase;white-space:nowrap;">${friendlyDate}</span><div style="flex:1;height:1px;background:rgba(245,245,240,0.07);"></div>`;
+      area.appendChild(divider);
+    }
+
+    const initials = (msg.author || '?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const color = seedColor(msg.uid || msg.author);
+    const isVerified = msg.uid && !msg.uid.startsWith('guest_');
+    const verifiedBadge = isVerified ? `<span title="Signed in with Google" style="font-size:0.62rem;color:#3cbbb1;margin-left:0.15rem;vertical-align:middle;" aria-label="Verified">✓</span>` : '';
+
+    if (isNew) {
+      // New group: avatar + header, then first bubble as its own msg-cont-row
+      const group = document.createElement('div');
+      group.className = 'msg-group';
+      group.innerHTML = `
+        <div class="msg-row">
+          <div class="msg-avatar" style="background:${parseAvatar(msg.photo, msg.author).bg};">${parseAvatar(msg.photo, msg.author).inner}</div>
+          <div class="msg-content">
+            <div class="msg-header">
+              <span class="msg-author">${msg.author}</span>${verifiedBadge}
+              ${msg.pronouns ? `<span class="msg-pronouns">${escHtml(msg.pronouns)}</span>` : ''}
+              ${msg.team ? `<span style="font-size:0.65rem;color:${color};font-weight:600;background:${color}22;padding:0.1rem 0.4rem;border-radius:50px;">${msg.team}</span>` : ''}
+              <span class="msg-time">${fullTime}</span>
+            </div>
+          </div>
+        </div>`;
+      // Append first bubble as a cont-row so it has its own scoped trigger
+      group.querySelector('.msg-content').appendChild(makeContRow(msg, key, false));
+      area.appendChild(group);
+    } else {
+      // Continuation: append to last group's msg-content
+      const last = area.querySelector('.msg-group:last-child .msg-content');
+      if (last) last.appendChild(makeContRow(msg, key, true));
+    }
+
+    if (key && db) loadReactions(key);
+    area.scrollTop = area.scrollHeight;
+  }
+
+  window.deleteMessage = async (key) => {
+    if (!currentUser) return;
+    if (!confirm('Delete this message?')) return;
+    try {
+      if (msgRefs[key]) await remove(msgRefs[key]);
+      // DOM removal is handled by the onChildRemoved listener in loadChannel
+    } catch(e) {
+      console.error('Delete failed:', e);
+    }
+  };
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // Sending
+  window.sendMessage = async () => {
+    if (!currentUser) return;
+    const input = document.getElementById('msgInput');
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    input.style.height = 'auto';
+
+    const msg = {
+      author:   currentUser.name,
+      uid:      currentUser.uid || null,
+      team:     currentUser.team || '',
+      photo:    currentUser.photo || null,
+      pronouns: currentUser.pronouns || '',
+      text,
+      ts: db ? serverTimestamp() : Date.now()
+    };
+
+    if (db) {
+      await push(ref(db, `channels/${currentChannel}/messages`), msg);
+    } else {
+      // Demo mode (no Firebase) — render locally
+      renderMessage({...msg, ts: Date.now()}, null, document.getElementById('messagesArea'));
+    }
+  };
+
+  window.handleKey = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  };
+
+  window.autoResize = (el) => {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  };
+
+  // ── PROFILE SYSTEM ──
+
+  // Resize image to 88x88 via canvas, return base64 jpeg
+  function resizeImageToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = 88; canvas.height = 88;
+          const ctx = canvas.getContext('2d');
+          // center-crop
+          const side = Math.min(img.width, img.height);
+          const sx = (img.width - side) / 2;
+          const sy = (img.height - side) / 2;
+          ctx.drawImage(img, sx, sy, side, side, 0, 0, 88, 88);
+          resolve(canvas.toDataURL('image/jpeg', 0.8));
+        };
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // Pending photo for profile modals
+  let setupPendingPhoto = null;
+  let editPendingPhoto = null;
+
+  // ── AVATAR BUILDER STATE ──
+  // ── DICEBEAR AVATAR BUILDER ──────────────────────────────────────────
+  const DB_SKIN = [
+    { id:'pale',      hex:'#f0dbd5' }, { id:'light',     hex:'#fdd8b5' },
+    { id:'wheat',     hex:'#e8b888' }, { id:'tanned',    hex:'#c98a52' },
+    { id:'brown',     hex:'#ae5d29' }, { id:'darkBrown', hex:'#614335' },
+    { id:'black',     hex:'#2c1810' },
+  ];
+  const DB_HAIR = [
+    { id:'shortHairShortFlat',  label:'Flat' },   { id:'shortHairShortCurly', label:'Curly' },
+    { id:'longHairBob',         label:'Bob' },    { id:'longHairStraight',    label:'Long' },
+    { id:'longHairFro',         label:'Fro' },    { id:'shortHairDreads01',   label:'Dreads' },
+    { id:'winterHat1',          label:'🎩 Hat' }, { id:'hijab',               label:'🧕 Hijab' },
+  ];
+  const DB_HAIR_COLOR = [
+    { id:'black',      hex:'#2c1a0e' }, { id:'brownDark',  hex:'#5a3825' },
+    { id:'brown',      hex:'#8b5e3c' }, { id:'auburn',     hex:'#a05228' },
+    { id:'blonde',     hex:'#d4a843' }, { id:'red',        hex:'#c0392b' },
+    { id:'pastelPink', hex:'#f7b2c0' }, { id:'silverGray', hex:'#aaaaaa' },
+  ];
+  const DB_OUTFIT = [
+    { id:'hoodie',        label:'Hoodie' }, { id:'shirtCrewNeck', label:'T-Shirt' },
+    { id:'blazerShirt',   label:'Blazer' }, { id:'collarSweater', label:'Sweater' },
+    { id:'graphicShirt',  label:'Graphic' },
+  ];
+  const DB_OUTFIT_COLOR = [
+    { id:'blue01',      hex:'#3d6b8e' }, { id:'pastelGreen', hex:'#a8d8a8' },
+    { id:'red',         hex:'#b83232' }, { id:'pastelBlue',  hex:'#84b0e8' },
+    { id:'heather',     hex:'#9ea8b5' }, { id:'black',       hex:'#333333' },
+  ];
+  const dbCfg = {
+    setup: { skinColor:'light', top:'shortHairShortFlat', hairColor:'brown', clothesType:'hoodie', clothesColor:'blue01' },
+    edit:  { skinColor:'light', top:'shortHairShortFlat', hairColor:'brown', clothesType:'hoodie', clothesColor:'blue01' },
+  };
+  function buildDiceBearUrl(cfg) {
+    const p = new URLSearchParams({ skinColor:cfg.skinColor||'light', top:cfg.top||'shortHairShortFlat', hairColor:cfg.hairColor||'brown', clothes:cfg.clothesType||'hoodie', clothesColor:cfg.clothesColor||'blue01' });
+    return 'https://api.dicebear.com/7.x/avataaars/svg?' + p.toString();
+  }
+  function initDbBuilder(prefix) {
+    function makeSwatches(containerId, items, cfgKey) {
+      const row = document.getElementById(containerId);
+      if (!row || row.children.length) return;
+      items.forEach(item => {
+        const el = document.createElement('div');
+        el.className = 'db-swatch' + (item.id === dbCfg[prefix][cfgKey] ? ' sel' : '');
+        el.style.background = item.hex;
+        el.title = item.id;
+        el.onclick = () => { dbCfg[prefix][cfgKey] = item.id; row.querySelectorAll('.db-swatch').forEach(x => x.classList.remove('sel')); el.classList.add('sel'); updateDbPreview(prefix); };
+        row.appendChild(el);
+      });
+    }
+    function makePills(containerId, items, cfgKey) {
+      const row = document.getElementById(containerId);
+      if (!row || row.children.length) return;
+      items.forEach(item => {
+        const el = document.createElement('button');
+        el.className = 'db-pill' + (item.id === dbCfg[prefix][cfgKey] ? ' sel' : '');
+        el.textContent = item.label;
+        el.onclick = () => { dbCfg[prefix][cfgKey] = item.id; row.querySelectorAll('.db-pill').forEach(x => x.classList.remove('sel')); el.classList.add('sel'); updateDbPreview(prefix); };
+        row.appendChild(el);
+      });
+    }
+    makeSwatches(`${prefix}-skin`,      DB_SKIN,         'skinColor');
+    makePills(`${prefix}-hair`,           DB_HAIR,         'top');
+    makeSwatches(`${prefix}-haircolor`, DB_HAIR_COLOR,   'hairColor');
+    makePills(`${prefix}-outfit`,         DB_OUTFIT,       'clothesType');
+    updateDbPreview(prefix);
+  }
+  function updateDbPreview(prefix) {
+    const url = buildDiceBearUrl(dbCfg[prefix]);
+    const img = document.getElementById(`${prefix}DbPreview`);
+    if (img) img.src = url;
+    if (prefix === 'setup') { setupPendingPhoto = url; }
+    else { editPendingPhoto = url; if (typeof updateEditPreview === 'function') updateEditPreview(); }
+  }
+  function syncDbFromUrl(prefix, url) {
+    if (!url || !url.includes('dicebear.com')) return;
+    try {
+      const params = new URL(url).searchParams;
+      if (params.get('skinColor')) dbCfg[prefix].skinColor = params.get('skinColor');
+      if (params.get('top')) dbCfg[prefix].top = params.get('top');
+      if (params.get('hairColor')) dbCfg[prefix].hairColor = params.get('hairColor');
+      if (params.get('clothes')) dbCfg[prefix].clothesType = params.get('clothes');
+      if (params.get('clothesColor')) dbCfg[prefix].clothesColor = params.get('clothesColor');
+    } catch(e) {}
+  }
+  let setupAvatarMode = 'upload', editAvatarMode = 'upload';
+
+  // Parse emoji:: avatar format → { bg, inner }
+  window.parseAvatar = function(photo, name) {
+    const color = nameColor(name || '');
+    if (photo && photo.startsWith('emoji::')) {
+      const parts = photo.split('::');
+      const emoji = parts[1] || '⭐';
+      const bg    = parts[2] || color;
+      return { bg, inner: `<span style="font-size:1.1rem;line-height:1;">${emoji}</span>` };
+    }
+    return {
+      bg: color,
+      inner: photo ? `<img src="${photo}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" />` : getInitials(name || '')
+    };
+  };
+
+  // Set avatar ring HTML from a photo value
+  function setRingFromPhoto(prefix, photo, name) {
+    const ring = document.getElementById(`${prefix}AvatarRing`);
+    const hint = `<div class="avatar-hint" id="${prefix}AvatarHint"><span>📷</span>Change</div>`;
+    if (!photo) {
+      ring.innerHTML = `<div class="avatar-initials">${getInitials(name || '')}</div>${hint}`;
+      return;
+    }
+    if (photo.startsWith('emoji::')) {
+      const parts = photo.split('::');
+      const emoji = parts[1] || '⭐';
+      const bg    = parts[2] || '#3cbbb1';
+      ring.innerHTML = `<div style="width:62px;height:62px;border-radius:50%;background:${bg};display:flex;align-items:center;justify-content:center;font-size:2rem;">${emoji}</div>${hint}`;
+    } else {
+      ring.innerHTML = `<img src="${photo}" />${hint}`;
+    }
+  }
+
+
+  window.switchAvatarTab = function(prefix, mode) {
+    if (prefix === 'setup') setupAvatarMode = mode;
+    else                    editAvatarMode   = mode;
+    document.getElementById(`${prefix}TabUpload`).classList.toggle('active', mode === 'upload');
+    document.getElementById(`${prefix}TabBuild`).classList.toggle('active',  mode === 'build');
+    const builder = document.getElementById(`${prefix}AvatarBuilder`);
+    builder.classList.toggle('open', mode === 'build');
+    if (mode === 'build') {
+      const cur = prefix === 'setup' ? (setupPendingPhoto || currentUser.photo) : (editPendingPhoto || currentUser.photo);
+      if (cur && cur.includes('dicebear.com')) syncDbFromUrl(prefix, cur);
+      initDbBuilder(prefix);
+    }
+  };
+
+  window.onAvatarRingClick = function(prefix) {
+    const mode = prefix === 'setup' ? setupAvatarMode : editAvatarMode;
+    if (mode === 'build') return;
+    document.getElementById(`${prefix}AvatarInput`).click();
+  };
+
+
+  // Wire avatar upload inputs
+  document.getElementById('setupAvatarInput').addEventListener('change', async e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      setupPendingPhoto = await resizeImageToBase64(file);
+      setRingFromPhoto('setup', setupPendingPhoto, currentUser.name);
+    } catch(err) { console.error('Photo resize failed:', err); }
+    e.target.value = '';
+  });
+
+  document.getElementById('editAvatarInput').addEventListener('change', async e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      editPendingPhoto = await resizeImageToBase64(file);
+      setRingFromPhoto('edit', editPendingPhoto, currentUser.name);
+      updateEditPreview();
+    } catch(err) { console.error('Photo resize failed:', err); }
+    e.target.value = '';
+  });
+
+  // Compute initials from name
+  function getInitials(name) {
+    return (name || '?').split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase() || '?';
+  }
+
+  // Get color for current user (use uid so it matches their messages)
+  function nameColor(name) {
+    return seedColor(currentUser?.uid || name);
+  }
+
+  // Load profile from Firebase (profiles/${uid})
+  async function loadProfile(uid) {
+    if (!db || !uid) return null;
+    try {
+      const snap = await get(ref(db, `profiles/${uid}`));
+      return snap.exists() ? snap.val() : null;
+    } catch(e) { return null; }
+  }
+
+  // Save profile to Firebase
+  async function saveProfile(uid, data) {
+    if (!db || !uid) return;
+    await set(ref(db, `profiles/${uid}`), data);
+  }
+
+  // After login, check if profile exists; show setup modal or go straight to chat
+  async function checkAndShowProfileSetup() {
+    hideSignInWall();
+
+    if (db && currentUser && !currentUser.isGuest) {
+      // 1. Try Firebase first
+      const profile = await loadProfile(currentUser.uid);
+      if (profile && profile.team) {
+        currentUser.name     = profile.name     || currentUser.name;
+        currentUser.pronouns = profile.pronouns || '';
+        currentUser.team     = profile.team     || currentUser.team;
+        currentUser.role     = profile.role     || '';
+        currentUser.country  = profile.country  || '';
+        currentUser.phone    = profile.phone    || '';
+        if (profile.photoURL) currentUser.photo = profile.photoURL;
+        // Keep localStorage in sync
+        try {
+          localStorage.setItem('ysaProfile', JSON.stringify({
+            name: currentUser.name, pronouns: currentUser.pronouns, country: currentUser.country,
+            phone: currentUser.phone, team: currentUser.team, role: currentUser.role, photoURL: currentUser.photo || null
+          }));
+        } catch(_) {}
+        enterChat();
+        return;
+      }
+
+      // 2. Fall back to localStorage (filled from index.html or prior chat session)
+      try {
+        const local = JSON.parse(localStorage.getItem('ysaProfile') || '{}');
+        if (local.name) {
+          currentUser.name     = local.name     || currentUser.name;
+          currentUser.pronouns = local.pronouns || '';
+          currentUser.team     = local.team     || currentUser.team;
+          currentUser.role     = local.role     || '';
+          currentUser.country  = local.country  || '';
+          currentUser.phone    = local.phone    || '';
+          if (local.photoURL) currentUser.photo = local.photoURL;
+          // If profile is complete (has name + team), skip setup modal entirely
+          if (local.name && local.team) {
+            enterChat();
+            return;
+          }
+        }
+      } catch(_) {}
+    }
+
+    // Show setup modal (Google users only; guests go straight via enterChat)
+    showProfileSetupModal();
+  }
+
+  // ── PRONOUNS HELPERS ──
+  window.togglePronounsOther = (prefix) => {
+    const sel = document.getElementById(`${prefix}PronounsSelect`);
+    const inp = document.getElementById(`${prefix}PronounsOther`);
+    if (!sel || !inp) return;
+    inp.style.display = sel.value === 'other' ? 'block' : 'none';
+    if (sel.value === 'other') inp.focus();
+  };
+
+  function getPronouns(prefix) {
+    const sel = document.getElementById(`${prefix}PronounsSelect`);
+    if (!sel) return '';
+    if (sel.value === 'other') {
+      return (document.getElementById(`${prefix}PronounsOther`).value || '').trim();
+    }
+    return sel.value;
+  }
+
+  function setPronouns(prefix, val) {
+    const sel = document.getElementById(`${prefix}PronounsSelect`);
+    const inp = document.getElementById(`${prefix}PronounsOther`);
+    if (!sel) return;
+    const presets = ['', 'she/her', 'he/him', 'they/them'];
+    if (presets.includes(val)) {
+      sel.value = val;
+      if (inp) inp.style.display = 'none';
+    } else if (val) {
+      sel.value = 'other';
+      if (inp) { inp.value = val; inp.style.display = 'block'; }
+    } else {
+      sel.value = '';
+      if (inp) inp.style.display = 'none';
+    }
+  }
+
+  function showProfileSetupModal() {
+    const modal = document.getElementById('profileSetupModal');
+    modal.style.display = 'flex';
+    setupPendingPhoto = null;
+
+    // Pre-fill name
+    document.getElementById('setupName').value = currentUser.name || '';
+
+    // Reset avatar ring + tabs
+    setupAvatarMode = 'upload';
+    document.getElementById('setupTabUpload').classList.add('active');
+    document.getElementById('setupTabBuild').classList.remove('active');
+    document.getElementById('setupAvatarBuilder').classList.remove('open');
+    setRingFromPhoto('setup', currentUser.photo, currentUser.name);
+    if (currentUser.photo && (currentUser.photo.startsWith('emoji::') || currentUser.photo.includes('dicebear.com'))) {
+      switchAvatarTab('setup', 'build');
+    }
+
+    // Pre-fill pronouns dropdown
+    setPronouns('setup', currentUser.pronouns || '');
+
+    // Pre-fill country
+    document.getElementById('setupCountry').value = currentUser.country || '';
+
+    // Pre-fill phone
+    const phoneEl = document.getElementById('setupPhone');
+    if (phoneEl) phoneEl.value = currentUser.phone || '';
+
+    // Pre-select team if already set
+    const teamSel = document.getElementById('setupTeam');
+    if (currentUser.team && currentUser.team !== 'YSA') {
+      teamSel.value = currentUser.team;
+    }
+
+    // Pre-select role
+    const roleSel = document.getElementById('setupRole');
+    if (currentUser.role) roleSel.value = currentUser.role;
+
+    // Clear error
+    const errEl = document.getElementById('setupErrorMsg');
+    if (errEl) { errEl.style.display = 'none'; errEl.textContent = ''; }
+  }
+
+  window.saveProfileSetup = async () => {
+    const name     = document.getElementById('setupName').value.trim();
+    const pronouns = getPronouns('setup');
+    const country  = document.getElementById('setupCountry').value.trim();
+    const phone    = (document.getElementById('setupPhone')?.value || '').trim();
+    const team     = document.getElementById('setupTeam').value;
+    const role     = document.getElementById('setupRole').value;
+
+    if (!name) { document.getElementById('setupName').focus(); return; }
+
+    const btn = document.getElementById('setupSaveBtn');
+    const errEl = document.getElementById('setupErrorMsg');
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+    if (errEl) { errEl.style.display = 'none'; errEl.textContent = ''; }
+
+    // Determine photo
+    const photoURL = setupPendingPhoto || currentUser.photo || null;
+
+    // Update currentUser immediately (so enterChat works even if Firebase save fails)
+    currentUser.name     = name;
+    currentUser.pronouns = pronouns;
+    currentUser.country  = country;
+    currentUser.phone    = phone;
+    currentUser.team     = team || currentUser.team || 'Guest';
+    currentUser.role     = role;
+    currentUser.photo    = photoURL;
+
+    // Always save to localStorage so index.html picks it up
+    try {
+      const prev = JSON.parse(localStorage.getItem('ysaProfile') || '{}');
+      localStorage.setItem('ysaProfile', JSON.stringify({
+        ...prev, name, pronouns, country, phone, team: currentUser.team, role, photoURL: photoURL || null
+      }));
+    } catch(_) {}
+
+    // Save to Firebase — don't block entering chat if it fails
+    if (db && currentUser.uid && !currentUser.isGuest) {
+      try {
+        await saveProfile(currentUser.uid, {
+          name, pronouns, country, phone,
+          team: currentUser.team, role,
+          email: currentUser.email || null,
+          photoURL: photoURL || null, updatedAt: Date.now()
+        });
+      } catch(e) {
+        console.warn('Profile save to Firebase failed (entering chat anyway):', e);
+        if (errEl) {
+          errEl.textContent = 'Profile saved locally — Firebase sync failed. You can edit later.';
+          errEl.style.display = 'block';
+        }
+      }
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Enter Chat →';
+    document.getElementById('profileSetupModal').style.display = 'none';
+    enterChat();
+  };
+
+  // ── PROFILE EDIT PANEL ──
+
+  window.openProfileEdit = () => {
+    editPendingPhoto = null;
+    const modal = document.getElementById('profileEditModal');
+    modal.classList.add('open');
+
+    // Pre-fill fields
+    document.getElementById('editName').value    = currentUser.name    || '';
+    document.getElementById('editCountry').value = currentUser.country || '';
+    const teamSel = document.getElementById('editTeam');
+    teamSel.value = currentUser.team || '';
+    const roleSel = document.getElementById('editRole');
+    if (roleSel) roleSel.value = currentUser.role || '';
+
+    // Pronouns dropdown
+    setPronouns('edit', currentUser.pronouns || '');
+
+    // Avatar ring + tabs
+    editAvatarMode = 'upload';
+    document.getElementById('editTabUpload').classList.add('active');
+    document.getElementById('editTabBuild').classList.remove('active');
+    document.getElementById('editAvatarBuilder').classList.remove('open');
+    setRingFromPhoto('edit', currentUser.photo, currentUser.name);
+    if (currentUser.photo && (currentUser.photo.startsWith('emoji::') || currentUser.photo.includes('dicebear.com'))) {
+      switchAvatarTab('edit', 'build');
+    }
+
+    updateEditPreview();
+  };
+
+  window.closeProfileEdit = () => {
+    document.getElementById('profileEditModal').classList.remove('open');
+  };
+
+  window.updateEditPreview = () => {
+    const name     = document.getElementById('editName').value.trim() || currentUser.name || 'You';
+    const pronouns = getPronouns('edit');
+    const photo    = editPendingPhoto || currentUser.photo;
+    const color    = nameColor(name);
+
+    document.getElementById('previewName').textContent = name;
+    const pEl = document.getElementById('previewPronouns');
+    pEl.textContent = pronouns ? pronouns : '';
+
+    const avatarEl = document.getElementById('previewAvatar');
+    const av = parseAvatar(photo, name);
+    avatarEl.style.background = av.bg;
+    avatarEl.innerHTML = av.inner;
+  };
+
+  window.saveProfileEdit = async () => {
+    const name     = document.getElementById('editName').value.trim();
+    const pronouns = getPronouns('edit');
+    const country  = document.getElementById('editCountry').value.trim();
+    const team     = document.getElementById('editTeam').value;
+    const role     = document.getElementById('editRole') ? document.getElementById('editRole').value : (currentUser.role || '');
+
+    if (!name) { document.getElementById('editName').focus(); return; }
+
+    const btn = document.querySelector('.profile-edit-save');
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+
+    const photoURL = editPendingPhoto || currentUser.photo || null;
+
+    currentUser.name     = name;
+    currentUser.pronouns = pronouns;
+    currentUser.country  = country;
+    currentUser.team     = team || currentUser.team || 'Guest';
+    currentUser.role     = role;
+    currentUser.photo    = photoURL;
+
+    // localStorage sync so index.html stays in sync
+    try {
+      const prev = JSON.parse(localStorage.getItem('ysaProfile') || '{}');
+      localStorage.setItem('ysaProfile', JSON.stringify({
+        ...prev, name, pronouns, country, team: currentUser.team, role, photoURL: photoURL || null
+      }));
+    } catch(_) {}
+
+    if (db && currentUser.uid && !currentUser.isGuest) {
+      try {
+        await saveProfile(currentUser.uid, {
+          name, pronouns, country, team: currentUser.team, role, photoURL: photoURL || null, updatedAt: Date.now()
+        });
+      } catch(e) {
+        console.warn('Profile edit save failed:', e);
+      }
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Save Changes';
+    closeProfileEdit();
+    document.getElementById('currentUserLabel').textContent = currentUser.name;
+    refreshUserBar();
+  };
+
+  // Update the bottom bar avatar + name + pronouns
+  function refreshUserBar() {
+    if (!currentUser) return;
+    const name     = currentUser.name     || '';
+    const pronouns = currentUser.pronouns || '';
+    const photo    = currentUser.photo;
+    const color    = nameColor(name);
+
+    document.getElementById('currentUserLabel').textContent = name;
+    const pEl = document.getElementById('userBarPronouns');
+    pEl.textContent = pronouns ? pronouns : '';
+
+    const avatarEl = document.getElementById('userBarAvatar');
+    const av = parseAvatar(photo, name);
+    avatarEl.style.background = av.bg;
+    avatarEl.innerHTML = av.inner;
+
+    // Show admin button only for admin email
+    const adminBtn = document.getElementById('adminBtnWrap');
+    if (adminBtn) adminBtn.style.display = (currentUser.email === ADMIN_EMAIL) ? 'inline' : 'none';
+  }
+
+  // ── ADMIN PANEL ──
+  let adminData = [];
+
+  window.openAdminPanel = async () => {
+    if (!currentUser || currentUser.email !== ADMIN_EMAIL) return;
+    document.getElementById('adminPanel').style.display = 'flex';
+    const onlineSnap = await get(ref(db, 'presence'));
+    renderAdminOnline(onlineSnap);
+    loadBannedUsers();
+    await loadAdminData();
+  };
+
+  window.closeAdminPanel = () => {
+    document.getElementById('adminPanel').style.display = 'none';
+  };
+
+  window.loadAdminData = async () => {
+    if (!db) return;
+    const loadMsg = document.getElementById('adminLoadMsg');
+    const table   = document.getElementById('adminTable');
+    loadMsg.style.display = 'block';
+    table.style.display   = 'none';
+    document.getElementById('adminCount').textContent = '';
+
+    try {
+      // Merge profiles (full setup) + signups (anyone who ever signed in)
+      const [profilesSnap, signupsSnap] = await Promise.all([
+        get(ref(db, 'profiles')),
+        get(ref(db, 'signups'))
+      ]);
+
+      const merged = {};
+
+      // First load signups as baseline
+      if (signupsSnap.exists()) {
+        signupsSnap.forEach(child => {
+          const s = child.val();
+          merged[child.key] = {
+            uid: child.key,
+            name: s.displayName || '—',
+            email: s.email || '—',
+            provider: s.provider || '—',
+            firstSeen: s.firstSeen || null,
+            _signupOnly: true
+          };
+        });
+      }
+
+      // Overlay full profile data (overwrites signup baseline if exists)
+      if (profilesSnap.exists()) {
+        profilesSnap.forEach(child => {
+          const p = child.val();
+          merged[child.key] = { uid: child.key, _signupOnly: false, ...merged[child.key], ...p };
+        });
+      }
+
+      adminData = Object.values(merged);
+      // Sort by registration date (firstSeen), earliest first; null/missing go last
+      adminData.sort((a, b) => {
+        const aT = a.firstSeen || Infinity;
+        const bT = b.firstSeen || Infinity;
+        return aT - bT;
+      });
+
+      renderAdminTable(adminData);
+    } catch(e) {
+      loadMsg.textContent = 'Error loading data: ' + e.message;
+    }
+  };
+
+  function renderAdminTable(rows) {
+    const loadMsg = document.getElementById('adminLoadMsg');
+    const table   = document.getElementById('adminTable');
+    const tbody   = document.getElementById('adminTableBody');
+    const countEl = document.getElementById('adminCount');
+
+    if (!rows.length) {
+      loadMsg.textContent = 'No profiles found yet.';
+      table.style.display = 'none';
+      return;
+    }
+    loadMsg.style.display = 'none';
+    tbody.innerHTML = '';
+    rows.forEach((p, i) => {
+      const updated = p.updatedAt ? new Date(p.updatedAt).toLocaleDateString() : '–';
+      const tr = document.createElement('tr');
+      tr.style.cssText = 'border-bottom:1px solid rgba(245,245,240,0.05);';
+      const signupBadge = p._signupOnly
+        ? `<span style="font-size:0.6rem;background:rgba(241,182,67,0.15);border:1px solid rgba(241,182,67,0.3);color:#f1b643;border-radius:50px;padding:0.1rem 0.4rem;margin-left:0.4rem;vertical-align:middle;">signed in</span>`
+        : '';
+      tr.innerHTML = `
+        <td style="padding:0.55rem 0.6rem; color:rgba(245,245,240,0.25);">${i + 1}</td>
+        <td style="padding:0.55rem 0.6rem; font-weight:700;">${esc(p.name || '–')}${!p.email || p.email === '—' ? '<span title="No email connected" style="color:var(--gold);margin-left:0.3rem;font-size:0.8rem;">*</span>' : ''}${signupBadge}</td>
+        <td style="padding:0.55rem 0.6rem; color:rgba(245,245,240,0.5);">${esc(p.email || '–')}</td>
+        <td style="padding:0.55rem 0.6rem; color:rgba(245,245,240,0.5);">${esc(p.phone || '–')}</td>
+        <td style="padding:0.55rem 0.6rem;">${esc(p.team || '–')}</td>
+        <td style="padding:0.55rem 0.6rem; color:rgba(245,245,240,0.5);">${esc(p.role || '–')}</td>
+        <td style="padding:0.55rem 0.6rem; color:rgba(245,245,240,0.5);">${esc(p.country || '–')}</td>
+        <td style="padding:0.55rem 0.6rem; color:rgba(245,245,240,0.25); font-size:0.75rem;">${updated}</td>
+        <td style="padding:0.55rem 0.6rem;">
+          ${p.uid !== currentUser?.uid ? `<button onclick="removeUser('${p.uid}','${esc(p.name || 'this user')}')" style="background:none;border:1px solid rgba(245,245,240,0.12);border-radius:6px;color:rgba(245,245,240,0.3);font-size:0.7rem;padding:0.15rem 0.5rem;cursor:pointer;" onmouseover="this.style.color='#ee4266';this.style.borderColor='rgba(238,66,102,0.4)'" onmouseout="this.style.color='rgba(245,245,240,0.3)';this.style.borderColor='rgba(245,245,240,0.12)'">Remove</button>` : '<span style="font-size:0.7rem;color:rgba(245,245,240,0.15);">you</span>'}
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+    table.style.display = 'table';
+    countEl.textContent = `${rows.length} profile${rows.length !== 1 ? 's' : ''}`;
+  }
+
+  window.filterAdminTable = () => {
+    const q = (document.getElementById('adminSearch').value || '').toLowerCase();
+    if (!q) { renderAdminTable(adminData); return; }
+    const filtered = adminData.filter(p =>
+      (p.name    || '').toLowerCase().includes(q) ||
+      (p.email   || '').toLowerCase().includes(q) ||
+      (p.team    || '').toLowerCase().includes(q) ||
+      (p.role    || '').toLowerCase().includes(q) ||
+      (p.country || '').toLowerCase().includes(q) ||
+      (p.phone   || '').toLowerCase().includes(q)
+    );
+    renderAdminTable(filtered);
+  };
+
+  window.exportAdminCSV = () => {
+    if (!adminData.length) return;
+    const cols = ['name','email','phone','team','role','country','pronouns','updatedAt'];
+    const header = cols.join(',');
+    const rows = adminData.map(p =>
+      cols.map(c => {
+        let v = c === 'updatedAt' ? (p[c] ? new Date(p[c]).toLocaleDateString() : '') : (p[c] || '');
+        return `"${String(v).replace(/"/g, '""')}"`;
+      }).join(',')
+    );
+    const csv = [header, ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url; a.download = 'ysa-registrations.csv'; a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  function esc(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // ── REACTIONS ──
+  // Brief toast notification
+  function showToast(msg, color) {
+    const t = document.createElement('div');
+    t.style.cssText = `position:fixed;bottom:72px;left:50%;transform:translateX(-50%);background:${color||'#3cbbb1'};color:#0a0f0d;padding:0.45rem 1.1rem;border-radius:50px;font-size:0.8rem;font-weight:700;z-index:9999;pointer-events:none;opacity:0;transition:opacity 0.2s;white-space:nowrap;`;
+    document.body.appendChild(t);
+    t.textContent = msg;
+    requestAnimationFrame(() => { t.style.opacity = '1'; });
+    setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 250); }, 2500);
+  }
+
+  window.toggleReaction = async (msgKey, emoji) => {
+    if (!currentUser || !db || !msgKey) return;
+
+    // Use Firebase Auth uid if available, otherwise use currentUser.uid (guest)
+    const fbUser = auth ? auth.currentUser : null;
+    const uid = fbUser ? fbUser.uid : currentUser.uid;
+    const channel = currentChannel; // snapshot current channel
+    const safeKey = emoji.replace(/:/g, '__');
+    const reactionRef = ref(db, `channels/${channel}/reactions/${msgKey}/${safeKey}/${uid}`);
+
+    try {
+      const snap = await get(reactionRef);
+      if (snap.exists()) {
+        await remove(reactionRef);
+      } else {
+        await set(reactionRef, true);
+      }
+    } catch(e) {
+      console.error('Reaction write failed:', e.code, e.message);
+      if (e.code === 'PERMISSION_DENIED') {
+        showToast('Reactions blocked — update Firebase rules', '#f1b643');
+      } else {
+        showToast('Reaction failed: ' + (e.code || e.message), '#ee4266');
+      }
+    }
+  };
+
+  // ── LINK + IMAGE HELPERS ──
+
+  function linkify(escapedText) {
+    return escapedText.replace(/(https?:\/\/[^\s<>"']+)/g,
+      '<a href="$1" target="_blank" rel="noopener noreferrer" class="chat-link">$1</a>'
+    );
+  }
+
+  function resizeImageForChat(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          const MAX = 900;
+          let w = img.width, h = img.height;
+          if (w > MAX || h > MAX) {
+            if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+            else { w = Math.round(w * MAX / h); h = MAX; }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', 0.8));
+        };
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  document.getElementById('imageUploadInput').addEventListener('change', async e => {
+    const file = e.target.files[0];
+    if (!file || !currentUser || !db) return;
+    try {
+      const imageData = await resizeImageForChat(file);
+      await push(ref(db, `channels/${currentChannel}/messages`), {
+        author:   currentUser.name,
+        uid:      currentUser.uid || null,
+        team:     currentUser.team || '',
+        photo:    currentUser.photo || null,
+        pronouns: currentUser.pronouns || '',
+        text:     '',
+        imageData,
+        ts: serverTimestamp()
+      });
+    } catch(err) {
+      showToast('Image failed to send', '#ee4266');
+      console.error(err);
+    }
+    e.target.value = '';
+  });
+
+  // ── BAN / UNBAN ──
+
+  window.banUser = async (uid, name) => {
+    if (!currentUser || currentUser.email !== ADMIN_EMAIL || !db) return;
+    if (!confirm(`Ban ${name}? They will be signed out immediately.`)) return;
+    await set(ref(db, `banned/${uid}`), { name, bannedAt: Date.now(), bannedBy: currentUser.email });
+    // Also immediately remove their presence entry so they vanish from the online list
+    await remove(ref(db, `presence/${uid}`));
+    showToast(`${name} banned`, '#ee4266');
+    const snap = await get(ref(db, 'presence'));
+    renderAdminOnline(snap);
+    loadBannedUsers();
+  };
+
+  window.unbanUser = async (uid, name) => {
+    if (!currentUser || currentUser.email !== ADMIN_EMAIL || !db) return;
+    await remove(ref(db, `banned/${uid}`));
+    showToast(`${name} unbanned`, '#4ade80');
+    loadBannedUsers();
+  };
+
+  window.loadBannedUsers = async () => {
+    const container = document.getElementById('bannedUsersList');
+    if (!container || !db) return;
+    const snap = await get(ref(db, 'banned'));
+    if (!snap.exists()) {
+      container.innerHTML = '<span style="color:rgba(245,245,240,0.25);font-style:italic;">No banned users</span>';
+      return;
+    }
+    const users = [];
+    snap.forEach(child => users.push({ uid: child.key, ...child.val() }));
+    container.innerHTML = users.map(u => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:0.45rem 0;border-bottom:1px solid rgba(245,245,240,0.05);">
+        <div>
+          <span style="font-weight:700;">${esc(u.name || u.uid)}</span>
+          <span style="font-size:0.72rem;color:rgba(245,245,240,0.3);margin-left:0.5rem;">${u.bannedAt ? new Date(u.bannedAt).toLocaleDateString() : ''}</span>
+        </div>
+        <button class="unban-btn" onclick="unbanUser('${u.uid}','${esc(u.name||'')}')">Unban</button>
+      </div>
+    `).join('');
+  };
+
+  window.clearAllBanned = async () => {
+    if (!currentUser || currentUser.email !== ADMIN_EMAIL || !db) return;
+    if (!confirm('Clear the entire ban list? Everyone will be able to sign in again.')) return;
+    await remove(ref(db, 'banned'));
+    showToast('Ban list cleared', '#4ade80');
+    loadBannedUsers();
+  };
+
+  window.removeUser = async (uid, name) => {
+    if (!currentUser || currentUser.email !== ADMIN_EMAIL || !db) return;
+    if (!confirm(`Remove ${name}? Their account data will be wiped so they can re-register fresh. They won't be banned.`)) return;
+    try {
+      await Promise.all([
+        remove(ref(db, `presence/${uid}`)),
+        remove(ref(db, `signups/${uid}`)),
+        remove(ref(db, `profiles/${uid}`)),
+      ]);
+      adminData = adminData.filter(p => p.uid !== uid);
+      renderAdminTable(adminData);
+      showToast(`${name} removed`, '#4ade80');
+    } catch(e) {
+      showToast('Error: ' + e.message, '#ee4266');
+    }
+  };
+
+  // Decode safe Firebase key back to reaction key
+  function decodeReactionKey(safeKey) {
+    return safeKey.replace(/__/g, ':');
+  }
+
+  function loadReactions(msgKey) {
+    if (!db || !msgKey) return;
+    const channel = currentChannel; // capture at call time — don't close over mutable var
+    const rRef = ref(db, `channels/${channel}/reactions/${msgKey}`);
+    const unsub = onValue(rRef, snap => {
+      const bar = document.getElementById(`reactions-${msgKey}`);
+      if (!bar) return;
+      bar.innerHTML = '';
+      if (!snap.exists()) return;
+      const data = snap.val(); // { "👍": { uid1: true, uid2: true }, "img__brain": { uid1: true } }
+      Object.entries(data).forEach(([rawKey, uids]) => {
+        const reactionKey = decodeReactionKey(rawKey);
+        if (!uids || typeof uids !== 'object') return;
+        const count = Object.keys(uids).length;
+        if (count === 0) return;
+        const myUid = auth?.currentUser?.uid || (currentUser ? currentUser.uid : null);
+        const reacted = myUid && uids[myUid];
+        const pill = document.createElement('button');
+        pill.className = 'reaction-pill' + (reacted ? ' reacted' : '');
+
+        let display;
+        if (reactionKey.startsWith('img:')) {
+          const id = reactionKey.slice(4);
+          const imgR = IMG_REACTIONS.find(r => r.id === id);
+          const src = imgR ? imgR.src : '';
+          const label = imgR ? imgR.label : id;
+          pill.title = (reacted ? 'Remove ' : 'Add ') + label;
+          display = `<img src="${src}" style="width:16px;height:16px;object-fit:contain;border-radius:3px;vertical-align:middle;">`;
+        } else {
+          pill.title = reacted ? 'Click to remove' : 'Click to react';
+          display = reactionKey;
+        }
+
+        pill.innerHTML = `${display}<span class="reaction-count">${count}</span>`;
+        pill.onclick = () => toggleReaction(msgKey, reactionKey);
+        bar.appendChild(pill);
+      });
+    });
+    reactionUnsubs[msgKey] = unsub;
+  }
+</script>
+
+<!-- Google Identity Services -->
+<script src="https://accounts.google.com/gsi/client" async></script>
+</body>
+</html>

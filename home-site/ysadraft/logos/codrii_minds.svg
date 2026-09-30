@@ -1,0 +1,113 @@
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="circ">
+      <circle cx="250" cy="250" r="250"/>
+    </clipPath>
+    <radialGradient id="bg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1a1a1a"/>
+      <stop offset="100%" stop-color="#000000"/>
+    </radialGradient>
+    <!-- Neon glow: two blur passes layered under the original stroke -->
+    <filter id="neon" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="7" result="bigBlur"/>
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="smallBlur"/>
+      <feMerge>
+        <feMergeNode in="bigBlur"/>
+        <feMergeNode in="smallBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <g clip-path="url(#circ)">
+    <!-- Background -->
+    <circle cx="250" cy="250" r="250" fill="url(#bg)"/>
+
+    <!-- ════ DEER BODY OUTLINE ════ -->
+    <!-- Single closed path: clockwise from nose tip, over head/back/rump,
+         then belly/chest/chin back to nose -->
+    <path d="
+      M 362,210
+      C 355,200 345,186 332,178
+      C 325,172 318,168 313,163
+      L 306,153
+      L 302,163
+      C 297,171 293,183 292,196
+      C 291,208 288,222 282,234
+      C 274,245 258,250 240,252
+      C 222,253 204,253 187,253
+      C 172,253 160,257 152,267
+      C 147,273 144,281 146,289
+      C 148,297 155,307 165,311
+      C 178,315 197,315 217,313
+      C 237,311 257,309 274,305
+      C 284,301 293,295 296,286
+      C 299,277 299,267 300,257
+      C 303,246 309,236 318,228
+      C 325,222 334,216 342,213
+      C 349,209 356,208 360,208
+      C 361,208 362,209 362,210 Z"
+      fill="none" stroke="#EE4266" stroke-width="9"
+      stroke-linecap="round" stroke-linejoin="round"
+      filter="url(#neon)"/>
+
+    <!-- Tail: small bump at the rump (left side of deer) -->
+    <path d="M 145,276 C 135,269 130,259 137,252 C 143,247 153,251 152,258"
+      fill="none" stroke="#EE4266" stroke-width="7"
+      stroke-linecap="round" filter="url(#neon)"/>
+
+    <!-- ════ LEGS ════ -->
+    <!-- Front right leg: forward, slightly raised (rearing) -->
+    <path d="M 296,284 C 300,300 305,320 309,340 C 312,356 313,372 311,392"
+      fill="none" stroke="#EE4266" stroke-width="9"
+      stroke-linecap="round" filter="url(#neon)"/>
+
+    <!-- Front left leg: planted, slightly behind -->
+    <path d="M 278,290 C 276,308 274,328 271,348 C 269,364 268,380 269,402"
+      fill="none" stroke="#EE4266" stroke-width="9"
+      stroke-linecap="round" filter="url(#neon)"/>
+
+    <!-- Back right leg: forward stride -->
+    <path d="M 196,290 C 194,310 192,332 190,354 C 188,372 188,390 190,412"
+      fill="none" stroke="#EE4266" stroke-width="9"
+      stroke-linecap="round" filter="url(#neon)"/>
+
+    <!-- Back left leg: back stride (angled slightly rearward) -->
+    <path d="M 177,286 C 173,305 167,327 162,349 C 158,366 157,384 159,408"
+      fill="none" stroke="#EE4266" stroke-width="9"
+      stroke-linecap="round" filter="url(#neon)"/>
+
+    <!-- ════ ANTLERS ════ -->
+    <!-- Left antler: main beam arcing up-left from poll -->
+    <path d="M 311,162 C 307,146 300,128 292,112 C 286,99 281,87 280,76"
+      fill="none" stroke="#EE4266" stroke-width="8"
+      stroke-linecap="round" filter="url(#neon)"/>
+    <!-- Left antler: brow tine (forward tine) -->
+    <path d="M 292,112 C 299,103 311,98 323,96"
+      fill="none" stroke="#EE4266" stroke-width="7"
+      stroke-linecap="round" filter="url(#neon)"/>
+    <!-- Left antler: rear tine -->
+    <path d="M 300,128 C 292,118 285,107 282,95"
+      fill="none" stroke="#EE4266" stroke-width="7"
+      stroke-linecap="round" filter="url(#neon)"/>
+
+    <!-- Right antler: main beam arcing up-right -->
+    <path d="M 321,158 C 330,142 340,125 350,110 C 358,97 364,86 366,76"
+      fill="none" stroke="#EE4266" stroke-width="8"
+      stroke-linecap="round" filter="url(#neon)"/>
+    <!-- Right antler: forward tine -->
+    <path d="M 350,110 C 358,101 370,97 380,95"
+      fill="none" stroke="#EE4266" stroke-width="7"
+      stroke-linecap="round" filter="url(#neon)"/>
+
+    <!-- ════ GOLD 4-POINTED STAR ════ -->
+    <!-- Center (315, 78), outer R=28, inner r=10 -->
+    <!-- Outer tips: top(315,50) right(343,78) bottom(315,106) left(287,78) -->
+    <!-- Inner at 45deg: r*cos45=7.07 -->
+    <!-- Top-right inner: (322.1,70.9)  Bottom-right: (322.1,85.1) -->
+    <!-- Bottom-left inner: (307.9,85.1) Top-left: (307.9,70.9)   -->
+    <polygon
+      points="315,50 322.1,70.9 343,78 322.1,85.1 315,106 307.9,85.1 287,78 307.9,70.9"
+      fill="#F1B643"/>
+  </g>
+</svg>
