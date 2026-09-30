@@ -1,0 +1,85 @@
+import { useState } from 'react'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { useAuth } from '../AuthContext'
+
+// Main YSA website. Set VITE_YSA_HOME_URL at build time to point somewhere else.
+const YSA_HOME_URL = import.meta.env.VITE_YSA_HOME_URL || 'https://youngscientistacademy.org'
+
+export default function Nav() {
+  const { user, logout, isTeacher, isAdmin, isTeachSTEM, isProgramStaff } = useAuth()
+  const navigate = useNavigate()
+  const [open, setOpen] = useState(false)
+
+  const handleLogout = () => {
+    setOpen(false)
+    logout()
+    navigate('/login')
+  }
+
+  return (
+    <nav className="nav">
+      <Link to="/" className="nav__brand" onClick={() => setOpen(false)}>
+        <div className="nav__logo-box">
+          <img src="/logo.png" alt="Young Scientist Academy" className="nav__logo-img" />
+        </div>
+      </Link>
+
+      <button
+        type="button"
+        className="nav__toggle"
+        aria-label="Toggle menu"
+        aria-expanded={open}
+        onClick={() => setOpen(o => !o)}
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <div className={'nav__links' + (open ? ' nav__links--open' : '')} onClick={() => setOpen(false)}>
+        <a href={YSA_HOME_URL} className="nav__link">YSA Home</a>
+
+        {!user && (
+          <>
+            <NavLink to="/" className={({ isActive }) => 'nav__link' + (isActive ? ' nav__link--active' : '')}>Library</NavLink>
+            <NavLink to="/login" className={({ isActive }) => 'nav__link' + (isActive ? ' nav__link--active' : '')}>Log in</NavLink>
+          </>
+        )}
+
+        {user && isTeacher && (
+          <>
+            <NavLink to="/" className={({ isActive }) => 'nav__link' + (isActive ? ' nav__link--active' : '')}>Lesson Library</NavLink>
+            <NavLink to="/teacher" className={({ isActive }) => 'nav__link' + (isActive ? ' nav__link--active' : '')}>Teaching Dashboard</NavLink>
+            <NavLink to="/teacher/modules" className={({ isActive }) => 'nav__link' + (isActive ? ' nav__link--active' : '')}>Modules</NavLink>
+            <NavLink to="/teacher/forum" className={({ isActive }) => 'nav__link' + (isActive ? ' nav__link--active' : '')}>Forum</NavLink>
+            {isTeachSTEM && (
+              <NavLink to="/teach-stem" className={({ isActive }) => 'nav__link' + (isActive ? ' nav__link--active' : '')}>Teach STEM</NavLink>
+            )}
+            {isProgramStaff && (
+              <NavLink to="/program-staff" className={({ isActive }) => 'nav__link' + (isActive ? ' nav__link--active' : '')}>Staff</NavLink>
+            )}
+            {isTeachSTEM && (
+              <NavLink to="/teacher/activity/create" className={({ isActive }) => 'nav__link' + (isActive ? ' nav__link--active' : '')}>Create a Lesson</NavLink>
+            )}
+            {isAdmin && (
+              <NavLink to="/admin" className={({ isActive }) => 'nav__link' + (isActive ? ' nav__link--active' : '')}>Admin</NavLink>
+            )}
+          </>
+        )}
+
+        {user && !isTeacher && (
+          <>
+            <NavLink to="/student" className={({ isActive }) => 'nav__link' + (isActive ? ' nav__link--active' : '')}>My Classrooms</NavLink>
+            <NavLink to="/join" className={({ isActive }) => 'nav__link' + (isActive ? ' nav__link--active' : '')}>Join Classroom</NavLink>
+          </>
+        )}
+
+        {user && (
+          <button onClick={handleLogout} className="nav__link" style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
+            Log out
+          </button>
+        )}
+      </div>
+    </nav>
+  )
+}
