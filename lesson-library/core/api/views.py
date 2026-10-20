@@ -16,7 +16,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from core.models import (
     Activity, ActivitySection, ActivityPrompt, SectionLink,
     GradeLevel, Standard, Concept, Classroom, Module, ModuleActivity,
-    TeacherProfile, StudentResponse, TeacherFeedback, ActivityFile,
+    TeacherProfile, StudentProfile, StudentResponse, TeacherFeedback, ActivityFile,
     ClassroomSectionPoints, StudentSectionScore, TeacherProjectReflection, ReflectionFile,
     TeachSTEMProfile, TeachSTEMTask,
     TeachSTEMTaskCompletion, ProjectTopicSubmission, ProjectStarter, TopicSuggestion, TStemSurveyResponse, TeacherSurveyResponse,
@@ -99,6 +99,7 @@ def api_register_student(request):
     username = request.data.get('username', '').strip()
     password = request.data.get('password', '')
     classroom_code = request.data.get('classroom_code', '').strip().upper()
+    program = request.data.get('program', '') or ''
     if not (first and last and username and password):
         return Response({'error': 'All fields are required.'}, status=400)
     if User.objects.filter(username=username).exists():
@@ -109,10 +110,13 @@ def api_register_student(request):
             classroom = Classroom.objects.get(code=classroom_code)
         except Classroom.DoesNotExist:
             return Response({'error': 'Invalid classroom code.'}, status=400)
+    if program not in dict(StudentProfile.PROGRAM_CHOICES):
+        return Response({'error': 'Invalid program.'}, status=400)
     user = User.objects.create_user(
         username=username, password=password,
         first_name=first, last_name=last,
     )
+    StudentProfile.objects.create(user=user, program=program)
     if classroom:
         classroom.students.add(user)
     tokens = _tokens_for_user(user)

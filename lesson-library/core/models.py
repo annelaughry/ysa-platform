@@ -299,6 +299,21 @@ class TeacherProfile(models.Model):
         return f"{self.user.get_full_name() or self.user.username} ({status})"
 
 
+class StudentProfile(models.Model):
+    PROGRAM_CHOICES = [
+        ('', 'None'),
+        ('stem_explorer', 'STEM Explorer'),
+        ('global_ambassador', 'Global Ambassador'),
+    ]
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='student_profile')
+    program = models.CharField(max_length=30, choices=PROGRAM_CHOICES, blank=True, default='')
+
+    def __str__(self):
+        name = self.user.get_full_name() or self.user.username
+        return f"{name} ({self.get_program_display()})" if self.program else name
+
+
 class TeachSTEMTask(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)

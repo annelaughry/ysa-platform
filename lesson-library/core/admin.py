@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Activity, ActivitySection, ActivityPrompt, GradeLevel, Standard, Strand, Concept, TeacherProfile, Classroom, StudentResponse, TeacherFeedback
+from .models import Activity, ActivitySection, ActivityPrompt, GradeLevel, Standard, Strand, Concept, TeacherProfile, StudentProfile, Classroom, StudentResponse, TeacherFeedback
 
 
 @admin.register(GradeLevel)
@@ -35,6 +35,13 @@ class TeacherProfileAdmin(admin.ModelAdmin):
         count = queryset.update(is_approved=True)
         self.message_user(request, f"{count} teacher account(s) approved.")
     approve_teachers.short_description = "Approve selected teacher accounts"
+
+
+@admin.register(StudentProfile)
+class StudentProfileAdmin(admin.ModelAdmin):
+    list_display = ('user', 'program')
+    list_filter = ('program',)
+    search_fields = ('user__username', 'user__first_name', 'user__last_name')
 
 
 @admin.register(Classroom)

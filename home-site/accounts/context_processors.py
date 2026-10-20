@@ -7,4 +7,5 @@ def ysa_links(request):
     return {
         'LESSON_LIBRARY_URL': base + '/',
         'LESSON_LIBRARY_REGISTER_URL': base + '/register',
+        'LESSON_LIBRARY_STUDENT_REGISTER_URL': base + '/register/student',
     }

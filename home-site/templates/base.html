@@ -141,6 +141,21 @@
       transition: box-shadow 0.15s;
     }
     .nav-avatar:hover { box-shadow: 0 0 0 3px rgba(60,187,177,0.35); }
+    .nav-logout-form { margin: 0; }
+    .nav-logout-btn {
+      padding: 0.4rem 0.9rem;
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      color: rgba(245,245,240,0.7);
+      font-family: inherit; font-size: 0.8rem; font-weight: 600;
+      cursor: pointer; white-space: nowrap;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .nav-logout-btn:hover {
+      border-color: rgba(238,66,102,0.5);
+      color: var(--pink);
+    }
 
     /* Hamburger */
     .nav-hamburger {
@@ -283,6 +298,10 @@
       <a href="{% url 'accounts:profile' %}" class="nav-avatar" title="{{ user.username }}">
         {{ user.username|first|upper }}
       </a>
+      <form method="post" action="{% url 'accounts:logout' %}" class="nav-logout-form">
+        {% csrf_token %}
+        <button type="submit" class="nav-logout-btn">Log out</button>
+      </form>
     {% else %}
       <a href="{% url 'accounts:login' %}" class="nav-login-btn">Login &rarr;</a>
     {% endif %}

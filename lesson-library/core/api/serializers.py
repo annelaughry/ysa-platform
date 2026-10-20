@@ -19,11 +19,13 @@ class UserSerializer(serializers.ModelSerializer):
     is_pending      = serializers.SerializerMethodField()
     is_teach_stem   = serializers.SerializerMethodField()
     is_program_staff = serializers.SerializerMethodField()
+    student_program = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = ['id', 'username', 'first_name', 'last_name', 'email',
-                  'is_staff', 'is_superuser', 'is_teacher', 'is_pending', 'is_teach_stem', 'is_program_staff']
+                  'is_staff', 'is_superuser', 'is_teacher', 'is_pending', 'is_teach_stem', 'is_program_staff',
+                  'student_program']
 
     def get_is_teacher(self, obj):
         if obj.is_staff or obj.is_superuser:
@@ -38,6 +40,9 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_is_program_staff(self, obj):
         return hasattr(obj, 'teacher_profile') and obj.teacher_profile.program_staff_approved
+
+    def get_student_program(self, obj):
+        return obj.student_profile.program if hasattr(obj, 'student_profile') else ''
 
 
 class GradeLevelSerializer(serializers.ModelSerializer):
